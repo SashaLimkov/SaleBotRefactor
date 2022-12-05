@@ -32,3 +32,15 @@ services:
       - postgresql-db
     networks:
       - app-network
+
+  bot:
+    restart: always
+    build:
+      context: ./
+    command: bash -c 'python ./src/manage.py startbot'
+    volumes:
+      - .:/app/
+    depends_on:
+      - web
+    networks:
+      - app-network
