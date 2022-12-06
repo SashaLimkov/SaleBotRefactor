@@ -43,11 +43,15 @@ SYSTEM_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+
+ADDITIONAL_APPS = [
     'nested_inline',
+    'django_celery_beat'
 ]
 
 if DEBUG:
-    SYSTEM_APPS.append('silk')
+    ADDITIONAL_APPS.append('silk')
 
 PROJECT_APPS = [
     'apps.message',
@@ -55,7 +59,7 @@ PROJECT_APPS = [
     'apps.utils'
 ]
 
-INSTALLED_APPS = SYSTEM_APPS + PROJECT_APPS
+INSTALLED_APPS = SYSTEM_APPS + ADDITIONAL_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -159,3 +163,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Bot settings
 
 BOT_TOKEN = env('BOT_TOKEN')
+
+# Celery and broker settings
+
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
