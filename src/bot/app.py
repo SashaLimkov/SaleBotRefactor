@@ -29,6 +29,6 @@ async def _on_shutdown(dispatcher: Dispatcher):
 
 def _setup_django():
     """Установка окружения Django внутри бота"""
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "telegrambot.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
     os.environ.update({"DJANGO_ALLOW_ASYNC_UNSAFE": "true"})
     django.setup()

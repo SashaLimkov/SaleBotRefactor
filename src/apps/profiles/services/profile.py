@@ -1,3 +1,5 @@
+from typing import Any
+
 from apps.profiles.models import Profile
 from apps.utils.services.date_time import get_datetime_now
 
@@ -17,7 +19,14 @@ def get_profile_by_telegram_id(telegram_id: int) -> Profile:
 
 def update_last_action_date_profile(telegram_id: int) -> None:
     """Обновляет время последнего действия пользователя и инкрементирует количество действий"""
-    profile = Profile.objects.get(telegram_id=telegram_id)
+    profile = Profile.objects.get(telegram_id=telegram_id).only('last_action_date', 'count_actions_in_current_day')
     profile.last_action_date = get_datetime_now()
     profile.count_actions_in_current_day += 1
+    profile.save()
+
+
+def update_field_profile(telegram_id: int, field: str, value: Any) -> None:
+    """Обновляет поле - field профиля на значение value"""
+    profile = Profile.objects.get(telegram_id=telegram_id).only(field)
+    profile.__setattr__(field, value)
     profile.save()

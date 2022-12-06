@@ -56,6 +56,8 @@ if DEBUG:
 PROJECT_APPS = [
     'apps.message',
     'apps.profiles',
+    'apps.posts',
+    'apps.settings',
     'apps.utils'
 ]
 
