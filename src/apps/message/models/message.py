@@ -8,7 +8,6 @@ class Message(TimeBasedModel):
     name = models.CharField('Название', max_length=60, unique=True)  # Поле используемое для получения сообщений из бота
     text = models.TextField('Текст', null=True, blank=True)
 
-
     def __str__(self):
         return f'{self.pk}# {self.name}'
 
