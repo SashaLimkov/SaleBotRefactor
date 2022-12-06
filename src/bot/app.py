@@ -2,7 +2,7 @@ from aiogram import Dispatcher
 from aiogram.utils import executor
 
 from .config import dp
-from . import handlers
+from . import filters, handlers
 
 import os
 import django

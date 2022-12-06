@@ -5,6 +5,7 @@ django-silk==5.0.2
 django-mptt==0.14.0
 django-nested-inline==0.4.5
 aiogram==2.23.1
+black==22.10.0
 redis==4.4.0
 aioredis==2.0.1
 celery==5.2.7
