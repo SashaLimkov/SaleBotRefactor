@@ -11,6 +11,11 @@ def add_settings(telegram_id: int) -> SettingsUser:
     return SettingsUser.objects.create(profile_id=telegram_id)
 
 
+def get_settings(telegram_id: int) -> SettingsUser:
+    """Возвращает настройки пользователя"""
+    return SettingsUser.objects.select_related('product_settings').get(profile_id=telegram_id)
+
+
 def update_field_settings(telegram_id: int, field: str, value: Any) -> None:
     """Обновляет поле - field профиля на значение value
     Возможные значения field: currency, formula, commission, rounder, logo, text_logo, logo_position,
