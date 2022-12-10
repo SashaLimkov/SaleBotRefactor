@@ -14,7 +14,7 @@ def get_user_active_subscription(telegram_id: int) -> Optional[Subscription]:
     if profile.is_helper:
         return Subscription.objects.filter(profile=profile.inviting_user, active=True).first()
     else:
-        return Subscription.objects.filter(profile=telegram_id, active=True).first()
+        return Subscription.objects.filter(profile_id=telegram_id, active=True).first()
 
 
 def create_user_subscription(telegram_id: int, cheque: str, rate: str) -> Subscription:

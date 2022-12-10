@@ -1,5 +1,5 @@
-from apps.profiles.models import Profile, Subscription
-from apps.settings.models import ChanelTelegram, ChanelVk, SettingsUser, ProductSettings
+from apps.profiles.models import Profile, Subscription, ProfileMetric
+from apps.settings.models import ChanelTelegram, ChanelVk, SettingsUser, ProductSettings, CourseUser
 
 from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
@@ -39,8 +39,19 @@ class SubscriptionInline(NestedStackedInline):
     extra = 0
 
 
+class CourseUserInline(NestedStackedInline):
+    model = CourseUser
+    extra = 0
+
+
+class ProfileMetricInline(NestedStackedInline):
+    model = ProfileMetric
+    extra = 0
+
+
 class ProfileAdmin(NestedModelAdmin):
-    inlines = [SettingsUserInline, HelpersProfileInline, SubscriptionInline, ChanelTelegramInline, ChanelVkInline]
+    inlines = [SettingsUserInline, HelpersProfileInline, SubscriptionInline, ChanelTelegramInline, ChanelVkInline,
+               CourseUserInline, ProfileMetricInline]
 
 
 admin.site.register(Profile, ProfileAdmin)

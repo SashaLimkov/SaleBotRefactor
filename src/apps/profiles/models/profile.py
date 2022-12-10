@@ -23,7 +23,10 @@ class Profile(TimeBasedModel):
     last_action_date = models.DateTimeField('Дата последней активности', default=get_datetime_now())
 
     activity = models.FloatField('Активность', default=0.0)
+
     count_actions_in_current_day = models.IntegerField('Количество действий за текущий день', default=0)
+    count_days_in_bot = models.IntegerField('Количество дней в боте', default=0)
+    count_actions = models.IntegerField('Общее количество действий', default=0)
 
     def __str__(self):
         return f'{self.telegram_id}# {self.username} | {self.first_name} {self.last_name}'

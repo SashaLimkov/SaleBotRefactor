@@ -33,7 +33,7 @@ class SettingsUser(TimeBasedModel):
     text_logo = models.CharField(verbose_name='Текстовый Логотип', max_length=255, blank=True, null=True)
     logo_position = models.CharField(max_length=10, verbose_name='Позиция лого', blank=True, null=True)
 
-    signature = models.TextField('Подпись', default="")
+    signature = models.TextField('Подпись', default="", blank=True)
     link = models.BooleanField('Короткая ссылка', default=False)
     hided_link = models.BooleanField('Ссылка в тексте', default=False)
 
