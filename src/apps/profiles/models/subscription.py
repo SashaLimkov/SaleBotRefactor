@@ -10,7 +10,7 @@ class Subscription(TimeBasedModel):
                                 verbose_name='Пользователь')
     datetime_buy = models.DateTimeField('Время покупки', default=get_datetime_now())
     datetime_end = models.DateTimeField('Время окончания подиски')
-    cheque = models.CharField('Чек', max_length=255)
+    cheque = models.CharField('Чек', max_length=255, null=True, blank=True)
     rate = models.ForeignKey(to='Rate', on_delete=models.SET_NULL, null=True, verbose_name='Тариф')
     days_left = models.IntegerField('Осталось дней')
 

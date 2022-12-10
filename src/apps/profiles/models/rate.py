@@ -4,6 +4,7 @@ from apps.utils.models import TimeBasedModel
 
 class Rate(TimeBasedModel):
     """Модель тарифов для подписок"""
+    displayed = models.BooleanField('Отображается', default=True)
     name = models.CharField('Название', max_length=255)
     description = models.TextField('Описание')
     price = models.FloatField('Цена')

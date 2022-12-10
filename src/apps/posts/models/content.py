@@ -16,8 +16,8 @@ class Content(TimeBasedModel):
         (DOCUMENT, 'Документ')
     )
 
-    post = models.ForeignKey(to='Post', on_delete=models.CASCADE, verbose_name='Пост')
-    file = models.FileField('Файл')
+    post = models.ForeignKey(to='Post', on_delete=models.CASCADE, related_name='contents', verbose_name='Пост')
+    file = models.FileField('Файл', upload_to='post_content')
     type = models.IntegerField('Тип файла', choices=TYPE_CHOICES)
 
     def __str__(self):

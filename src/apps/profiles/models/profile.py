@@ -11,6 +11,9 @@ class Profile(TimeBasedModel):
     is_blocked = models.BooleanField('Забанен', default=False)
     in_chat = models.BooleanField('В чате', default=False)
 
+    inviting_user = models.ForeignKey(to='self', blank=True, null=True, on_delete=models.CASCADE,
+                                      to_field='telegram_id', verbose_name='Пригласивший пользователь')
+
     telegram_id = models.BigIntegerField('ID Telegram', unique=True)
     username = models.CharField('Username Telegram', max_length=255, null=True, blank=True)
     first_name = models.CharField('Имя в Telegram', max_length=255, null=True, blank=True)

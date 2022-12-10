@@ -3,14 +3,18 @@ from typing import Optional, List, Union
 
 from django.db.models import QuerySet
 
-from apps.profiles.models import Subscription, Rate
+from apps.profiles.models import Subscription, Rate, Profile
 from apps.utils.services.date_time import get_datetime_now
 from django.db.models import F
 
 
 def get_user_active_subscription(telegram_id: int) -> Optional[Subscription]:
     """Получить активную подписку пользователя"""
-    return Subscription.objects.filter(profile_id=telegram_id, active=True).first()
+    profile = Profile.objects.get(telegram_id=telegram_id)
+    if profile.is_helper:
+        return Subscription.objects.filter(profile=profile.inviting_user, active=True).first()
+    else:
+        return Subscription.objects.filter(profile=telegram_id, active=True).first()
 
 
 def create_user_subscription(telegram_id: int, cheque: str, rate: str) -> Subscription:
