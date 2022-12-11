@@ -19,6 +19,9 @@ class Profile(TimeBasedModel):
     first_name = models.CharField('Имя в Telegram', max_length=255, null=True, blank=True)
     last_name = models.CharField('Фамилия в Telegram', max_length=255, null=True, blank=True)
 
+    phone = models.CharField('Номер телефона', max_length=15)
+    full_name = models.CharField('ФИО', max_length=255)
+
     registration_date = models.DateTimeField('Дата регистрации', default=get_datetime_now())
     last_action_date = models.DateTimeField('Дата последней активности', default=get_datetime_now())
 

@@ -7,20 +7,22 @@ from apps.settings.services.settings_user import add_settings
 from apps.utils.services.date_time import get_datetime_now
 
 
-def create_user(telegram_id: int, username: str = None, first_name: str = None,
+def create_user(telegram_id: int, phone: str, full_name: str, username: str = None, first_name: str = None,
                 last_name: str = None, is_helper: bool = False) -> Profile:
     """Создает профиль пользователя и соответствующие настройки"""
-    profile = _create_profile(telegram_id, username, first_name, last_name, is_helper)
+    profile = _create_profile(telegram_id, phone, full_name, username, first_name, last_name, is_helper)
     settings = add_settings(telegram_id)
     add_product_settings(settings.id)
     create_user_subscription(telegram_id, 'Старт пробной подписки', 'Пробный')
     return profile
 
 
-def _create_profile(telegram_id: int, username: str = None, first_name: str = None,
+def _create_profile(telegram_id: int, phone: str, full_name: str, username: str = None, first_name: str = None,
                     last_name: str = None, is_helper: bool = False) -> Profile:
     """Создание профиля пользователя бота """
     return Profile.objects.create(telegram_id=telegram_id,
+                                  phone=phone,
+                                  full_name=full_name,
                                   username=username,
                                   first_name=first_name,
                                   last_name=last_name,
