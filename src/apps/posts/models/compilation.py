@@ -24,7 +24,7 @@ class Compilation(TimeBasedModel):
 class FinalCompilation(TimeBasedModel):
     """Модель финальной подборки"""
     compilation = models.ForeignKey(to='Compilation', on_delete=models.CASCADE, verbose_name='Подборка')
-    text = models.TextField('Текст поста обзора')
+    text = models.TextField('Текст ГИДа')
 
     message_id = models.BigIntegerField('ID Сообщения', blank=True, null=True)
 
