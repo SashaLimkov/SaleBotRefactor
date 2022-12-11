@@ -11,11 +11,8 @@ async def start_command(message: types.Message, state: FSMContext):
     if main_message_id:
         await message.delete()
         await try_delete_message(chat_id=message.chat.id, message_id=main_message_id)
-    args = message.get_args()
-    if args:
-        pass
     mes = await bot.send_message(
         chat_id=message.chat.id,
-        text="Чтобы продолжить надо пройти регистрацию",
+        text="алло",
     )
     await state.update_data({"main_message_id": mes.message_id})
