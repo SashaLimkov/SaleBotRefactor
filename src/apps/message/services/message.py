@@ -20,4 +20,4 @@ def get_message_by_name_for_user(name: str, telegram_id: int = None) -> Message 
 
 def _get_message_by_name(name: str) -> Message:
     """Возвращает сообщение по названию"""
-    return Message.objects.select_related('keyboard').prefetch_related('keyboard__button_set').get(name=name)
+    return Message.objects.select_related('keyboard').prefetch_related('keyboard__button_set').filter(name=name).first()
