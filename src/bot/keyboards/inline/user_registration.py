@@ -6,7 +6,7 @@ __all__ = [
 
 
 async def get_start_registration_keyboard():
-    await get_base_keyboard(
+    return await get_base_keyboard(
         buttons=[
             {
                 "text": "Начать регистрацию",
