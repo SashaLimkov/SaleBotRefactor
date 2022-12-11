@@ -13,4 +13,4 @@ def get_list_compilations_by_date(date: datetime.date) -> Union[QuerySet, List[C
 
 def get_compilation_by_id(compilation_id: int) -> Compilation:
     """Возвращает подборку по названию"""
-    return Compilation.objects.get(pk=compilation_id)
+    return Compilation.objects.filter(pk=compilation_id).first()
