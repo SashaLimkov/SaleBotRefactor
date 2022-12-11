@@ -29,25 +29,31 @@ def _create_profile(telegram_id: int, username: str = None, first_name: str = No
 
 def get_profile_by_telegram_id(telegram_id: int) -> Profile:
     """Возвращает Profile пользователя по telegram_id"""
-    return Profile.objects.get(telegram_id=telegram_id)
+    return Profile.objects.filter(telegram_id=telegram_id).first()
 
 
 def get_profile_is_helper(telegram_id: int) -> bool:
     """Проверяет, является ли пользователь помощником"""
-    return Profile.objects.get(telegram_id=telegram_id).is_helper
+    return Profile.objects.filter(telegram_id=telegram_id).first().is_helper
 
 
 def update_last_action_date_profile(telegram_id: int) -> None:
     """Обновляет время последнего действия пользователя и инкрементирует количество действий"""
-    profile = Profile.objects.get(telegram_id=telegram_id)
-    profile.last_action_date = get_datetime_now()
-    profile.count_actions_in_current_day += 1
-    profile.save()
+    profile = Profile.objects.filter(telegram_id=telegram_id).first()
+    if profile:
+        profile.last_action_date = get_datetime_now()
+        profile.count_actions_in_current_day += 1
+        profile.save()
+    else:
+        raise 'Profile not found'
 
 
 def update_field_profile(telegram_id: int, field: str, value: Any) -> None:
     """Обновляет поле - field профиля на значение value
     Возможные значения field: is_active, is_helper, is_blocked, in_chat"""
-    profile = Profile.objects.get(telegram_id=telegram_id)
-    profile.__setattr__(field, value)
-    profile.save()
+    profile = Profile.objects.filter(telegram_id=telegram_id).first()
+    if profile:
+        profile.__setattr__(field, value)
+        profile.save()
+    else:
+        raise 'Profile not found'
