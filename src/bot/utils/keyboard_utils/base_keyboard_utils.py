@@ -2,7 +2,7 @@ from aiogram import types
 
 
 async def get_base_keyboard(buttons: list,
-                            keyboard_options: dict,
+                            keyboard_options: dict = {},
                             is_inline: bool = True) -> types.InlineKeyboardMarkup | types.ReplyKeyboardMarkup:
     """
     :param buttons: list of json for buttons with button_options
