@@ -8,15 +8,12 @@ __all__ = [
 async def get_user_contact():
     keyboard = await get_base_keyboard(
         buttons=[
-            {
-                "text": "Отправить номер",
-                "request_contact": True
-            },
+            {"text": "Отправить номер", "request_contact": True},
         ],
         keyboard_options={
             "resize_keyboard": True,
         },
-        is_inline=False
+        is_inline=False,
     )
     print(keyboard)
     return keyboard

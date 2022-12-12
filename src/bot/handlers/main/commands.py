@@ -16,13 +16,14 @@ async def start_command(message: types.Message, state: FSMContext):
     main_message_id = data.get("main_message_id", False)
     user_id = message.chat.id
     user = get_profile_by_telegram_id(telegram_id=user_id)
-    text = get_message_by_name_for_user(name="confirm_registration", telegram_id=user_id).text.format(
-        name=user.first_name)
+    text = get_message_by_name_for_user(
+        name="confirm_registration", telegram_id=user_id
+    ).text.format(name=user.first_name)
     await message.delete()
     await mw.try_send_message(
         user_id=user_id,
         text=text,
         message=message,
         state=state,
-        keyboard=await ik.get_main_menu(user.in_chat)
+        keyboard=await ik.get_main_menu(user.in_chat),
     )

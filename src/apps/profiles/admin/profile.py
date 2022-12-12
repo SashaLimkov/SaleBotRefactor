@@ -1,5 +1,11 @@
 from apps.profiles.models import Profile, Subscription, ProfileMetric
-from apps.settings.models import ChanelTelegram, ChanelVk, SettingsUser, ProductSettings, CourseUser
+from apps.settings.models import (
+    ChanelTelegram,
+    ChanelVk,
+    SettingsUser,
+    ProductSettings,
+    CourseUser,
+)
 
 from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
@@ -8,8 +14,8 @@ from django.contrib import admin
 
 class HelpersProfileInline(NestedStackedInline):
     model = Profile
-    verbose_name = 'Помощник'
-    verbose_name_plural = 'Помощники'
+    verbose_name = "Помощник"
+    verbose_name_plural = "Помощники"
     extra = 0
 
 
@@ -50,8 +56,15 @@ class ProfileMetricInline(NestedStackedInline):
 
 
 class ProfileAdmin(NestedModelAdmin):
-    inlines = [SettingsUserInline, HelpersProfileInline, SubscriptionInline, ChanelTelegramInline, ChanelVkInline,
-               CourseUserInline, ProfileMetricInline]
+    inlines = [
+        SettingsUserInline,
+        HelpersProfileInline,
+        SubscriptionInline,
+        ChanelTelegramInline,
+        ChanelVkInline,
+        CourseUserInline,
+        ProfileMetricInline,
+    ]
 
 
 admin.site.register(Profile, ProfileAdmin)

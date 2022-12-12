@@ -9,78 +9,191 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Profile',
+            name="Profile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('telegram_id', models.BigIntegerField(unique=True, verbose_name='ID Telegram')),
-                ('username', models.CharField(blank=True, max_length=255, null=True, verbose_name='Username Telegram')),
-                ('first_name', models.CharField(blank=True, max_length=255, null=True, verbose_name='Имя в Telegram')),
-                ('last_name', models.CharField(blank=True, max_length=255, null=True, verbose_name='Фамилия в Telegram')),
-                ('registration_date', models.DateTimeField(default=datetime.datetime(2022, 12, 6, 7, 36, 47, 804041), verbose_name='Дата регистрации')),
-                ('last_action_date', models.DateTimeField(default=datetime.datetime(2022, 12, 6, 7, 36, 47, 804059), verbose_name='Дата последней активности')),
-                ('activity', models.FloatField(default=0.0, verbose_name='Активность')),
-                ('count_actions_in_current_day', models.IntegerField(default=0, verbose_name='Количество действий за текущий день')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "telegram_id",
+                    models.BigIntegerField(unique=True, verbose_name="ID Telegram"),
+                ),
+                (
+                    "username",
+                    models.CharField(
+                        blank=True,
+                        max_length=255,
+                        null=True,
+                        verbose_name="Username Telegram",
+                    ),
+                ),
+                (
+                    "first_name",
+                    models.CharField(
+                        blank=True,
+                        max_length=255,
+                        null=True,
+                        verbose_name="Имя в Telegram",
+                    ),
+                ),
+                (
+                    "last_name",
+                    models.CharField(
+                        blank=True,
+                        max_length=255,
+                        null=True,
+                        verbose_name="Фамилия в Telegram",
+                    ),
+                ),
+                (
+                    "registration_date",
+                    models.DateTimeField(
+                        default=datetime.datetime(2022, 12, 6, 7, 36, 47, 804041),
+                        verbose_name="Дата регистрации",
+                    ),
+                ),
+                (
+                    "last_action_date",
+                    models.DateTimeField(
+                        default=datetime.datetime(2022, 12, 6, 7, 36, 47, 804059),
+                        verbose_name="Дата последней активности",
+                    ),
+                ),
+                ("activity", models.FloatField(default=0.0, verbose_name="Активность")),
+                (
+                    "count_actions_in_current_day",
+                    models.IntegerField(
+                        default=0, verbose_name="Количество действий за текущий день"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Пользователь Telegram',
-                'verbose_name_plural': 'Пользователи Telegram',
+                "verbose_name": "Пользователь Telegram",
+                "verbose_name_plural": "Пользователи Telegram",
             },
         ),
         migrations.CreateModel(
-            name='Rate',
+            name="Rate",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=255, verbose_name='Название')),
-                ('description', models.TextField(verbose_name='Описание')),
-                ('price', models.FloatField(verbose_name='Цена')),
-                ('currency', models.CharField(max_length=5, verbose_name='Идентификатор валюты')),
-                ('count_day_sub', models.IntegerField(verbose_name='Количество дней подписки')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=255, verbose_name="Название")),
+                ("description", models.TextField(verbose_name="Описание")),
+                ("price", models.FloatField(verbose_name="Цена")),
+                (
+                    "currency",
+                    models.CharField(max_length=5, verbose_name="Идентификатор валюты"),
+                ),
+                (
+                    "count_day_sub",
+                    models.IntegerField(verbose_name="Количество дней подписки"),
+                ),
             ],
             options={
-                'verbose_name': 'Тариф',
-                'verbose_name_plural': 'Тарифы',
+                "verbose_name": "Тариф",
+                "verbose_name_plural": "Тарифы",
             },
         ),
         migrations.CreateModel(
-            name='Subscription',
+            name="Subscription",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('active', models.BooleanField(default=True, verbose_name='Активна')),
-                ('datetime_buy', models.DateTimeField(default=datetime.datetime(2022, 12, 6, 7, 36, 47, 810589), verbose_name='Время покупки')),
-                ('datetime_end', models.DateTimeField(verbose_name='Время окончания подиски')),
-                ('cheque', models.CharField(max_length=255, verbose_name='Чек')),
-                ('days_left', models.IntegerField(verbose_name='Осталось дней')),
-                ('profile', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='profiles.profile', to_field='telegram_id', verbose_name='Пользователь')),
-                ('rate', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='profiles.rate', verbose_name='Тариф')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("active", models.BooleanField(default=True, verbose_name="Активна")),
+                (
+                    "datetime_buy",
+                    models.DateTimeField(
+                        default=datetime.datetime(2022, 12, 6, 7, 36, 47, 810589),
+                        verbose_name="Время покупки",
+                    ),
+                ),
+                (
+                    "datetime_end",
+                    models.DateTimeField(verbose_name="Время окончания подиски"),
+                ),
+                ("cheque", models.CharField(max_length=255, verbose_name="Чек")),
+                ("days_left", models.IntegerField(verbose_name="Осталось дней")),
+                (
+                    "profile",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="profiles.profile",
+                        to_field="telegram_id",
+                        verbose_name="Пользователь",
+                    ),
+                ),
+                (
+                    "rate",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="profiles.rate",
+                        verbose_name="Тариф",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Подписка',
-                'verbose_name_plural': 'Подписки',
+                "verbose_name": "Подписка",
+                "verbose_name_plural": "Подписки",
             },
         ),
         migrations.CreateModel(
-            name='ProfileMetric',
+            name="ProfileMetric",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('date', models.DateField()),
-                ('count_actions', models.IntegerField()),
-                ('profile', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='profiles.profile', to_field='telegram_id')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("date", models.DateField()),
+                ("count_actions", models.IntegerField()),
+                (
+                    "profile",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="profiles.profile",
+                        to_field="telegram_id",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

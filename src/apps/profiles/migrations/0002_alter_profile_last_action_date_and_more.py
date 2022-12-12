@@ -7,23 +7,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('profiles', '0001_initial'),
+        ("profiles", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='profile',
-            name='last_action_date',
-            field=models.DateTimeField(default=datetime.datetime(2022, 12, 6, 8, 33, 1, 693738), verbose_name='Дата последней активности'),
+            model_name="profile",
+            name="last_action_date",
+            field=models.DateTimeField(
+                default=datetime.datetime(2022, 12, 6, 8, 33, 1, 693738),
+                verbose_name="Дата последней активности",
+            ),
         ),
         migrations.AlterField(
-            model_name='profile',
-            name='registration_date',
-            field=models.DateTimeField(default=datetime.datetime(2022, 12, 6, 8, 33, 1, 693720), verbose_name='Дата регистрации'),
+            model_name="profile",
+            name="registration_date",
+            field=models.DateTimeField(
+                default=datetime.datetime(2022, 12, 6, 8, 33, 1, 693720),
+                verbose_name="Дата регистрации",
+            ),
         ),
         migrations.AlterField(
-            model_name='subscription',
-            name='datetime_buy',
-            field=models.DateTimeField(default=datetime.datetime(2022, 12, 6, 8, 33, 1, 695387), verbose_name='Время покупки'),
+            model_name="subscription",
+            name="datetime_buy",
+            field=models.DateTimeField(
+                default=datetime.datetime(2022, 12, 6, 8, 33, 1, 695387),
+                verbose_name="Время покупки",
+            ),
         ),
     ]

@@ -13,8 +13,8 @@ class EasyInlineKeyboard(Base):
     """Default EasyInlineKeyboard class"""
 
     def __call__(
-            self,
-            slice_: slice = slice(None, None, None),
+        self,
+        slice_: slice = slice(None, None, None),
     ) -> InlineKeyboardMarkup:
         """
         :return:
@@ -22,8 +22,8 @@ class EasyInlineKeyboard(Base):
         return self.slice(slice_)
 
     def slice(
-            self,
-            slice_: slice = slice(None, None, None),
+        self,
+        slice_: slice = slice(None, None, None),
     ) -> InlineKeyboardMarkup:
         """
         :return:
@@ -153,8 +153,8 @@ class EasyInlineKeyboard(Base):
 
             if not isinstance(keyboard, InlineKeyboardMarkup):
                 type_error_message = (
-                        "Keyboard cannot be %s. Only InlineKeyboardMarkup allowed."
-                        % type(keyboard)
+                    "Keyboard cannot be %s. Only InlineKeyboardMarkup allowed."
+                    % type(keyboard)
                 )
                 raise TypeError(type_error_message)
             data.extend(keyboard.inline_keyboard)
@@ -162,10 +162,10 @@ class EasyInlineKeyboard(Base):
 
     @classmethod
     def combine(
-            cls,
-            keyboards: Optional[
-                Union[Tuple[InlineKeyboardMarkup, ...], InlineKeyboardMarkup]
-            ] = None,
+        cls,
+        keyboards: Optional[
+            Union[Tuple[InlineKeyboardMarkup, ...], InlineKeyboardMarkup]
+        ] = None,
     ) -> InlineKeyboardMarkup:
         """
         This function combines multiple InlineKeyboardMarkup objects into one.

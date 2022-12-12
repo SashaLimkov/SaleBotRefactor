@@ -22,4 +22,3 @@ class UserPostAdmin(admin.ModelAdmin):
 
 admin.site.register(Post, PostAdmin)
 admin.site.register(UserPost, UserPostAdmin)
-

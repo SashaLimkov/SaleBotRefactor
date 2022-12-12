@@ -7,26 +7,44 @@ from apps.settings.services.settings_user import add_settings
 from apps.utils.services.date_time import get_datetime_now
 
 
-def create_user(telegram_id: int, phone: str, full_name: str, username: str = None, first_name: str = None,
-                last_name: str = None, is_helper: bool = False) -> Profile:
+def create_user(
+    telegram_id: int,
+    phone: str,
+    full_name: str,
+    username: str = None,
+    first_name: str = None,
+    last_name: str = None,
+    is_helper: bool = False,
+) -> Profile:
     """Создает профиль пользователя и соответствующие настройки"""
-    profile = _create_profile(telegram_id, phone, full_name, username, first_name, last_name, is_helper)
+    profile = _create_profile(
+        telegram_id, phone, full_name, username, first_name, last_name, is_helper
+    )
     settings = add_settings(telegram_id)
     add_product_settings(settings.id)
-    create_user_subscription(telegram_id, 'Старт пробной подписки', 'Пробный')
+    create_user_subscription(telegram_id, "Старт пробной подписки", "Пробный")
     return profile
 
 
-def _create_profile(telegram_id: int, phone: str, full_name: str, username: str = None, first_name: str = None,
-                    last_name: str = None, is_helper: bool = False) -> Profile:
-    """Создание профиля пользователя бота """
-    return Profile.objects.create(telegram_id=telegram_id,
-                                  phone=phone,
-                                  full_name=full_name,
-                                  username=username,
-                                  first_name=first_name,
-                                  last_name=last_name,
-                                  is_helper=is_helper)
+def _create_profile(
+    telegram_id: int,
+    phone: str,
+    full_name: str,
+    username: str = None,
+    first_name: str = None,
+    last_name: str = None,
+    is_helper: bool = False,
+) -> Profile:
+    """Создание профиля пользователя бота"""
+    return Profile.objects.create(
+        telegram_id=telegram_id,
+        phone=phone,
+        full_name=full_name,
+        username=username,
+        first_name=first_name,
+        last_name=last_name,
+        is_helper=is_helper,
+    )
 
 
 def get_profile_by_telegram_id(telegram_id: int) -> Profile:
@@ -47,7 +65,7 @@ def update_last_action_date_profile(telegram_id: int) -> None:
         profile.count_actions_in_current_day += 1
         profile.save()
     else:
-        raise 'Profile not found'
+        raise "Profile not found"
 
 
 def update_field_profile(telegram_id: int, field: str, value: Any) -> None:
@@ -58,4 +76,4 @@ def update_field_profile(telegram_id: int, field: str, value: Any) -> None:
         profile.__setattr__(field, value)
         profile.save()
     else:
-        raise 'Profile not found'
+        raise "Profile not found"

@@ -4,8 +4,14 @@ from apps.utils.models import TimeBasedModel
 
 class ProductSettings(TimeBasedModel):
     """Модель настроек отображения конретных полей в товаре"""
-    settings = models.OneToOneField(to='SettingsUser', primary_key=True,
-                                    verbose_name='Настройки', related_name='product_settings', on_delete=models.CASCADE)
+
+    settings = models.OneToOneField(
+        to="SettingsUser",
+        primary_key=True,
+        verbose_name="Настройки",
+        related_name="product_settings",
+        on_delete=models.CASCADE,
+    )
     link = models.BooleanField("Ссылка", default=True)
     name = models.BooleanField("Название", default=True)
     price = models.BooleanField("Цена", default=True)

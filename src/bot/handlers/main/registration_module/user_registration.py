@@ -25,7 +25,7 @@ async def start_registration(message: types.Message, state: FSMContext):
             text=text.text,
             main_message_id=main_message_id,
             keyboard=await ik.get_start_registration_keyboard(),
-            state=state
+            state=state,
         )
     else:
         await try_send_message(
@@ -33,7 +33,7 @@ async def start_registration(message: types.Message, state: FSMContext):
             user_id=user_id,
             text=text.text,
             keyboard=await ik.get_start_registration_keyboard(),
-            state=state
+            state=state,
         )
 
 
@@ -49,7 +49,11 @@ async def get_registration_menu(message: types.Message, state: FSMContext):
     text = get_message_by_name_for_user(name="registration_main_menu")
     fio = data.get("fio", False)
     phone = data.get("phone", False)
-    text = text.text.format(name=message.chat.full_name, fio=fio if fio else "", phone=phone if phone else "")
+    text = text.text.format(
+        name=message.chat.full_name,
+        fio=fio if fio else "",
+        phone=phone if phone else "",
+    )
     if fio and phone:
         await try_edit_message(
             message=message,
@@ -57,7 +61,7 @@ async def get_registration_menu(message: types.Message, state: FSMContext):
             text=text,
             keyboard=await ik.get_user_registration_menu(done=True),
             main_message_id=main_message_id,
-            state=state
+            state=state,
         )
         return
     await try_edit_message(
@@ -66,11 +70,13 @@ async def get_registration_menu(message: types.Message, state: FSMContext):
         text=text,
         keyboard=await ik.get_user_registration_menu(),
         main_message_id=main_message_id,
-        state=state
+        state=state,
     )
 
 
-async def press_user_fio_or_phone(call: types.CallbackQuery, state: FSMContext, callback_data: dict):
+async def press_user_fio_or_phone(
+    call: types.CallbackQuery, state: FSMContext, callback_data: dict
+):
     data = await state.get_data()
     main_message_id = data.get("main_message_id", False)
     user_id = call.from_user.id
@@ -83,7 +89,7 @@ async def press_user_fio_or_phone(call: types.CallbackQuery, state: FSMContext, 
             text=text,
             main_message_id=main_message_id,
             keyboard=0,
-            state=state
+            state=state,
         )
     else:
         await UserRegistration.PHONE_NUMBER.set()
@@ -94,7 +100,7 @@ async def press_user_fio_or_phone(call: types.CallbackQuery, state: FSMContext, 
             text=text,
             main_message_id=main_message_id,
             keyboard=await rk.get_user_contact(),
-            state=state
+            state=state,
         )
 
 
@@ -117,7 +123,9 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
     fio = data.get("fio", False)
     phone = data.get("phone", False)
     first_name = call.message.chat.first_name
-    text = get_message_by_name_for_user(name="confirm_registration").text.format(name=first_name)
+    text = get_message_by_name_for_user(name="confirm_registration").text.format(
+        name=first_name
+    )
     last_name = call.message.chat.last_name
     username = call.message.chat.username
     user = create_user(
@@ -126,7 +134,7 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
         full_name=fio,
         first_name=first_name,
         last_name=last_name,
-        username=username
+        username=username,
     )
     if user:
         await deleter.try_delete_message(chat_id=user_id, message_id=main_message_id)
@@ -137,5 +145,5 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
             message=call.message,
             state=state,
             keyboard=await ik.get_main_menu(user.in_chat),
-            splited_message=True
+            splited_message=True,
         )
