@@ -11,8 +11,18 @@ from bot.utils.notice_programmers import notice_programmers
 
 
 async def try_edit_message(
-    message, user_id, text, main_message_id, keyboard, state: FSMContext
+        message, user_id, text, main_message_id, keyboard, state: FSMContext
 ):
+    """
+    Функция, которая пытается обновить любое текстовое сообщение по main_message_id.
+    :param message:
+    :param user_id:
+    :param text:
+    :param main_message_id:
+    :param keyboard:
+    :param state:
+    :return:
+    """
     try:
         await bot.edit_message_text(
             chat_id=user_id,
@@ -32,6 +42,16 @@ async def try_edit_message(
 
 
 async def try_send_message(message, user_id, text, keyboard, state: FSMContext):
+    """Функция, которая пытается отправить любое текстовое сообщение.
+    С учетом main_message_id для дальнейшего его обновления.
+    Удаляет предыдущее главное сообщение.
+    :param message:
+    :param user_id:
+    :param text:
+    :param keyboard:
+    :param state:
+    :return:
+    """
     data = await state.get_data()
     main_message_id = data.get("main_message_id", False)
     await try_delete_message(user_id, main_message_id)
@@ -47,14 +67,26 @@ async def try_send_message(message, user_id, text, keyboard, state: FSMContext):
 
 
 async def try_send_video(
-    video_path,
-    chat_id: int,
-    text,
-    message,
-    state: FSMContext,
-    keyboard,
-    splited_message: bool = False,
+        video_path,
+        chat_id: int,
+        text,
+        message,
+        state: FSMContext,
+        keyboard,
+        splited_message: bool = False,
 ):
+    """
+    Функция, которая пытается отправить видео по пути к нему. Отправляет с учетом мета-данных о видео.
+    Также имеется возможность прикрутить описание к видео либо в этом же сообщении, либо в раздельном.
+    :param video_path:
+    :param chat_id:
+    :param text:
+    :param message:
+    :param state:
+    :param keyboard:
+    :param splited_message:
+    :return:
+    """
     vid = cv2.VideoCapture(video_path)
     wh, hh = vid.get(cv2.CAP_PROP_FRAME_WIDTH), vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
     try:
