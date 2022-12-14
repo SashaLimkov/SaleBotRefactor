@@ -42,7 +42,10 @@ async def main_settings_actions(
         text = get_message_by_name_for_user(name="product_settings", telegram_id=user_id).text
         keyboard = await ik.get_product_settings_menu(callback_data=callback_data, telegram_id=user_id)
     elif user_action == 7:
-        pass
+        user_signature = user_settings.signature
+        text_db = get_message_by_name_for_user(name="user_signature", telegram_id=user_id).text
+        text = text_db.format(signature=user_signature) if user_signature else "Подпись отсутствует."
+        keyboard = await ik.get_signature_menu(callback_data=callback_data, user_signature=user_signature)
     elif user_action == 8:
         pass
     elif user_action == 9:

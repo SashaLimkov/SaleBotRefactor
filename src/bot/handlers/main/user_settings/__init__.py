@@ -2,9 +2,15 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import filters
 from bot.data import callback_data as cd
 
-from bot.handlers.main.user_settings import main_settings_menu, currency, rounder, formula, product_settings
+from bot.handlers.main.user_settings import main_settings_menu, \
+    currency, \
+    rounder, \
+    formula, \
+    product_settings, \
+    user_signature
 from bot.states.Commission import Commission
 from bot.states.Currency import Currency
+from bot.states.Signature import Signature
 
 
 def setup(dp: Dispatcher):
@@ -45,4 +51,13 @@ def setup(dp: Dispatcher):
         product_settings.product_settings_menu,
         cd.settings_product.filter(),
         state="*"
+    )
+    dp.register_callback_query_handler(
+        user_signature.user_signature_menu,
+        cd.settings_signature.filter(),
+        state="*"
+    )
+    dp.register_message_handler(
+        user_signature.set_user_signature,
+        state=Signature.GET_SIGNATURE
     )
