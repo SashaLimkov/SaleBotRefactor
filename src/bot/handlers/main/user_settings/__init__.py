@@ -2,7 +2,7 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import filters
 from bot.data import callback_data as cd
 
-from bot.handlers.main.user_settings import main_settings_menu, currency, rounder, formula
+from bot.handlers.main.user_settings import main_settings_menu, currency, rounder, formula, product_settings
 from bot.states.Commission import Commission
 from bot.states.Currency import Currency
 
@@ -40,4 +40,9 @@ def setup(dp: Dispatcher):
     dp.register_message_handler(
         formula.check_commission,
         state=Commission.GET_COMMISSION
+    )
+    dp.register_callback_query_handler(
+        product_settings.product_settings_menu,
+        cd.settings_product.filter(),
+        state="*"
     )

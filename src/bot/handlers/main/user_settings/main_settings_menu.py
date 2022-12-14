@@ -39,8 +39,8 @@ async def main_settings_actions(
     elif user_action == 5:
         pass
     elif user_action == 6:
-        text = get_message_by_name_for_user(name="product_settings", telegram_id=user_id)
-
+        text = get_message_by_name_for_user(name="product_settings", telegram_id=user_id).text
+        keyboard = await ik.get_product_settings_menu(callback_data=callback_data, telegram_id=user_id)
     elif user_action == 7:
         pass
     elif user_action == 8:
