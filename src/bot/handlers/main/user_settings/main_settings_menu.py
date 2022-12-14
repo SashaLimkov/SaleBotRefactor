@@ -2,8 +2,6 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from apps.message.services.message import get_message_by_name_for_user
-from apps.profiles.services.profile import get_profile_by_telegram_id
-from apps.profiles.services.subscription import get_user_active_subscription
 from apps.settings.services.settings_user import get_settings
 from bot.handlers.main.user_settings.currency import get_custom_currency_info
 from bot.keyboards import inline as ik
@@ -30,7 +28,7 @@ async def main_settings_actions(
     elif user_action == 2:
         pass
     elif user_action == 3:
-        selected_rounder = 1
+        selected_rounder = user_settings.rounder
         text = get_message_by_name_for_user(name="rounder_settings", telegram_id=user_id).text.format(
             selected_rounder=selected_rounder)
         keyboard = await ik.get_rounder_settings_menu(callback_data=callback_data)

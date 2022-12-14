@@ -2,7 +2,7 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import filters
 from bot.data import callback_data as cd
 
-from bot.handlers.main.user_settings import main_settings_menu, currency
+from bot.handlers.main.user_settings import main_settings_menu, currency, rounder
 from bot.states.Currency import Currency
 
 
@@ -25,4 +25,9 @@ def setup(dp: Dispatcher):
     dp.register_message_handler(
         currency.check_wrote_currency_value,
         state=Currency.GET_CUR_VALUE
+    )
+    dp.register_callback_query_handler(
+        rounder.select_rounder_lvl,
+        cd.settings_rounder.filter(),
+        state="*"
     )
