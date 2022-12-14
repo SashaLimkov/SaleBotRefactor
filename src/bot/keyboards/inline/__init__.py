@@ -5,3 +5,4 @@ from .currency import *
 from .formula_and_comission import *
 from .product_settings import *
 from .user_signature import *
+from .link_settings import *
