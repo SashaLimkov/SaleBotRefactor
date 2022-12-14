@@ -50,7 +50,8 @@ async def main_settings_actions(
         text = get_message_by_name_for_user(name="link_settings", telegram_id=user_id).text
         keyboard = await ik.get_link_settings_menu(callback_data=callback_data, telegram_id=user_id)
     elif user_action == 9:
-        pass
+        text = get_message_by_name_for_user(name="channel_settings", telegram_id=user_id).text
+        keyboard = await ik.get_channels_menu(callback_data=callback_data)
     else:
         pass
     await mw.try_edit_message(

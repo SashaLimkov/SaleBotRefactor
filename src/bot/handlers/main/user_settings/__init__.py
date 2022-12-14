@@ -8,7 +8,8 @@ from bot.handlers.main.user_settings import main_settings_menu, \
     formula, \
     product_settings, \
     user_signature, \
-    link_settings
+    link_settings, \
+    user_channels
 from bot.states.Commission import Commission
 from bot.states.Currency import Currency
 from bot.states.Signature import Signature
@@ -65,5 +66,10 @@ def setup(dp: Dispatcher):
     dp.register_callback_query_handler(
         link_settings.link_settings_menu,
         cd.settings_link.filter(),
+        state="*"
+    )
+    dp.register_callback_query_handler(
+        user_channels.get_tg_channels_and_instructions,
+        cd.settings_channel.filter(),
         state="*"
     )

@@ -57,10 +57,11 @@ async def get_rounder_settings_menu(callback_data: dict):
             )
         )
     )
-    keyboard.add(await get_inline_button(
-        text="◀ Назад",
-        cd=cd.mm.new(
-            action=callback_data["first_lvl"]
-        )
-    ))
+    keyboard.add(
+        await get_inline_button(
+            text="◀ Назад",
+            cd=cd.mm.new(
+                action=callback_data["first_lvl"]
+            )
+        ))
     return keyboard
