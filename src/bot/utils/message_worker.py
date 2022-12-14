@@ -38,6 +38,7 @@ async def try_edit_message(
         await notice_programmers(
             exception_info=traceback.format_exc(), **message.from_user.to_python()
         )
+        await message.delete()
         await try_send_message(message, user_id, text, keyboard, state)
 
 

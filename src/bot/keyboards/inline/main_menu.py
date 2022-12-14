@@ -1,5 +1,5 @@
 from bot.utils.datetime_helper import get_datetime
-from bot.utils.keyboard_utils.base_keyboard_utils import get_base_keyboard
+from bot.utils.keyboard_utils.base_keyboard_utils import get_base_keyboard, get_inline_button
 from bot.data import callback_data as cd
 from bot.data import list_and_tuple_data as ld
 
@@ -19,19 +19,28 @@ async def get_main_menu(in_chat):
     ]
     buttons += [
         {"text": "🎦Видео-инструкция", "callback_data": cd.mm.new(action=4)},
-        {"text": "👩‍💻 поддержка бота", "url": "https://t.me/deva_v_brendax"},
     ]
-
-    if not in_chat:
-        buttons.append(
-            {"text": "👉 Доступ в канал 👈", "callback_data": cd.ADD_TO_CHANNEL}
-        )
-    return await get_base_keyboard(
+    keyboard = await get_base_keyboard(
         buttons=buttons,
         keyboard_options={
             "row_width": 2,
         },
     )
+    keyboard.add(
+        await get_inline_button(
+            text="👩‍💻 поддержка бота",
+            url="https://t.me/deva_v_brendax"
+        )
+    )
+    if not in_chat:
+        keyboard.add(
+            await get_inline_button(
+                text="👉 Доступ в канал 👈",
+                cd=cd.ADD_TO_CHANNEL,
+            )
+        )
+
+    return keyboard
 
 
 async def get_settings_menu(callback_data: dict):

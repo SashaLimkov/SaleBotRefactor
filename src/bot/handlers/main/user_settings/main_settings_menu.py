@@ -4,6 +4,8 @@ from aiogram.dispatcher import FSMContext
 from apps.message.services.message import get_message_by_name_for_user
 from apps.profiles.services.profile import get_profile_by_telegram_id
 from apps.profiles.services.subscription import get_user_active_subscription
+from apps.settings.services.settings_user import get_settings
+from bot.handlers.main.user_settings.currency import get_custom_currency_info
 from bot.keyboards import inline as ik
 from bot.utils import message_worker as mw
 
@@ -15,10 +17,11 @@ async def main_settings_actions(
     main_message_id = data.get("main_message_id", False)
     user_id = call.message.chat.id
     user_action = int(callback_data["second_lvl"])
+    user_settings = get_settings(user_id)
     # user = get_profile_by_telegram_id(user_id)
     if user_action == 1:
-        custom_cur = ""
-        selected_cur = ""
+        custom_cur = await get_custom_currency_info(telegram_id=user_id)
+        selected_cur = "RUB" if user_settings.currency else "Валюта сайта"
         text = get_message_by_name_for_user(name="currency_settings_main", telegram_id=user_id).text.format(
             custom_cur=custom_cur,
             selected_cur=selected_cur
