@@ -7,7 +7,7 @@ class Currency(TimeBasedModel):
 
     name = models.CharField("Название валюты (в боте)", max_length=20)
     currency = models.CharField("Валюта", max_length=4, unique=True)
-    sign = models.CharField("Знак валюты", max_length=1, blank=True, null=True)
+    sign = models.CharField("Знак валюты", max_length=3, blank=True, null=True)
 
     def __str__(self):
         return self.currency
