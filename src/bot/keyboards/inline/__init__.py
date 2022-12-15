@@ -7,3 +7,4 @@ from .product_settings import *
 from .user_signature import *
 from .link_settings import *
 from .user_channels import *
+from .watermark import *

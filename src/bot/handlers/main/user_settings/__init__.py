@@ -9,9 +9,10 @@ from bot.handlers.main.user_settings import main_settings_menu, \
     product_settings, \
     user_signature, \
     link_settings, \
-    user_channels
+    user_channels, logo_and_text_logo
 from bot.states.Commission import Commission
 from bot.states.Currency import Currency
+from bot.states.LogoAndTLogo import LogoAndTLogo
 from bot.states.Signature import Signature
 
 
@@ -71,5 +72,19 @@ def setup(dp: Dispatcher):
     dp.register_callback_query_handler(
         user_channels.get_tg_channels_and_instructions,
         cd.settings_channel.filter(),
+        state="*"
+    )
+    dp.register_callback_query_handler(
+        logo_and_text_logo.logo_and_t_logo_settings,
+        cd.settings_wm.filter(),
+        state="*"
+    )
+    dp.register_message_handler(
+        logo_and_text_logo.set_t_logo,
+        state=LogoAndTLogo.EDIT_TEXT_LOGO
+    )
+    dp.register_callback_query_handler(
+        logo_and_text_logo.set_logo_or_t_logo_position,
+        cd.settings_wm_position.filter(),
         state="*"
     )

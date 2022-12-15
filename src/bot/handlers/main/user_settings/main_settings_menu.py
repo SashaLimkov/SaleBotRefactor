@@ -37,7 +37,19 @@ async def main_settings_actions(
     elif user_action == 4:
         pass
     elif user_action == 5:
-        pass
+        logo = user_settings.logo
+        text_logo = user_settings.text_logo
+        if not text_logo and not logo:
+            text = get_message_by_name_for_user(name="select_wm_action", telegram_id=user_id).text
+            keyboard = await ik.get_wm_add_logo_menu(callback_data=callback_data)
+        elif text_logo:
+            text = get_message_by_name_for_user(name="text_logo_settings", telegram_id=user_id).text.format(
+                t_logo=text_logo
+            )
+            keyboard = await ik.logo_settings(callback_data=callback_data, telegram_id=user_id)
+        elif logo:
+            text = get_message_by_name_for_user(name="photo_logo_settings", telegram_id=user_id).text
+            keyboard = await ik.logo_settings(callback_data=callback_data, telegram_id=user_id)
     elif user_action == 6:
         text = get_message_by_name_for_user(name="product_settings", telegram_id=user_id).text
         keyboard = await ik.get_product_settings_menu(callback_data=callback_data, telegram_id=user_id)
