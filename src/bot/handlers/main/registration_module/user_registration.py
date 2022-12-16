@@ -9,7 +9,7 @@ from bot.keyboards import inline as ik
 from bot.keyboards import reply as rk
 from bot.states.Registration import UserRegistration
 from bot.utils import deleter
-from bot.utils.message_worker import try_edit_message, try_send_message, try_send_video
+from bot.utils.message_worker import try_edit_message, try_send_message, try_send_video, send_confirmed_reg_message
 
 
 async def start_registration(message: types.Message, state: FSMContext):
@@ -75,7 +75,7 @@ async def get_registration_menu(message: types.Message, state: FSMContext):
 
 
 async def press_user_fio_or_phone(
-    call: types.CallbackQuery, state: FSMContext, callback_data: dict
+        call: types.CallbackQuery, state: FSMContext, callback_data: dict
 ):
     data = await state.get_data()
     main_message_id = data.get("main_message_id", False)
@@ -141,9 +141,20 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
         await try_send_video(
             video_path="bot/media/hello.mp4",
             chat_id=user_id,
-            text=text,
+            text="",
             message=call.message,
             state=state,
-            keyboard=await ik.get_main_menu(user.in_chat),
+            keyboard=None,
             splited_message=True,
+        )
+        await send_confirmed_reg_message(
+            chat_id=user_id,
+            text=text
+        )
+        await try_send_message(
+            message=call.message,
+            user_id=user_id,
+            text=get_message_by_name_for_user("main_menu_message").text,
+            keyboard=await ik.get_main_menu(user.in_chat),
+            state=state
         )

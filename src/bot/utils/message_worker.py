@@ -11,7 +11,7 @@ from bot.utils.notice_programmers import notice_programmers
 
 
 async def try_edit_message(
-    message, user_id, text, main_message_id, keyboard, state: FSMContext
+        message, user_id, text, main_message_id, keyboard, state: FSMContext
 ):
     """
     Функция, которая пытается обновить любое текстовое сообщение по main_message_id.
@@ -70,14 +70,24 @@ async def try_send_message(message, user_id, text, keyboard, state: FSMContext):
         )
 
 
+async def send_confirmed_reg_message(chat_id: int, text: str):
+    try:
+        await bot.send_message(
+            chat_id=chat_id,
+            text=text,
+        )
+    except Exception as e:
+        print(e)
+
+
 async def try_send_video(
-    video_path,
-    chat_id: int,
-    text,
-    message,
-    state: FSMContext,
-    keyboard,
-    splited_message: bool = False,
+        video_path,
+        chat_id: int,
+        text,
+        message,
+        state: FSMContext,
+        keyboard,
+        splited_message: bool = False,
 ):
     """
     Функция, которая пытается отправить видео по пути к нему. Отправляет с учетом мета-данных о видео.

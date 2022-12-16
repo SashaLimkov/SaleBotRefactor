@@ -17,7 +17,7 @@ async def start_command(message: types.Message, state: FSMContext):
     user_id = message.chat.id
     user = get_profile_by_telegram_id(telegram_id=user_id)
     text = get_message_by_name_for_user(
-        name="confirm_registration", telegram_id=user_id
+        name="main_menu_message", telegram_id=user_id
     ).text.format(name=user.first_name)
     await message.delete()
     await mw.try_send_message(
