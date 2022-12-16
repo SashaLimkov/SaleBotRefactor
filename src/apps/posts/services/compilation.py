@@ -6,7 +6,9 @@ from django.db.models import QuerySet
 from apps.posts.models import Compilation
 
 
-def get_list_compilations_by_date(date: datetime.date) -> Union[QuerySet, List[Compilation]]:
+def get_list_compilations_by_date(
+    date: datetime.date,
+) -> Union[QuerySet, List[Compilation]]:
     """Возвращает QuerySet подборок, за выбранную дату"""
     return Compilation.objects.filter(date=date)
 

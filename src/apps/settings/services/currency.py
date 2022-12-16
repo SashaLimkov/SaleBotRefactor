@@ -11,8 +11,12 @@ import requests
 
 def get_course_currency(currency_name: str) -> float:
     """Возвращает курс валюты относительно рубля"""
-    tree = ET.fromstring(requests.get('http://www.cbr.ru/scripts/XML_daily.asp').text)
-    return float(tree.find(f"Valute[CharCode='{currency_name}']").find('Value').text.replace(',', '.'))
+    tree = ET.fromstring(requests.get("http://www.cbr.ru/scripts/XML_daily.asp").text)
+    return float(
+        tree.find(f"Valute[CharCode='{currency_name}']")
+        .find("Value")
+        .text.replace(",", ".")
+    )
 
 
 def get_list_currency() -> Union[QuerySet, List[Currency]]:

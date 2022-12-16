@@ -83,7 +83,7 @@ def watermark(img_post, img_wm, position, t_wm=" "):
     name = splited[-1]
     img_post_p = img_post_p.convert("RGB")
     splited[-1] = str(random.randint(10000, 9999999)) + name
-    splited[-2] = 'photos_gen'
+    splited[-2] = "photos_gen"
     splited.pop(-3)
     print(splited)
     print("/".join(splited))

@@ -39,4 +39,6 @@ def test_number_of_items_in_row_out_of_limits():
     :return:
     """
     with pytest.raises(ValueError) as _:
-        EasyInlineKeyboard(items=[[1, 2, 3], list(range(10))], copy_text_to_callback=True)
+        EasyInlineKeyboard(
+            items=[[1, 2, 3], list(range(10))], copy_text_to_callback=True
+        )

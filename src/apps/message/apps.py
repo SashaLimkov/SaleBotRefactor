@@ -2,6 +2,6 @@ from django.apps import AppConfig
 
 
 class MessageConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.message'
-    verbose_name = 'Модуль сообщений'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.message"
+    verbose_name = "Модуль сообщений"

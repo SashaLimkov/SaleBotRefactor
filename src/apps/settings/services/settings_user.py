@@ -13,7 +13,11 @@ def add_settings(telegram_id: int) -> SettingsUser:
 
 def get_settings(telegram_id: int) -> SettingsUser:
     """Возвращает настройки пользователя"""
-    return SettingsUser.objects.select_related('product_settings').filter(profile_id=telegram_id).first()
+    return (
+        SettingsUser.objects.select_related("product_settings")
+        .filter(profile_id=telegram_id)
+        .first()
+    )
 
 
 def update_field_settings(telegram_id: int, field: str, value: Any) -> None:
@@ -22,13 +26,14 @@ def update_field_settings(telegram_id: int, field: str, value: Any) -> None:
     signature, link, hided_link"""
     profile = SettingsUser.objects.filter(profile_id=telegram_id).first()
     if profile:
-        if field == 'logo':
+        if field == "logo":
             with open(value, "rb") as file:
                 profile.logo.save(
-                    str(randint(10000, 9999999)) + "." + value.split(".")[-1], File(file)
+                    str(randint(10000, 9999999)) + "." + value.split(".")[-1],
+                    File(file),
                 )
         else:
             profile.__setattr__(field, value)
         profile.save()
     else:
-        raise 'Settings not found'
+        raise "Settings not found"
