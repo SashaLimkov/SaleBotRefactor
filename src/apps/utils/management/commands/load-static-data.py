@@ -8,11 +8,6 @@ class Command(BaseCommand):
     help = "load all bot needed text"
     currency_data = [
         {
-            "name": "ALL",
-            "currency": "ALL",
-            "sign": "",
-        },
-        {
             "name": "USD",
             "currency": "USD",
             "sign": "$",
@@ -36,9 +31,9 @@ class Command(BaseCommand):
     text_data = {
         "start_registration": "Чтобы продолжить надо пройти регистрацию",
         "registration_main_menu": """{name}, здравствуйте!
-        Пожалуйста, заполните следующие данные о себе: 
-        <b>ФИО</b>: {fio}
-        <b>Номер телефона</b>:{phone}""",
+Пожалуйста, заполните следующие данные о себе: 
+<b>ФИО</b>: {fio}
+<b>Номер телефона</b>:{phone}""",
         "registration_get_fio": "Укажите ФИО",
         "registration_get_phone": "Нажмите на кнопку Отправить контакт, чтобы отправить свой номер телефона боту.",
         "confirm_registration": """{name}, приветствую тебя на канале анонсов для байеров "PRO шопинг"!

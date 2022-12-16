@@ -66,7 +66,14 @@ def setup(dp: Dispatcher):
         logo_and_text_logo.logo_and_t_logo_settings, cd.settings_wm.filter(), state="*"
     )
     dp.register_message_handler(
-        logo_and_text_logo.set_t_logo, state=LogoAndTLogo.EDIT_TEXT_LOGO
+        logo_and_text_logo.set_t_logo,
+        content_types=types.ContentTypes.ANY,
+        state=LogoAndTLogo.EDIT_TEXT_LOGO
+    )
+    dp.register_message_handler(
+        logo_and_text_logo.set_logo,
+        content_types=types.ContentTypes.ANY,
+        state=LogoAndTLogo.EDIT_LOGO
     )
     dp.register_callback_query_handler(
         logo_and_text_logo.set_logo_or_t_logo_position,

@@ -30,19 +30,12 @@ async def try_edit_message(
             message_id=main_message_id,
             reply_markup=keyboard if keyboard else None,
         )
-    except exceptions.MessageNotModified:
-        await notice_programmers(
-            exception_info=traceback.format_exc(), **message.from_user.to_python()
-        )
     except Exception:
-        await notice_programmers(
-            exception_info=traceback.format_exc(), **message.from_user.to_python()
-        )
         await try_send_message(message, user_id, text, keyboard, state)
-        try:
-            await message.delete()
-        except Exception as e:
-            pass
+        await try_delete_message(
+            chat_id=user_id,
+            message_id=main_message_id,
+        )
 
 
 async def try_send_message(message, user_id, text, keyboard, state: FSMContext):
@@ -123,4 +116,83 @@ async def try_send_video(
             text=text,
             keyboard=keyboard if keyboard else None,
             state=state,
+        )
+
+
+async def try_edit_photo(
+        photo_path,
+        chat_id: int,
+        text,
+        message,
+        main_message_id,
+        state: FSMContext,
+        keyboard,
+):
+    """
+    Функция, которая пытается отправить видео по пути к нему. Отправляет с учетом мета-данных о видео.
+    Также имеется возможность прикрутить описание к видео либо в этом же сообщении, либо в раздельном.
+    :param photo_path:
+    :param chat_id:
+    :param text:
+    :param message:
+    :param state:
+    :param keyboard:
+    :param main_message_id:
+    :return:
+    """
+    try:
+        await bot.edit_message_caption(
+            chat_id=chat_id,
+            caption=text,
+            message_id=main_message_id,
+            reply_markup=keyboard
+        )
+    except Exception:
+        await try_send_photo(
+            photo_path=photo_path,
+            chat_id=chat_id,
+            text=text,
+            message=message,
+            main_message_id=main_message_id,
+            state=state,
+            keyboard=keyboard
+        )
+
+
+async def try_send_photo(
+        photo_path,
+        chat_id: int,
+        text,
+        message,
+        main_message_id,
+        state: FSMContext,
+        keyboard,
+):
+    """
+    Функция, которая пытается отправить видео по пути к нему. Отправляет с учетом мета-данных о видео.
+    Также имеется возможность прикрутить описание к видео либо в этом же сообщении, либо в раздельном.
+    :param photo_path:
+    :param chat_id:
+    :param text:
+    :param message:
+    :param state:
+    :param keyboard:
+    :param main_message_id:
+    :return:
+    """
+    try:
+        await try_delete_message(
+            chat_id=chat_id,
+            message_id=main_message_id,
+        )
+        mes = await bot.send_photo(
+            chat_id=chat_id,
+            photo=types.InputFile(photo_path),
+            caption=text,
+            reply_markup=keyboard
+        )
+        await state.update_data(main_message_id=mes.message_id)
+    except Exception:
+        await notice_programmers(
+            exception_info=traceback.format_exc(), **message.from_user.to_python()
         )
