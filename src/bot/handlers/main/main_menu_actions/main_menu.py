@@ -16,7 +16,7 @@ async def get_main_menu(call: types.CallbackQuery, state: FSMContext):
     user_id = call.message.chat.id
     user = get_profile_by_telegram_id(telegram_id=user_id)
     text = get_message_by_name_for_user(
-        name="confirm_registration", telegram_id=user_id
+        name="main_menu_message", telegram_id=user_id
     ).text.format(name=user.first_name)
     await mw.try_edit_message(
         user_id=user_id,
@@ -29,7 +29,7 @@ async def get_main_menu(call: types.CallbackQuery, state: FSMContext):
 
 
 async def main_menu_actions(
-    call: types.CallbackQuery, callback_data: dict, state: FSMContext
+        call: types.CallbackQuery, callback_data: dict, state: FSMContext
 ):
     data = await state.get_data()
     main_message_id = data.get("main_message_id", False)
