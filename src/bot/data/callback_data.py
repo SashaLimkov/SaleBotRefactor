@@ -15,7 +15,11 @@ settings_product = CallbackData("s_prod", "first_lvl", "second_lvl", "third_lvl"
 settings_link = CallbackData("s_link", "first_lvl", "second_lvl", "third_lvl")
 settings_channel = CallbackData("s_ch", "first_lvl", "second_lvl", "third_lvl")
 settings_signature = CallbackData("s_sign", "first_lvl", "second_lvl", "third_lvl")
-settings_formula_and_comm = CallbackData("s_f_a_c", "first_lvl", "second_lvl", "third_lvl")
-select_customize_currency = CallbackData("s_c_cur", "first_lvl", "second_lvl", "third_lvl", "selected_cur")
+settings_formula_and_comm = CallbackData(
+    "s_f_a_c", "first_lvl", "second_lvl", "third_lvl"
+)
+select_customize_currency = CallbackData(
+    "s_c_cur", "first_lvl", "second_lvl", "third_lvl", "selected_cur"
+)
 settings_wm = CallbackData("s_wm", "first_lvl", "second_lvl", "third_lvl")
 settings_wm_position = CallbackData("s_wm_pos", "first_lvl", "second_lvl", "third_lvl")

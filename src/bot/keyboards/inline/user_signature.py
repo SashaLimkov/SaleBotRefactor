@@ -1,10 +1,10 @@
-from bot.utils.keyboard_utils.base_keyboard_utils import get_base_keyboard, get_inline_button
+from bot.utils.keyboard_utils.base_keyboard_utils import (
+    get_base_keyboard,
+    get_inline_button,
+)
 from bot.data import callback_data as cd
 
-__all__ = [
-    "get_signature_menu",
-    "cancel_signature_editing"
-]
+__all__ = ["get_signature_menu", "cancel_signature_editing"]
 
 
 async def get_signature_menu(callback_data: dict, user_signature: str):
@@ -21,7 +21,7 @@ async def get_signature_menu(callback_data: dict, user_signature: str):
                     first_lvl=callback_data["first_lvl"],
                     second_lvl=callback_data["second_lvl"],
                     third_lvl=0,
-                )
+                ),
             )
         )
         keyboard.add(
@@ -31,7 +31,7 @@ async def get_signature_menu(callback_data: dict, user_signature: str):
                     first_lvl=callback_data["first_lvl"],
                     second_lvl=callback_data["second_lvl"],
                     third_lvl=1,
-                )
+                ),
             )
         )
     else:
@@ -42,16 +42,14 @@ async def get_signature_menu(callback_data: dict, user_signature: str):
                     first_lvl=callback_data["first_lvl"],
                     second_lvl=callback_data["second_lvl"],
                     third_lvl=0,
-                )
+                ),
             )
         )
     keyboard.add(
         await get_inline_button(
-            text="◀ Назад",
-            cd=cd.mm.new(
-                action=callback_data["first_lvl"]
-            )
-        ))
+            text="◀ Назад", cd=cd.mm.new(action=callback_data["first_lvl"])
+        )
+    )
     return keyboard
 
 
@@ -63,7 +61,7 @@ async def cancel_signature_editing(callback_data: dict):
                 "callback_data": cd.settings_menu.new(
                     first_lvl=callback_data["first_lvl"],
                     second_lvl=callback_data["second_lvl"],
-                )
+                ),
             }
         ],
         keyboard_options={

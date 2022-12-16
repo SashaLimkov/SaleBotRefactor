@@ -1,12 +1,11 @@
 from apps.settings.services.settings_user import get_settings
-from bot.utils.keyboard_utils.base_keyboard_utils import get_base_keyboard, get_inline_button
+from bot.utils.keyboard_utils.base_keyboard_utils import (
+    get_base_keyboard,
+    get_inline_button,
+)
 from bot.data import callback_data as cd
 
-__all__ = [
-    "get_wm_add_logo_menu",
-    "cancel_updating_logo_or_t_logo",
-    "logo_settings"
-]
+__all__ = ["get_wm_add_logo_menu", "cancel_updating_logo_or_t_logo", "logo_settings"]
 
 
 async def get_wm_add_logo_menu(callback_data: dict):
@@ -21,8 +20,8 @@ async def get_wm_add_logo_menu(callback_data: dict):
             cd=cd.settings_wm.new(
                 first_lvl=callback_data["first_lvl"],
                 second_lvl=callback_data["second_lvl"],
-                third_lvl=0
-            )
+                third_lvl=0,
+            ),
         )
     )
     keyboard.add(
@@ -31,17 +30,15 @@ async def get_wm_add_logo_menu(callback_data: dict):
             cd=cd.settings_wm.new(
                 first_lvl=callback_data["first_lvl"],
                 second_lvl=callback_data["second_lvl"],
-                third_lvl=1
-            )
+                third_lvl=1,
+            ),
         )
     )
     keyboard.add(
         await get_inline_button(
-            text="◀ Назад",
-            cd=cd.mm.new(
-                action=callback_data["first_lvl"]
-            )
-        ))
+            text="◀ Назад", cd=cd.mm.new(action=callback_data["first_lvl"])
+        )
+    )
     return keyboard
 
 
@@ -52,8 +49,8 @@ async def cancel_updating_logo_or_t_logo(callback_data: dict):
                 "text": "Отмена",
                 "callback_data": cd.settings_menu.new(
                     first_lvl=callback_data["first_lvl"],
-                    second_lvl=callback_data["second_lvl"]
-                )
+                    second_lvl=callback_data["second_lvl"],
+                ),
             }
         ],
         keyboard_options={
@@ -76,8 +73,8 @@ async def logo_settings(callback_data: dict, telegram_id: int):
                 cd=cd.settings_wm_position.new(
                     first_lvl=callback_data["first_lvl"],
                     second_lvl=callback_data["second_lvl"],
-                    third_lvl="off"
-                )
+                    third_lvl="off",
+                ),
             )
         )
         keyboard.insert(
@@ -86,8 +83,8 @@ async def logo_settings(callback_data: dict, telegram_id: int):
                 cd=cd.settings_wm_position.new(
                     first_lvl=callback_data["first_lvl"],
                     second_lvl=callback_data["second_lvl"],
-                    third_lvl="..."
-                )
+                    third_lvl="...",
+                ),
             )
         )
     elif user_settings.logo_position == "fill":
@@ -97,8 +94,8 @@ async def logo_settings(callback_data: dict, telegram_id: int):
                 cd=cd.settings_wm_position.new(
                     first_lvl=callback_data["first_lvl"],
                     second_lvl=callback_data["second_lvl"],
-                    third_lvl="..."
-                )
+                    third_lvl="...",
+                ),
             )
         )
         keyboard.insert(
@@ -107,8 +104,8 @@ async def logo_settings(callback_data: dict, telegram_id: int):
                 cd=cd.settings_wm_position.new(
                     first_lvl=callback_data["first_lvl"],
                     second_lvl=callback_data["second_lvl"],
-                    third_lvl="off"
-                )
+                    third_lvl="off",
+                ),
             )
         )
     else:
@@ -118,8 +115,8 @@ async def logo_settings(callback_data: dict, telegram_id: int):
                 cd=cd.settings_wm_position.new(
                     first_lvl=callback_data["first_lvl"],
                     second_lvl=callback_data["second_lvl"],
-                    third_lvl="center"
-                )
+                    third_lvl="center",
+                ),
             )
         )
         keyboard.insert(
@@ -128,8 +125,8 @@ async def logo_settings(callback_data: dict, telegram_id: int):
                 cd=cd.settings_wm_position.new(
                     first_lvl=callback_data["first_lvl"],
                     second_lvl=callback_data["second_lvl"],
-                    third_lvl="fill"
-                )
+                    third_lvl="fill",
+                ),
             )
         )
     keyboard.add(
@@ -138,15 +135,13 @@ async def logo_settings(callback_data: dict, telegram_id: int):
             cd=cd.settings_wm_position.new(
                 first_lvl=callback_data["first_lvl"],
                 second_lvl=callback_data["second_lvl"],
-                third_lvl="remove"
-            )
+                third_lvl="remove",
+            ),
         )
     )
     keyboard.add(
         await get_inline_button(
-            text="◀ Назад",
-            cd=cd.mm.new(
-                action=callback_data["first_lvl"]
-            )
-        ))
+            text="◀ Назад", cd=cd.mm.new(action=callback_data["first_lvl"])
+        )
+    )
     return keyboard

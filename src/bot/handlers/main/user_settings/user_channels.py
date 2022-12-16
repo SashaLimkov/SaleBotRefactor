@@ -8,13 +8,15 @@ from apps.settings.services.settings_user import update_field_settings
 from bot.keyboards import inline as ik
 
 
-async def get_tg_channels_and_instructions(call: types.CallbackQuery, callback_data: dict, state: FSMContext):
+async def get_tg_channels_and_instructions(
+    call: types.CallbackQuery, callback_data: dict, state: FSMContext
+):
     data = await state.get_data()
     main_message_id = data.get("main_message_id", False)
     user_id = call.message.chat.id
     text = get_message_by_name_for_user(
-        name="tg_channel_instructions",
-        telegram_id=user_id).text.format(channels_list=await get_tg_channels_list_text(telegram_id=user_id))
+        name="tg_channel_instructions", telegram_id=user_id
+    ).text.format(channels_list=await get_tg_channels_list_text(telegram_id=user_id))
     keyboard = await ik.get_channels_list(callback_data=callback_data)
     await mw.try_edit_message(
         message=call.message,

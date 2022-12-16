@@ -1,5 +1,8 @@
 from bot.utils.datetime_helper import get_datetime
-from bot.utils.keyboard_utils.base_keyboard_utils import get_base_keyboard, get_inline_button
+from bot.utils.keyboard_utils.base_keyboard_utils import (
+    get_base_keyboard,
+    get_inline_button,
+)
 from bot.data import callback_data as cd
 from bot.data import list_and_tuple_data as ld
 
@@ -28,8 +31,7 @@ async def get_main_menu(in_chat):
     )
     keyboard.add(
         await get_inline_button(
-            text="👩‍💻 поддержка бота",
-            url="https://t.me/deva_v_brendax"
+            text="👩‍💻 поддержка бота", url="https://t.me/deva_v_brendax"
         )
     )
     if not in_chat:
