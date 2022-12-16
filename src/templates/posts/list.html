@@ -44,7 +44,15 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-9">
+                                <div class="col-3">
+                                    <div class="search-box">
+                                        <div class="position-relative">
+                                            <input type="text" class="form-control" id="datepicker-range">
+                                            <i class="bx bx-calendar-event search-icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
                                     <div class="text-sm-end">
                                         <button type="button"
                                                 class="btn btn-success btn-rounded waves-effect waves-light mb-2 me-2">
@@ -76,6 +84,9 @@
 {% block extra_js %}
     <script src="{% static 'libs/glightbox/dist/js/glightbox.min.js'%}"></script>
 
+    <script src="{% static 'libs/flatpickr/dist/flatpickr.min.js'%}"></script>
+
+
     <script>
         var loadThisContent = function (page = 1) {
             $.ajax({
@@ -84,6 +95,7 @@
                 data: {
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                     "search": $('#search').val(),
+                    'date-range': $('#datepicker-range').val(),
                     'page': page
                 },
                 dataType: 'json',
@@ -97,12 +109,19 @@
         $('#search').keyup(function () {
             loadThisContent()
         })
+        $('#datepicker-range').change(function (){
+            loadThisContent()
+        })
     </script>
 
     <script>
 
         document.addEventListener("DOMContentLoaded", function () {
             loadThisContent()
+            flatpickr("#datepicker-range", {
+                mode: "range",
+                defaultDate: new Date
+            })
         })
 
     </script>

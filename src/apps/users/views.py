@@ -25,7 +25,7 @@ class UserTableView(View):
 
         if len(search) >= 3:
             queryset = get_search_users_queryset(search)
-        if not queryset:
+        if not queryset and not search:
             queryset = get_all_users_queryset()
 
         paginator = Paginator(queryset, 50)

@@ -9,7 +9,7 @@ from apps.profiles.models import Profile, Subscription
 
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models.functions import Cast
-from django.db.models import CharField, Prefetch, QuerySet
+from django.db.models import CharField, Prefetch, QuerySet, Q
 
 
 def create_user(
@@ -77,24 +77,34 @@ def update_field_profile(telegram_id: int, field: str, value: Any) -> None:
         raise "Profile not found"
 
 
-def get_search_profiles_queryset(search: str,
-                                 date_start: Optional[datetime.date],
-                                 date_end: Optional[datetime.date]) -> Union[QuerySet, List[Profile]]:
+def get_search_profiles_queryset(search: str, filter_date: Q) -> Union[QuerySet, List[Profile]]:
     """Получить QuerySet пользователей с поиском по строке search"""
     vector = TrigramSimilarity('phone', search) + TrigramSimilarity('username', search) \
                   + TrigramSimilarity('full_name', search) + TrigramSimilarity(
         Cast('telegram_id', output_field=CharField()), search)
     prefetch_subscription = Prefetch('subscription_set', queryset=Subscription.objects.filter(active=True))
-    queryset = Profile.objects.prefetch_related(prefetch_subscription).annotate(similarity=vector).filter(
-            similarity__gt=0.35).order_by('-similarity')
+    if not filter_date:
+        queryset = Profile.objects.prefetch_related(prefetch_subscription).annotate(similarity=vector).filter(
+                similarity__gt=0.35).order_by('-similarity')
+    else:
+        queryset = Profile.objects.prefetch_related(prefetch_subscription).annotate(similarity=vector).filter(
+            filter_date, similarity__gt=0.35).order_by('-similarity')
     return queryset
 
 
-def get_all_profiles_queryset(date_start: Optional[datetime.date],
-                              date_end: Optional[datetime.date]) -> Union[QuerySet, List[Profile]]:
+def get_all_profiles_queryset(filter_date: Q) -> Union[QuerySet, List[Profile]]:
     """Получить QuerySet пользователей"""
-    return Profile.objects.all().prefetch_related(Prefetch('subscription_set',
-                                                           queryset=Subscription.objects.filter(active=True)))
+    prefetch_subscription = Prefetch('subscription_set', queryset=Subscription.objects.filter(active=True))
+    if filter_date:
+        return Profile.objects.filter(filter_date).prefetch_related(prefetch_subscription)
+    else:
+        return Profile.objects.all().prefetch_related(prefetch_subscription)
+
+
+def get_date_range_profiles_filter(date_start: Optional[datetime.date],
+                                     date_end: Optional[datetime.date]) -> Q:
+    """Получение фильтра по дате регистрации"""
+    return Q(registration_date__gte=date_start, registration_date__lte=date_end)
 
 
 def get_subscribe_profile_queryset(queryset: QuerySet) -> Union[QuerySet, List[Profile]]:

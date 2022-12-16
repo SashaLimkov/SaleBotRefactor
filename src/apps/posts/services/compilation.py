@@ -1,8 +1,8 @@
 import datetime
-from typing import Union, List
+from typing import Union, List, Optional
 
 from django.contrib.postgres.search import TrigramSimilarity
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 
 from apps.posts.models import Compilation
 
@@ -19,18 +19,30 @@ def get_compilation_by_id(compilation_id: int) -> Compilation:
     return Compilation.objects.filter(pk=compilation_id).first()
 
 
-def get_search_compilations_queryset(search: str) -> Union[QuerySet, List[Compilation]]:
+def get_search_compilations_queryset(search: str, filter_date: Q) -> Union[QuerySet, List[Compilation]]:
     """Получить QuerySet подборок с поиском по строке search"""
-    vector = TrigramSimilarity('phone', search) + TrigramSimilarity('username', search) \
-             + TrigramSimilarity('full_name', search)
-    queryset = Compilation.objects.prefetch_related('contents').annotate(similarity=vector).filter(
-        similarity__gt=0.35).order_by('-similarity')
+    vector = TrigramSimilarity('name', search) + TrigramSimilarity('text', search)
+    if filter_date:
+        queryset = Compilation.objects.prefetch_related('contents').annotate(similarity=vector).filter(
+            filter_date, similarity__gt=0.35).order_by('-similarity')
+    else:
+        queryset = Compilation.objects.prefetch_related('contents').annotate(similarity=vector).filter(
+            similarity__gt=0.35).order_by('-similarity')
     return queryset
 
 
-def get_all_compilation_queryset() -> Union[QuerySet, List[Compilation]]:
+def get_all_compilation_queryset(filter_date: Q) -> Union[QuerySet, List[Compilation]]:
     """Получить QuerySet пользователей"""
-    return Compilation.objects.all().prefetch_related('contents')
+    if filter_date:
+        return Compilation.objects.filter(filter_date).prefetch_related('contents')
+    else:
+        return Compilation.objects.all().prefetch_related('contents')
+
+
+def get_date_range_compilation_filter(date_start: Optional[datetime.date],
+                                      date_end: Optional[datetime.date]) -> Q:
+    """Получение фильтра по дате создания подборки"""
+    return Q(date__gte=date_start, date__lte=date_end)
 
 
 def get_content_compilation_queryset(queryset: QuerySet) -> Union[QuerySet, List[Compilation]]:

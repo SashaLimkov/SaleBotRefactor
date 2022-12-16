@@ -1,10 +1,140 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'partials/base.html' %}
+{% load static %}
 
-</body>
-</html>
+{% block title %}{{ compilation.name }}{% endblock title %} {"title": "{{ compilation.name }}"})
+
+{% block extra_css %}
+    <!-- dropzone css -->
+    <link href="{% static 'libs/dropzone/dist/min/dropzone.min.css' %}" rel="stylesheet" type="text/css"/>
+
+{% endblock extra_css %}
+
+{% block content %}
+    <!-- ============================================================== -->
+    <!-- Start right Content here -->
+    <!-- ============================================================== -->
+    <div class="main-content">
+
+        <div class="page-content">
+            <div class="container-fluid">
+
+                <!-- start page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                            <h4 class="mb-sm-0 font-size-18">{{ compilation.name }}</h4>
+
+                            <div class="page-title-right">
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Главная</a></li>
+                                    <li class="breadcrumb-item"><a href="{% url 'compilation_list' %}">Подборки</a></li>
+                                    <li class="breadcrumb-item active">Пользователи бота</li>
+                                </ol>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+                <div class="row">
+                    <div class="col-md-12 col-xl-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Обзор</h3>
+                            </div>
+                            <div class="card-body">
+                                <form action="#" class="dropzone">
+                                    <div class="fallback">
+                                        <input name="file" type="file" multiple="multiple">
+                                    </div>
+                                    <div class="dz-message needsclick">
+                                        <div class="mb-3">
+                                            <i class="display-4 text-muted bx bx-cloud-upload"></i>
+                                        </div>
+
+                                        <h5>Drop files here or click to upload.</h5>
+                                    </div>
+                                </form>
+                                <br>
+                                <form>
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Название</label>
+                                        <input class="form-control" type="text" id="default-input"
+                                               placeholder="Название">
+                                    </div>
+                                    {#                                    <div class="mb-4">#}
+                                    {#                                        <label class="form-label" for="default-input">Медиа</label>#}
+                                    {#                                        <input class="form-control" type="text" id="default-input"#}
+                                    {#                                               placeholder="Название">#}
+                                    {#                                    </div>#}
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Дата</label>
+                                        <input class="form-control" type="text" id="default-input"
+                                               placeholder="Название">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Текст</label>
+                                        <div id="ckeditor-classic"></div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Завершенный
+                                            обзор</label>
+                                        <input class="form-control" type="text" id="default-input"
+                                               placeholder="Название">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 col-xl-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Гид</h3>
+                            </div>
+                            <div class="card-body">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-xl-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Посты</h3>
+                            </div>
+                            <div class="card-body">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- container-fluid -->
+        </div>
+        <!-- End Page-content -->
+
+
+        {% block footer %}
+            {% include 'partials/footer.html' %}
+        {% endblock footer %}
+    </div>
+    <!-- end main content-->
+{% endblock content %}
+
+{% block extra_js %}
+    <!-- ckeditor -->
+    <script src="{% static 'libs/@ckeditor/ckeditor5-build-classic/build/ckeditor.js' %}"></script>
+
+    <!-- dropzone js -->
+    <script src="{% static 'libs/dropzone/dist/min/dropzone.min.js' %}"></script>
+
+    <script>
+        ClassicEditor.create(document.querySelector("#ckeditor-classic")).then(function (e) {
+            e.ui.view.editable.element.style.height = "200px"
+        }).catch(function (e) {
+            console.error(e)
+        });
+    </script>
+{% endblock extra_js %}
