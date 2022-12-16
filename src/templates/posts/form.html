@@ -4,9 +4,7 @@
 {% block title %}{{ compilation.name }}{% endblock title %} {"title": "{{ compilation.name }}"})
 
 {% block extra_css %}
-    <!-- dropzone css -->
-    <link href="{% static 'libs/dropzone/dist/min/dropzone.min.css' %}" rel="stylesheet" type="text/css"/>
-
+    <link rel="stylesheet" href="{% static 'libs/glightbox/dist/css/glightbox.min.css' %}">
 {% endblock extra_css %}
 
 {% block content %}
@@ -43,44 +41,38 @@
                                 <h3 class="card-title">Обзор</h3>
                             </div>
                             <div class="card-body">
-                                <form action="#" class="dropzone">
-                                    <div class="fallback">
-                                        <input name="file" type="file" multiple="multiple">
-                                    </div>
-                                    <div class="dz-message needsclick">
-                                        <div class="mb-3">
-                                            <i class="display-4 text-muted bx bx-cloud-upload"></i>
-                                        </div>
-
-                                        <h5>Drop files here or click to upload.</h5>
-                                    </div>
-                                </form>
-                                <br>
+                                <div class="card-img-top img-fluid">
+                                    <a href="{% static 'images/small/img-1.jpg' %}" class="image-popup">
+                                        <img src="{% static 'images/small/img-1.jpg' %}" class="img-fluid"
+                                             alt="work-thumbnail">
+                                    </a>
+                                </div>
                                 <form>
                                     <div class="mb-4">
-                                        <label class="form-label" for="default-input">Название</label>
-                                        <input class="form-control" type="text" id="default-input"
+                                        <label class="form-label" for="default-input">Медиа</label>
+                                        <input class="form-control" type="file" id="media" name="media"
                                                placeholder="Название">
                                     </div>
-                                    {#                                    <div class="mb-4">#}
-                                    {#                                        <label class="form-label" for="default-input">Медиа</label>#}
-                                    {#                                        <input class="form-control" type="text" id="default-input"#}
-                                    {#                                               placeholder="Название">#}
-                                    {#                                    </div>#}
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Название</label>
+                                        <input class="form-control" type="text" id="name" name="name"
+                                               placeholder="Название">
+                                    </div>
                                     <div class="mb-4">
                                         <label class="form-label" for="default-input">Дата</label>
-                                        <input class="form-control" type="text" id="default-input"
-                                               placeholder="Название">
+                                        <input class="form-control" type="text" id="date-compilation" name="date">
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label" for="default-input">Текст</label>
                                         <div id="ckeditor-classic"></div>
                                     </div>
                                     <div class="mb-4">
-                                        <label class="form-label" for="default-input">Завершенный
-                                            обзор</label>
-                                        <input class="form-control" type="text" id="default-input"
-                                               placeholder="Название">
+                                        <div class="form-check form-check-right">
+                                            <input class="form-check-input" type="checkbox" id="formCheckRight2">
+                                            <label class="form-check-label" for="formCheckRight2">
+                                                Завершенный обзор
+                                            </label>
+                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -93,7 +85,23 @@
                                 <h3 class="card-title">Гид</h3>
                             </div>
                             <div class="card-body">
-
+                                <div class="card-img-top img-fluid">
+                                    <a href="{% static 'images/small/img-1.jpg' %}" class="image-popup">
+                                        <img src="{% static 'images/small/img-1.jpg' %}" class="img-fluid"
+                                             alt="work-thumbnail">
+                                    </a>
+                                </div>
+                                <form>
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Медиа</label>
+                                        <input class="form-control" type="file" id="media" name="media"
+                                               placeholder="Название">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Текст</label>
+                                        <div id="ckeditor-gid"></div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -127,8 +135,13 @@
     <!-- ckeditor -->
     <script src="{% static 'libs/@ckeditor/ckeditor5-build-classic/build/ckeditor.js' %}"></script>
 
-    <!-- dropzone js -->
-    <script src="{% static 'libs/dropzone/dist/min/dropzone.min.js' %}"></script>
+    <script src="{% static 'libs/glightbox/dist/js/glightbox.min.js' %}"></script>
+
+    <script src="{% static 'libs/flatpickr/dist/flatpickr.min.js' %}"></script>
+
+    <script>
+        lightbox = GLightbox({selector: ".image-popup", title: !1})
+    </script>
 
     <script>
         ClassicEditor.create(document.querySelector("#ckeditor-classic")).then(function (e) {
@@ -136,5 +149,19 @@
         }).catch(function (e) {
             console.error(e)
         });
+
+        ClassicEditor.create(document.querySelector("#ckeditor-gid")).then(function (e) {
+            e.ui.view.editable.element.style.height = "200px"
+        }).catch(function (e) {
+            console.error(e)
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            flatpickr("#date-compilation", {
+                defaultDate: new Date
+            })
+        })
     </script>
 {% endblock extra_js %}
