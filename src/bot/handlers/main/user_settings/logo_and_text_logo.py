@@ -93,6 +93,22 @@ async def set_logo_or_t_logo_position(call: types.CallbackQuery, callback_data: 
         #     value=""
         # )
     user_settings = get_settings(telegram_id=user_id)
+    text, keyboard = await return_text_and_keyboard_for_wm_settings(
+        user_settings=user_settings,
+        user_id=user_id,
+        callback_data=callback_data
+    )
+    await mw.try_edit_message(
+        message=call.message,
+        user_id=user_id,
+        text=text,
+        main_message_id=main_message_id,
+        keyboard=keyboard,
+        state=state,
+    )
+
+
+async def return_text_and_keyboard_for_wm_settings(user_settings, user_id: int, callback_data: dict):
     logo = user_settings.logo
     text_logo = user_settings.text_logo
     if not text_logo and not logo:
@@ -106,11 +122,5 @@ async def set_logo_or_t_logo_position(call: types.CallbackQuery, callback_data: 
     elif logo:
         text = get_message_by_name_for_user(name="photo_logo_settings", telegram_id=user_id).text
         keyboard = await ik.logo_settings(callback_data=callback_data, telegram_id=user_id)
-    await mw.try_edit_message(
-        message=call.message,
-        user_id=user_id,
-        text=text,
-        main_message_id=main_message_id,
-        keyboard=keyboard,
-        state=state,
-    )
+
+    return text, keyboard

@@ -5,6 +5,7 @@ from apps.message.services.message import get_message_by_name_for_user
 from apps.settings.services.settings_user import get_settings
 from bot.handlers.main.user_settings.currency import get_custom_currency_info
 from bot.handlers.main.user_settings.formula import get_formula_commission_text_and_selected_formula
+from bot.handlers.main.user_settings.logo_and_text_logo import return_text_and_keyboard_for_wm_settings
 from bot.keyboards import inline as ik
 from bot.utils import message_worker as mw
 
@@ -37,19 +38,11 @@ async def main_settings_actions(
     elif user_action == 4:
         pass
     elif user_action == 5:
-        logo = user_settings.logo
-        text_logo = user_settings.text_logo
-        if not text_logo and not logo:
-            text = get_message_by_name_for_user(name="select_wm_action", telegram_id=user_id).text
-            keyboard = await ik.get_wm_add_logo_menu(callback_data=callback_data)
-        elif text_logo:
-            text = get_message_by_name_for_user(name="text_logo_settings", telegram_id=user_id).text.format(
-                t_logo=text_logo
-            )
-            keyboard = await ik.logo_settings(callback_data=callback_data, telegram_id=user_id)
-        elif logo:
-            text = get_message_by_name_for_user(name="photo_logo_settings", telegram_id=user_id).text
-            keyboard = await ik.logo_settings(callback_data=callback_data, telegram_id=user_id)
+        text, keyboard = await return_text_and_keyboard_for_wm_settings(
+            user_settings=user_settings,
+            user_id=user_id,
+            callback_data=callback_data
+        )
     elif user_action == 6:
         text = get_message_by_name_for_user(name="product_settings", telegram_id=user_id).text
         keyboard = await ik.get_product_settings_menu(callback_data=callback_data, telegram_id=user_id)
