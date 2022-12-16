@@ -15,9 +15,9 @@ class Profile(TimeBasedModel):
                                       to_field='telegram_id', verbose_name='Пригласивший пользователь')
 
     telegram_id = models.BigIntegerField('ID Telegram', unique=True)
-    username = models.CharField('Username Telegram', max_length=255, null=True, blank=True)
-    first_name = models.CharField('Имя в Telegram', max_length=255, null=True, blank=True)
-    last_name = models.CharField('Фамилия в Telegram', max_length=255, null=True, blank=True)
+    username = models.CharField('Username Telegram', max_length=255, null=True, blank=True, default='')
+    first_name = models.CharField('Имя в Telegram', max_length=255, null=True, blank=True, default='')
+    last_name = models.CharField('Фамилия в Telegram', max_length=255, null=True, blank=True, default='')
 
     phone = models.CharField('Номер телефона', max_length=15)
     full_name = models.CharField('ФИО', max_length=255)

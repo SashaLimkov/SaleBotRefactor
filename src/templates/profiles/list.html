@@ -1,10 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'partials/base.html' %}
+{% load static %}
 
-</body>
-</html>
+{% block title %}Пользователи бота{% endblock title %} {"title": "Пользователи бота"})
+
+{% block extra_css %}
+    <!-- DataTables -->
+    <link href="{% static 'libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css'%}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css'%}" rel="stylesheet" type="text/css" />
+
+    <!-- Responsive datatable examples -->
+    <link href="{% static 'libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css'%}" rel="stylesheet" type="text/css" />
+{% endblock extra_css %}
+
+{% block content %}
+<!-- ============================================================== -->
+<!-- Start right Content here -->
+<!-- ============================================================== -->
+<div class="main-content">
+
+    <div class="page-content">
+        <div class="container-fluid">
+
+            <!-- start page title -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                        <h4 class="mb-sm-0 font-size-18">Пользователи бота</h4>
+
+                        <div class="page-title-right">
+                            <ol class="breadcrumb m-0">
+                                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Главная</a></li>
+                                <li class="breadcrumb-item active">Пользователи бота</li>
+                            </ol>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- end page title -->
+            <div class="row">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="datatable" class="table table-bordered dt-responsive nowrap w-100 dataTable no-footer dtr-inline collapsed" aria-describedby="datatable_info">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- container-fluid -->
+    </div>
+    <!-- End Page-content -->
+
+
+    {% block footer %}
+        {% include 'partials/footer.html' %}
+    {% endblock footer %}
+</div>
+<!-- end main content-->
+{% endblock content %}
+
+{% block extra_js %}
+    <script type="text/javascript" src="{% static 'ajax_datatable/js/utils.js' %}"></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+    <script >
+
+        $(document).ready(function() {
+            AjaxDatatableViewUtils.initialize_table(
+                $('#datatable'),
+                "{% url 'table_profiels' %}",
+                {
+                    // extra_options (example)
+                    processing: false,
+                    autoWidth: true,
+                    full_row_select: false,
+                    scrollX: false
+                }, {
+                    // extra_data
+
+                },
+            );
+        });
+
+    </script>
+    <script src="{% static 'libs/datatables.net/js/jquery.dataTables.min.js'%}"></script>
+    <script src="{% static 'libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js'%}"></script>
+    <!-- Buttons examples -->
+    <script src="{% static 'libs/datatables.net-buttons/js/dataTables.buttons.min.js'%}"></script>
+    <script src="{% static 'libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js'%}"></script>
+    <script src="{% static 'libs/jszip/jszip.min.js'%}"></script>
+    <script src="{% static 'libs/pdfmake/build/pdfmake.min.js'%}"></script>
+    <script src="{% static 'libs/pdfmake/build/vfs_fonts.js'%}"></script>
+    <script src="{% static 'libs/datatables.net-buttons/js/buttons.html5.min.js'%}"></script>
+    <script src="{% static 'libs/datatables.net-buttons/js/buttons.print.min.js'%}"></script>
+    <script src="{% static 'libs/datatables.net-buttons/js/buttons.colVis.min.js'%}"></script>
+
+    <!-- Responsive examples -->
+    <script src="{% static 'libs/datatables.net-responsive/js/dataTables.responsive.min.js'%}"></script>
+    <script src="{% static 'libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js'%}"></script>
+
+{% endblock extra_js %}

@@ -1,0 +1,39 @@
+{% for item in rows %}
+    <tr>
+        <td>
+            <div class="form-check font-size-16">
+                <input class="form-check-input" type="checkbox" id="check_{{ item.pk }}">
+                <label class="form-check-label" for="check_{{ item.pk }}"></label>
+            </div>
+        </td>
+        <td>{{ item.telegram_id }}</td>
+        <td>{{ item.username }}</td>
+
+        <td>{{ item.phone }}</td>
+        <td><span class="badge bg-success font-size-12"><i class="mdi mdi-star me-1"></i> {{ item.activity }}</span></td>
+        <td></td>
+        <td>{{ item.registration_date }}</td>
+        <td>
+            <div class="dropdown">
+                <a href="#" class="dropdown-toggle card-drop" data-bs-toggle="dropdown"
+                   aria-expanded="false">
+                    <i class="mdi mdi-dots-horizontal font-size-18"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a href="#" class="dropdown-item"><i
+                            class="mdi mdi-pencil font-size-16 text-success me-1"></i>Изменить</a>
+                    </li>
+                    <li><a href="#" class="dropdown-item"><i
+                            class="mdi mdi-message-bulleted font-size-16 text-primary me-1"></i>Отправить
+                        сообщение</a></li>
+                    <li><a href="#" class="dropdown-item"><i
+                            class="mdi mdi-block-helper font-size-16 text-danger me-1"></i>Заблокировать</a>
+                    </li>
+                    <li><a href="#" class="dropdown-item"><i
+                            class="mdi mdi-trash-can font-size-16 text-danger me-1"></i>Удалить</a>
+                    </li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+{% endfor %}
