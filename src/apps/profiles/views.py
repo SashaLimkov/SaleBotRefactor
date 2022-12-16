@@ -1,66 +1,49 @@
-from ajax_datatable.views import AjaxDatatableView
+import datetime
+
 from django.views.generic import ListView, View
 
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from apps.profiles.models import Profile
 
-from django.contrib.postgres.search import TrigramSimilarity
-from django.db.models.functions import Cast
-from django.db.models import CharField
+from django.core.paginator import Paginator
+
+from apps.profiles.services.profile import get_search_profiles_queryset, get_all_profiles_queryset, \
+    get_subscribe_profile_queryset
+from apps.utils.services.paginator import get_paginator_context
 
 
 class ProfileListView(ListView):
     model = Profile
-    template_name = 'profiles/list2.html'
+    template_name = 'profiles/list.html'
     context_object_name = 'profiles'
 
 
 class ProfileTableView(View):
     def post(self, request):
-        data = {}
-        if 'search' in request.POST.keys():
-            search = request.POST['search']
-            vector_trgm = TrigramSimilarity('phone', search) + TrigramSimilarity('username', search) \
-                          + TrigramSimilarity('full_name', search) + TrigramSimilarity(Cast('telegram_id', output_field=CharField()), search)
-            context = {'rows': Profile.objects.annotate(similarity=vector_trgm).filter(similarity__gt=0.35).order_by('-similarity')}
+        queryset = None
+        search = request.POST.get('search', '')
+        page = int(request.POST.get('page', 1))
+        daterange = request.POST.get('date-range', '').split(' to ')
+        if daterange:
+            date_start = datetime.datetime.strptime(daterange[0], '%Y-%m-%d')
+            date_end = datetime.datetime.strptime(daterange[1], '%Y-%m-%d')
         else:
-            context = {'rows': Profile.objects.all()}
-        data['rows'] = render_to_string('profiles/row.html',
-                                        context, request=request)
+            date_start = None
+            date_end = None
+
+        if len(search) >= 3:
+            queryset = get_search_profiles_queryset(search, date_start, date_end)
+        if not queryset:
+            queryset = get_all_profiles_queryset(date_start, date_end)
+
+        paginator = Paginator(queryset, 50)
+        queryset = get_subscribe_profile_queryset(paginator.page(page))
+        context_paginator = get_paginator_context(page, paginator.num_pages)
+
+        context = {'rows': queryset}
+        data = {
+            'rows': render_to_string('profiles/row.html', context, request=request),
+            'paginator': render_to_string('partials/paginator.html', context_paginator, request=request)
+        }
         return JsonResponse(data)
-
-
-class ProfileDatatableView(AjaxDatatableView):
-    model = Profile
-    title = 'Пользователи Telegram'
-    last_by = 'registration_date'
-    show_date_filters = True
-
-    CHOICES_GROUP = (
-        (0, 'Все'),
-        (1, 'Только подписчики'),
-        (2, 'Все, исключая подписчиков'),
-        (3, 'Кто не продлил'),
-        (4, 'Кто не продлил более 1 мес'),
-        (5, 'Ни разу не платил')
-    )
-
-    column_defs = [
-        {'name': 'id', 'title': 'ID', 'visible': True, 'searchable': False},
-        {'name': 'telegram_id', 'visible': True, 'searchable': True},
-        {'name': 'username', 'visible': True, 'searchable': True},
-        {'name': 'first_name', 'visible': False, 'searchable': False},
-        {'name': 'last_name', 'visible': False, 'searchable': False},
-        {'name': 'phone', 'visible': True, 'searchable': True},
-        {'name': 'full_name', 'visible': False, 'searchable': False},
-        {'name': 'registration_date', 'visible': True, 'searchable': False},
-        {'name': 'last_action_date', 'visible': False, 'searchable': False},
-        {'name': 'activity', 'visible': False, 'searchable': False},
-        {'name': 'count_actions_in_current_day', 'visible': False, 'searchable': False},
-        {'name': 'count_days_in_bot', 'visible': False, 'searchable': False},
-        {'name': 'count_actions', 'visible': False, 'searchable': False},
-    ]
-
-    def customize_row(self, row, obj):
-        row['telegram_id'] = f"""<a href="{row['pk']}">{row['telegram_id']}</a>"""

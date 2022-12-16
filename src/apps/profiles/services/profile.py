@@ -1,19 +1,24 @@
-from typing import Any
+from datetime import datetime
+from typing import Any, Union, List, Optional
 
-from apps.profiles.models import Profile
 from apps.profiles.services.subscription import create_user_subscription
 from apps.settings.services.settings_product_user import add_product_settings
 from apps.settings.services.settings_user import add_settings
 from apps.utils.services.date_time import get_datetime_now
+from apps.profiles.models import Profile, Subscription
+
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models.functions import Cast
+from django.db.models import CharField, Prefetch, QuerySet
 
 
 def create_user(
     telegram_id: int,
     phone: str,
     full_name: str,
-    username: str = None,
-    first_name: str = None,
-    last_name: str = None,
+    username: str = '',
+    first_name: str = '',
+    last_name: str = '',
     is_helper: bool = False,
 ) -> Profile:
     """Создает профиль пользователя и соответствующие настройки"""
@@ -26,15 +31,8 @@ def create_user(
     return profile
 
 
-def _create_profile(
-    telegram_id: int,
-    phone: str,
-    full_name: str,
-    username: str = None,
-    first_name: str = None,
-    last_name: str = None,
-    is_helper: bool = False,
-) -> Profile:
+def _create_profile(telegram_id: int, phone: str, full_name: str, username: str = '', first_name: str = '',
+                    last_name: str = '', is_helper: bool = False) -> Profile:
     """Создание профиля пользователя бота"""
     return Profile.objects.create(
         telegram_id=telegram_id,
@@ -77,3 +75,30 @@ def update_field_profile(telegram_id: int, field: str, value: Any) -> None:
         profile.save()
     else:
         raise "Profile not found"
+
+
+def get_search_profiles_queryset(search: str,
+                                 date_start: Optional[datetime.date],
+                                 date_end: Optional[datetime.date]) -> Union[QuerySet, List[Profile]]:
+    """Получить QuerySet пользователей с поиском по строке search"""
+    vector = TrigramSimilarity('phone', search) + TrigramSimilarity('username', search) \
+                  + TrigramSimilarity('full_name', search) + TrigramSimilarity(
+        Cast('telegram_id', output_field=CharField()), search)
+    prefetch_subscription = Prefetch('subscription_set', queryset=Subscription.objects.filter(active=True))
+    queryset = Profile.objects.prefetch_related(prefetch_subscription).annotate(similarity=vector).filter(
+            similarity__gt=0.35).order_by('-similarity')
+    return queryset
+
+
+def get_all_profiles_queryset(date_start: Optional[datetime.date],
+                              date_end: Optional[datetime.date]) -> Union[QuerySet, List[Profile]]:
+    """Получить QuerySet пользователей"""
+    return Profile.objects.all().prefetch_related(Prefetch('subscription_set',
+                                                           queryset=Subscription.objects.filter(active=True)))
+
+
+def get_subscribe_profile_queryset(queryset: QuerySet) -> Union[QuerySet, List[Profile]]:
+    """Привязать поле с информацией об активной подписке к существующему QuerySet"""
+    for item in queryset:
+        item.subscription_active = item.subscription_set.all()
+    return queryset

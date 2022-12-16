@@ -1,0 +1,25 @@
+{% load static %}
+
+{% for compilation in rows %}
+    <div class="col-md-6 col-xl-3">
+        <div class="card">
+            <div class="card-img-top img-fluid">
+                <a href="{% static 'images/small/img-1.jpg' %}" class="image-popup">
+                    <img src="{% static 'images/small/img-1.jpg' %}" class="img-fluid"
+                         alt="work-thumbnail">
+                </a>
+            </div>
+            <div class="card-header">
+                <h2 class="card-title">{{ compilation.name }}</h2>
+                <h5 class="card-title-desc">{{ compilation.date }}</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ compilation.text }}</p>
+                <a href="javascript: void(0);" class="btn btn-primary waves-effect waves-light">Перейти</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        lightbox = GLightbox({selector: ".image-popup", title: !1})
+    </script>
+{% endfor %}

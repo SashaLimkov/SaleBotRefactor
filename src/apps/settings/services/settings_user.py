@@ -27,11 +27,10 @@ def update_field_settings(telegram_id: int, field: str, value: Any) -> None:
     profile = SettingsUser.objects.filter(profile_id=telegram_id).first()
     if profile:
         if field == "logo":
-            with open(value, "rb") as file:
-                profile.logo.save(
-                    str(randint(10000, 9999999)) + "." + value.split(".")[-1],
-                    File(file),
-                )
+            profile.logo.save(
+                str(randint(10000, 9999999)) + "." + value.split(".")[-1],
+                File(value),
+            )
         else:
             profile.__setattr__(field, value)
         profile.save()

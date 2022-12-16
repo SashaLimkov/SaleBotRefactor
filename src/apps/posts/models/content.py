@@ -22,6 +22,24 @@ class Content(TimeBasedModel):
         on_delete=models.CASCADE,
         related_name="contents",
         verbose_name="Пост",
+        null=True,
+        blank=True
+    )
+    compilation = models.ForeignKey(
+        to="Compilation",
+        on_delete=models.CASCADE,
+        related_name="contents",
+        verbose_name="Компиляция",
+        null=True,
+        blank=True
+    )
+    final_compilation = models.ForeignKey(
+        to="FinalCompilation",
+        on_delete=models.CASCADE,
+        related_name="contents",
+        verbose_name="Гид",
+        null=True,
+        blank=True
     )
     file = models.FileField("Файл", upload_to="post_content")
     type = models.IntegerField("Тип файла", choices=TYPE_CHOICES)
