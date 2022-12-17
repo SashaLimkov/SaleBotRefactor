@@ -1,7 +1,5 @@
 from aiogram import Dispatcher
-from aiogram.dispatcher import filters
 
-from bot.data import callback_data as cd
 from bot.handlers.main.channels import work_with_sys_messages
 
 

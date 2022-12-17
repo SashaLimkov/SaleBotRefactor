@@ -38,6 +38,24 @@ async def try_edit_message(
         )
 
 
+async def try_send_invoice(message, user_id, keyboard, state, main_message_id, **kwargs):
+    try:
+        await try_delete_message(
+            chat_id=user_id,
+            message_id=main_message_id
+        )
+        mes = await bot.send_invoice(
+            chat_id=user_id,
+            reply_markup=keyboard,
+            **kwargs,
+        )
+        await state.update_data({"main_message_id": mes.message_id})
+    except Exception:
+        await notice_programmers(
+            exception_info=traceback.format_exc(), **message.chat.to_python()
+        )
+
+
 async def try_send_message(message, user_id, text, keyboard, state: FSMContext):
     """Функция, которая пытается отправить любое текстовое сообщение.
     С учетом main_message_id для дальнейшего его обновления.
@@ -63,7 +81,7 @@ async def try_send_message(message, user_id, text, keyboard, state: FSMContext):
         )
 
 
-async def send_confirmed_reg_message(chat_id: int, text: str):
+async def send_confirmed_message(chat_id: int, text: str):
     try:
         await bot.send_message(
             chat_id=chat_id,
