@@ -13,5 +13,5 @@ def setup(dp: Dispatcher):
     channels.setup(dp)
     subscriptions.setup(dp)
     dp.register_message_handler(
-        commands.start_command, filters.CommandStart(), IsRegistered(), state="*"
+        commands.start_command, filters.CommandStart(), state="*"
     )

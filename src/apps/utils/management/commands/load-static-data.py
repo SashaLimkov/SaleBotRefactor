@@ -1,6 +1,7 @@
 from django.core.management import BaseCommand
 
 from apps.message.models import Message
+from apps.profiles.models import Rate
 from apps.settings.models import Currency
 
 
@@ -141,6 +142,57 @@ class Command(BaseCommand):
 {deep_link}""",
         "cant_add_helper_helper": "Вы не можете добавить помощника, так как сами являетесь помощником."
     }
+    rates_list = [
+        {
+            "displayed": False,
+            "name": "Пробный",
+            "description": "Пробная подписка",
+            "price": 0,
+            "currency": "ALL",
+            "count_day_sub": "3",
+        },
+        {
+            "displayed": True,
+            "name": "Чат анонсов 30 дней",
+            "description": """Вы получите доступ к следующим ресурсам: 
+-Чат анонсов для байеров "PRO шопинг" (канал)
+-Чат бот @Anons_buyers_bot""",
+            "price": 2000,
+            "currency": "₽🇷🇺",
+            "count_day_sub": 30,
+        },
+        {
+            "displayed": True,
+            "name": "Чат анонсов 90 дней",
+            "description": """Вы получите доступ к следующим ресурсам: 
+-Чат анонсов для байеров "PRO шопинг" (канал)
+-Чат бот @Anons_buyers_bot""",
+            "price": 5600,
+            "currency": "₽🇷🇺",
+            "count_day_sub": 90,
+        },
+        {
+            "displayed": True,
+            "name": "Чат анонсов до 30 дней",
+            "description": """Вы получите одноразовую ссылку для помощника, дающую доступ к следующим ресурсам на {days} дней: 
+-Чат анонсов для байеров "PRO шопинг" (канал)
+-Чат бот @Anons_buyers_bot""",
+            "price": 200,
+            "currency": "₽🇷🇺",
+            "count_day_sub": 30,
+        },
+        {
+            "displayed": True,
+            "name": "Чат анонсов до 90 дней",
+            "description": """Вы получите одноразовую ссылку для помощника, дающую доступ к следующим ресурсам на {days} дней: 
+-Чат анонсов для байеров "PRO шопинг" (канал)
+-Чат бот @Anons_buyers_bot""",
+            "price": 560,
+            "currency": "₽🇷🇺",
+            "count_day_sub": 90,
+        },
+
+    ]
 
     def handle(self, *args, **options):
         for key, value in self.text_data.items():
@@ -154,3 +206,8 @@ class Command(BaseCommand):
                 **cur
             )
             c.save()
+        for rate in self.rates_list:
+            r = Rate(
+                **rate
+            )
+            r.save()
