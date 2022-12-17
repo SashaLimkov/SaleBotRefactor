@@ -6,19 +6,20 @@ from apps.posts.models import Post, UserPost
 from apps.settings.services.course import get_value_course_user_by_currency
 from apps.settings.services.currency import get_course_currency
 from apps.settings.services.settings_user import get_settings
+from bot.utils.rounder import round_num_to
 
 
 def get_posts_by_compilation_id(compilation_id: int) -> Union[QuerySet, List[Post]]:
     """Возвращает QuerySet постов по id подборки"""
     return (
         Post.objects.filter(compilation_id=compilation_id)
-        .select_related("compilation", "shop")
-        .prefetch_related("items", "contents", "user_post", "shop__currency")
+            .select_related("compilation", "shop")
+            .prefetch_related("items", "contents", "user_post", "shop__currency")
     )
 
 
 def get_formatted_posts_by_compilation_id(
-    compilation_id: int,
+        compilation_id: int,
 ) -> List[Tuple[str, List[Tuple[str, str]]]]:
     """Возвращает кортеж форматированных постов в формате Tuple['текст поста', Tuple['список медиа']]"""
     posts = get_posts_by_compilation_id(compilation_id)
@@ -45,7 +46,7 @@ def get_formatted_posts_by_compilation_id(
 
 
 def get_formatted_user_settings_posts_by_compilation_id(
-    compilation_id: int, telegram_id: int, channel=0
+        compilation_id: int, telegram_id: int, channel=0
 ) -> List[Tuple[str, List[Tuple[str, str]]]]:
     """Возвращает посты на основе настроек пользователя в формате Tuple['текст поста', Tuple['список медиа']]
     Аргумент channel, принимает значение 0 - отправка в TG и 1 - отправка в ВК"""
@@ -87,8 +88,8 @@ def get_formatted_user_settings_posts_by_compilation_id(
                         price_old = price_old + (price_old / 100 * settings.commission)
                         price_new = price_new + (price_new / 100 * settings.commission)
                     if settings.rounder:
-                        price_old = round(price_old, settings.rounder)
-                        price_new = round(price_new, settings.rounder)
+                        price_old = await round_num_to(price_old, settings.rounder, settings.currency)
+                        price_new = await round_num_to(price_new, settings.rounder, settings.currency)
                     post_text += f"Цена: <b><s>{price_old}{sign}</s>"
                     if price_new:
                         post_text += f"➡️{price_new}{sign}</b>" + "\n"
@@ -111,8 +112,8 @@ def add_user_post(post_id: int, text: str, telegram_id: int) -> UserPost:
     """Добавляет пользовательский пост, наследованный от оригинального поста"""
     return (
         UserPost.objects.select_related("post", "profile")
-        .prefetch_related("post__compilation", "post__shop")
-        .update_or_create(
+            .prefetch_related("post__compilation", "post__shop")
+            .update_or_create(
             post_id=post_id, profile_id=telegram_id, defaults={"text": text}
         )
     )
