@@ -15,7 +15,7 @@ from bot.utils import message_worker as mw
 
 
 async def main_settings_actions(
-    call: types.CallbackQuery, callback_data: dict, state: FSMContext
+        call: types.CallbackQuery, callback_data: dict, state: FSMContext
 ):
     data = await state.get_data()
     main_message_id = data.get("main_message_id", False)
@@ -46,9 +46,20 @@ async def main_settings_actions(
     elif user_action == 4:
         pass
     elif user_action == 5:
-        text, keyboard = await return_text_and_keyboard_for_wm_settings(
+        text, keyboard, photo = await return_text_and_keyboard_for_wm_settings(
             user_settings=user_settings, user_id=user_id, callback_data=callback_data
         )
+        if photo:
+            await mw.try_edit_photo(
+                photo_path=user_settings.logo.path,
+                chat_id=user_id,
+                text=text,
+                message=call.message,
+                main_message_id=main_message_id,
+                state=state,
+                keyboard=keyboard
+            )
+            return
     elif user_action == 6:
         text = get_message_by_name_for_user(
             name="product_settings", telegram_id=user_id

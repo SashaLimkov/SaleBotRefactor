@@ -19,15 +19,15 @@ def get_user_active_subscription(telegram_id: int) -> Optional[Subscription]:
         return Subscription.objects.filter(profile_id=telegram_id, active=True).first()
 
 
-def create_user_subscription(telegram_id: int, cheque: str, rate: str) -> Subscription:
+def create_user_subscription(telegram_id: int, cheque: str, rate: str, helper_days: int = None) -> Subscription:
     """Создает новую подписку пользователя"""
     rate = Rate.objects.get(name=rate)
     return Subscription.objects.create(
         profile_id=telegram_id,
-        datetime_end=get_datetime_now() + datetime.timedelta(days=rate.count_day_sub),
+        datetime_end=get_datetime_now() + datetime.timedelta(days=helper_days if helper_days else rate.count_day_sub),
         cheque=cheque,
         rate=rate,
-        days_left=rate.count_day_sub,
+        days_left=helper_days if helper_days else rate.count_day_sub,
     )
 
 

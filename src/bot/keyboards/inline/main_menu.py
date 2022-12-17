@@ -82,12 +82,12 @@ async def get_date_menu():
 
 async def get_sub_menu(is_active: bool, is_helper: bool, callback_data: dict):
     buttons = []
-    if is_active and not is_helper:
+    if is_active:
         buttons = [
             {
                 "text": value,
                 "callback_data": cd.sub_menu.new(
-                    first_lvl=callback_data["action"], second_lvl=index + 1
+                    first_lvl=callback_data["action"], second_lvl=index
                 ),
             }
             for index, value in enumerate(ld.SUBSCRIPTION_MENU)

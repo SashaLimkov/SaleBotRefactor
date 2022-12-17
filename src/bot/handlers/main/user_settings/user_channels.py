@@ -9,7 +9,7 @@ from bot.keyboards import inline as ik
 
 
 async def get_tg_channels_and_instructions(
-    call: types.CallbackQuery, callback_data: dict, state: FSMContext
+        call: types.CallbackQuery, callback_data: dict, state: FSMContext
 ):
     data = await state.get_data()
     main_message_id = data.get("main_message_id", False)
@@ -32,5 +32,5 @@ async def get_tg_channels_list_text(telegram_id: int) -> str:
     tg_channels = get_list_telegram_channels(telegram_id=telegram_id)
     channel_list = ""
     for channel in tg_channels:
-        channel_list += f"{channel.name}\n"
+        channel_list += f"- {channel.name}\n"
     return channel_list

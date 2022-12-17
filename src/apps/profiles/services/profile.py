@@ -13,26 +13,31 @@ from django.db.models import CharField, Prefetch, QuerySet, Q
 
 
 def create_user(
-    telegram_id: int,
-    phone: str,
-    full_name: str,
-    username: str = '',
-    first_name: str = '',
-    last_name: str = '',
-    is_helper: bool = False,
+        telegram_id: int,
+        phone: str,
+        full_name: str,
+        username: str = '',
+        first_name: str = '',
+        last_name: str = '',
+        is_helper: bool = False,
+        helper_days: int = None,
+        rate: str = None,
+        cheque: str = None,
+        inviter_id: int = None
 ) -> Profile:
     """Создает профиль пользователя и соответствующие настройки"""
     profile = _create_profile(
-        telegram_id, phone, full_name, username, first_name, last_name, is_helper
+        telegram_id, phone, full_name, username, first_name, last_name, is_helper, inviter_id
     )
     settings = add_settings(telegram_id)
     add_product_settings(settings.id)
-    create_user_subscription(telegram_id, "Старт пробной подписки", "Пробный")
+    create_user_subscription(telegram_id, "Старт пробной подписки" if not cheque else cheque,
+                             "Пробный" if not rate else rate, helper_days=helper_days)
     return profile
 
 
 def _create_profile(telegram_id: int, phone: str, full_name: str, username: str = '', first_name: str = '',
-                    last_name: str = '', is_helper: bool = False) -> Profile:
+                    last_name: str = '', is_helper: bool = False, inviter_id: int = None) -> Profile:
     """Создание профиля пользователя бота"""
     return Profile.objects.create(
         telegram_id=telegram_id,
@@ -42,7 +47,15 @@ def _create_profile(telegram_id: int, phone: str, full_name: str, username: str 
         first_name=first_name,
         last_name=last_name,
         is_helper=is_helper,
-    )
+    ) if not inviter_id else Profile.objects.create(telegram_id=telegram_id,
+                                                    phone=phone,
+                                                    full_name=full_name,
+                                                    username=username,
+                                                    first_name=first_name,
+                                                    last_name=last_name,
+                                                    is_helper=is_helper,
+                                                    inviting_user_id=inviter_id
+                                                    )
 
 
 def get_profile_by_telegram_id(telegram_id: int) -> Profile:
@@ -80,12 +93,12 @@ def update_field_profile(telegram_id: int, field: str, value: Any) -> None:
 def get_search_profiles_queryset(search: str, filter_date: Q) -> Union[QuerySet, List[Profile]]:
     """Получить QuerySet пользователей с поиском по строке search"""
     vector = TrigramSimilarity('phone', search) + TrigramSimilarity('username', search) \
-                  + TrigramSimilarity('full_name', search) + TrigramSimilarity(
+             + TrigramSimilarity('full_name', search) + TrigramSimilarity(
         Cast('telegram_id', output_field=CharField()), search)
     prefetch_subscription = Prefetch('subscription_set', queryset=Subscription.objects.filter(active=True))
     if not filter_date:
         queryset = Profile.objects.prefetch_related(prefetch_subscription).annotate(similarity=vector).filter(
-                similarity__gt=0.35).order_by('-similarity')
+            similarity__gt=0.35).order_by('-similarity')
     else:
         queryset = Profile.objects.prefetch_related(prefetch_subscription).annotate(similarity=vector).filter(
             filter_date, similarity__gt=0.35).order_by('-similarity')
@@ -102,7 +115,7 @@ def get_all_profiles_queryset(filter_date: Q) -> Union[QuerySet, List[Profile]]:
 
 
 def get_date_range_profiles_filter(date_start: Optional[datetime.date],
-                                     date_end: Optional[datetime.date]) -> Q:
+                                   date_end: Optional[datetime.date]) -> Q:
     """Получение фильтра по дате регистрации"""
     return Q(registration_date__gte=date_start, registration_date__lte=date_end)
 

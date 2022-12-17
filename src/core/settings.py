@@ -54,7 +54,7 @@ LOCAL_APPS = [
     'apps.profiles',
     'apps.posts',
     'apps.settings',
-    'apps.utils'
+    'apps.utils',
 ]
 
 THIRD_PARTY_APPS = [
@@ -228,6 +228,7 @@ SOCIALACCOUNT_PROVIDERS = {
 # Bot settings
 
 BOT_TOKEN = env('BOT_TOKEN')
+CHANNEL = env('CHANNEL')
 
 # Celery and broker settings
 
