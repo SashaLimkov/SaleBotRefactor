@@ -228,6 +228,7 @@ SOCIALACCOUNT_PROVIDERS = {
 # Bot settings
 
 BOT_TOKEN = env('BOT_TOKEN')
+CHANNEL = env('CHANNEL')
 
 # Celery and broker settings
 
