@@ -1,16 +1,19 @@
 import datetime
 
-from django.views.generic import ListView, View, DetailView
+from django.shortcuts import render
+from django.views.generic import ListView, View, DetailView, CreateView
 
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 
 from apps.posts.services.compilation import get_search_compilations_queryset, get_all_compilation_queryset, \
-    get_content_compilation_queryset, get_date_range_compilation_filter
-from apps.posts.models import Compilation
+    get_content_compilation_queryset, get_date_range_compilation_filter, create_compilation, update_compilation, \
+    create_final_compilation, update_or_create_final_compilation
+from apps.posts.models import Compilation, Content, FinalCompilation
 
 from django.core.paginator import Paginator
 
+from apps.posts.services.content import update_or_create_content, create_content
 from apps.utils.services.paginator import get_paginator_context
 
 
@@ -35,7 +38,6 @@ class CompilationTableView(View):
             filter_date = get_date_range_compilation_filter(date_start, date_end)
         if len(search) >= 3:
             queryset = get_search_compilations_queryset(search, filter_date)
-        print(queryset)
         if not queryset and not search:
             queryset = get_all_compilation_queryset(filter_date)
 
@@ -56,3 +58,131 @@ class CompilationDetailView(DetailView):
     template_name = 'posts/form.html'
     context_object_name = 'compilation'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['compilation'].datetime_send = datetime.date.strftime(context['compilation'].datetime_send,
+                                                                      '%Y-%m-%dT%H:%M')
+        context['posts']
+        return context
+
+    def post(self, request, pk):
+        if request.FILES.get('media'):
+            format_file = str(request.FILES.get('media')).split('.')[-1]
+            if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
+                type_content = 0
+            else:
+                type_content = 1
+            update_or_create_content(
+                file_name=str(request.FILES.get('media')),
+                file=request.FILES.get('media'),
+                type_content=type_content,
+                to='compilation',
+                to_id=pk
+            )
+        update_compilation(
+            compilation_id=pk,
+            name=request.POST.get('name'),
+            text=request.POST.get('text').replace('<p>', '').replace('</p>', ''),
+            date=datetime.datetime.strptime(request.POST.get('date'), '%Y-%m-%d'),
+            datetime_send=datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'),
+            done=True if request.POST.get('complete') == 'true' else False
+        )
+        return JsonResponse({'success': True})
+
+
+class FinalCompilationSaveView(View):
+    def post(self, request, pk):
+        final_compilation = update_or_create_final_compilation(
+            compilation_id=pk,
+            text=request.POST.get('text').replace('<p>', '').replace('</p>', '')
+        )[0]
+        if request.FILES.get('media'):
+            format_file = str(request.FILES.get('media')).split('.')[-1]
+            if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
+                type_content = 0
+            else:
+                type_content = 1
+            update_or_create_content(
+                file_name=str(request.FILES.get('media')),
+                file=request.FILES.get('media'),
+                type_content=type_content,
+                to='final_compilation',
+                to_id=final_compilation.pk
+            )
+        return JsonResponse({'success': True})
+
+
+class CompilationCreateView(View):
+    def get(self, requet):
+        return render(requet, 'posts/form_create.html')
+
+    def post(self, request):
+        compilation_id = request.POST.get('compilation_id')
+        if compilation_id != 'undefined':
+            compilation = update_compilation(
+                compilation_id=int(compilation_id),
+                name=request.POST.get('name'),
+                text=request.POST.get('text').replace('<p>', '').replace('</p>', ''),
+                date=datetime.datetime.strptime(request.POST.get('date'), '%Y-%m-%d'),
+                datetime_send=datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'),
+                done=True if request.POST.get('complete') == 'true' else False
+            )
+            if request.FILES.get('media'):
+                format_file = str(request.FILES.get('media')).split('.')[-1]
+                if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
+                    type_content = 0
+                else:
+                    type_content = 1
+                update_or_create_content(
+                    file_name=str(request.FILES.get('media')),
+                    file=request.FILES.get('media'),
+                    type_content=type_content,
+                    to='compilation',
+                    to_id=compilation.id
+                )
+        else:
+            compilation = create_compilation(
+                name=request.POST.get('name'),
+                text=request.POST.get('text').replace('<p>', '').replace('</p>', ''),
+                date=datetime.datetime.strptime(request.POST.get('date'), '%Y-%m-%d'),
+                datetime_send=datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'),
+                done=True if request.POST.get('complete') == 'true' else False
+            )
+            format_file = str(request.FILES.get('media')).split('.')[-1]
+            if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
+                type_content = 0
+            else:
+                type_content = 1
+            create_content(
+                file_name=str(request.FILES.get('media')),
+                file=request.FILES.get('media'),
+                type_content=type_content,
+                to='compilation',
+                to_id=compilation.id
+            )
+
+        gid = render_to_string('posts/form_gid.html', {'compilation_id': compilation.pk}, request=request)
+        return JsonResponse({'success': True, 'gid': gid})
+
+
+class FinalCompilationCreateView(View):
+    def post(self, request):
+        compilation_id = request.POST.get('compilation')
+        final_compilation = create_final_compilation(
+            compilation_id=int(compilation_id),
+            text=request.POST.get('text').replace('<p>', '').replace('</p>', '')
+        )
+        format_file = str(request.FILES.get('media')).split('.')[-1]
+        if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
+            type_content = 0
+        else:
+            type_content = 1
+        print(final_compilation)
+        create_content(
+            file_name=str(request.FILES.get('media')),
+            file=request.FILES.get('media'),
+            type_content=type_content,
+            to='final_compilation',
+            to_id=final_compilation.pk
+        )
+        return JsonResponse({'success': True})

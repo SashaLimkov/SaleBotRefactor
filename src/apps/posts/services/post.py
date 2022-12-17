@@ -3,6 +3,7 @@ from typing import Union, List, Tuple
 from django.db.models import QuerySet
 
 from apps.posts.models import Post, UserPost
+from apps.posts.services.content import watermark
 from apps.settings.services.course import get_value_course_user_by_currency
 from apps.settings.services.currency import get_course_currency
 from apps.settings.services.settings_user import get_settings
@@ -100,7 +101,11 @@ def get_formatted_user_settings_posts_by_compilation_id(
                 if settings.signature:
                     post_text += "\n\n" + settings.signature
             for content in post.contents.all():
-                contents.append((content.type, content.file.path))
+                if settings.logo or settings.text_logo and content.type == 0:
+                    contents.append((0, watermark(content.file.path, settings.logo,
+                                                  settings.logo_position, settings.text_logo)))
+                else:
+                    contents.append((content.type, content.file.path))
         else:
             post_text = post.user_post.all()[0].text
         result_user_list.append((post_text, contents))

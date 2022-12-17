@@ -16,3 +16,4 @@ class CompilationAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Compilation, CompilationAdmin)
+admin.site.register(Content)

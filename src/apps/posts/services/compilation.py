@@ -4,7 +4,7 @@ from typing import Union, List, Optional
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import QuerySet, Q
 
-from apps.posts.models import Compilation
+from apps.posts.models import Compilation, FinalCompilation
 
 
 def get_list_compilations_by_date(
@@ -50,5 +50,44 @@ def get_content_compilation_queryset(queryset: QuerySet) -> Union[QuerySet, List
     for item in queryset:
         if item.contents.all():
             item.media = item.contents.all()[0].file
-            print(item.media.url)
     return queryset
+
+
+def create_compilation(name: str, date: datetime.datetime, text: str,
+                       done: bool, datetime_send: datetime.datetime) -> Compilation:
+    """Создает новый объект подборки"""
+    return Compilation.objects.create(
+        name=name,
+        text=text,
+        date=date,
+        datetime_send=datetime_send,
+        done=done
+    )
+
+
+def update_compilation(compilation_id: int, name: str, date: datetime.datetime, text: str,
+                       done: bool, datetime_send: datetime.datetime) -> Compilation:
+    """Обновляет существующий объект подборки"""
+    compilation = Compilation.objects.get(pk=compilation_id)
+    compilation.name = name
+    compilation.date = date
+    compilation.done = done
+    compilation.text = text
+    compilation.datetime_send = datetime_send
+    compilation.save()
+    return compilation
+
+
+def create_final_compilation(compilation_id: int, text: str) -> FinalCompilation:
+    """Создает новый объект окончания подборки"""
+    return FinalCompilation.objects.create(
+        compilation_id=compilation_id,
+        text=text,
+    )
+
+
+def update_or_create_final_compilation(compilation_id: int, text: str,) -> FinalCompilation:
+    """Обновляет существующий объект окончания подборки"""
+    return FinalCompilation.objects.update_or_create(compilation_id=compilation_id,
+                                                     defaults={'text': text})
+

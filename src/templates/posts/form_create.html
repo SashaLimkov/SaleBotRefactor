@@ -1,7 +1,7 @@
 {% extends 'partials/base.html' %}
 {% load static %}
 
-{% block title %}{{ compilation.name }}{% endblock title %} {"title": "{{ compilation.name }}"})
+{% block title %}Новая подборка{% endblock title %} {"title": "Новая подборка"})
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'libs/glightbox/dist/css/glightbox.min.css' %}">
@@ -26,13 +26,13 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                            <h4 class="mb-sm-0 font-size-18">{{ compilation.name }}</h4>
+                            <h4 class="mb-sm-0 font-size-18">Новая подборка</h4>
 
                             <div class="page-title-right">
                                 <ol class="breadcrumb m-0">
                                     <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Главная</a></li>
                                     <li class="breadcrumb-item"><a href="{% url 'compilation_list' %}">Подборки</a></li>
-                                    <li class="breadcrumb-item active">{{ compilation.name }}</li>
+                                    <li class="breadcrumb-item active">Новая подборка</li>
                                 </ol>
                             </div>
 
@@ -47,17 +47,6 @@
                                 <h3 class="card-title">Обзор</h3>
                             </div>
                             <div class="card-body">
-                                <div class="card-img-top img-fluid">
-                                    {% if compilation.contents.first.type == 0 %}
-                                        <a href="{{ compilation.contents.first.file.url }}" class="image-popup">
-                                            <img src="{{ compilation.contents.first.file.url }}" class="img-fluid"
-                                                 alt="work-thumbnail">
-                                        </a>
-                                    {% elif compilation.contents.first.type == 1 %}
-                                        <video controls="controls" style="width: 100%; height: auto; max-height: 100%;"
-                                               src="{{ compilation.contents.first.file.url }}"></video>
-                                    {% endif %}
-                                </div>
                                 <form id="compilation-form">
                                     <div class="mb-4">
                                         <label class="form-label" for="default-input">Медиа</label>
@@ -67,12 +56,12 @@
                                     <div class="mb-4">
                                         <label class="form-label" for="default-input">Название</label>
                                         <input class="form-control" type="text" id="name" name="name"
-                                               placeholder="Название" value="{{ compilation.name }}">
+                                               placeholder="Название" value="">
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label" for="default-input">Дата</label>
                                         <input class="form-control" type="text" id="date-compilation" name="date"
-                                               value="{{ compilation.date }}">
+                                               value="">
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label" for="default-input">Текст</label>
@@ -97,7 +86,7 @@
                                             <label for="example-datetime-local-input" class="form-label">Время
                                                 отправки</label>
                                             <input class="form-control" type="datetime-local"
-                                                   value="{{ compilation.datetime_send }}"
+                                                   value=""
                                                    id="example-datetime-local-input" name="date_send">
                                         </div>
                                     </div>
@@ -110,42 +99,7 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-md-12 col-xl-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Гид</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="card-img-top img-fluid">
-                                    {% if compilation.finalcompilation_set.first.contents.first.type == 0 %}
-                                        <a href="{{ compilation.finalcompilation_set.first.contents.first.file.url }}"
-                                           class="image-popup">
-                                            <img src="{{ compilation.finalcompilation_set.first.contents.first.file.url }}"
-                                                 class="img-fluid"
-                                                 alt="work-thumbnail">
-                                        </a>
-                                    {% elif compilation.finalcompilation_set.first.contents.first.type == 1 %}
-                                        <video controls="controls" style="width: 100%; height: auto; max-height: 100%;"
-                                               src="{{ compilation.finalcompilation_set.first.contents.first.file.url }}"></video>
-                                    {% endif %}
-                                </div>
-                                <form id="final-form">
-                                    <div class="mb-4">
-                                        <label class="form-label" for="default-input">Медиа</label>
-                                        <input class="form-control" type="file" id="media_final" name="media"
-                                               placeholder="Название">
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="form-label" for="default-input">Текст</label>
-                                        <div id="ckeditor-gid"></div>
-                                    </div>
-                                    <div class="mb-4">
-                                        <button type="submit" class="btn btn-primary">Сохранить</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                    <div class="col-md-12 col-xl-6" id="gid-form">
                     </div>
                 </div>
                 <div class="row">
@@ -155,19 +109,7 @@
                                 <h3 class="card-title">Посты</h3>
                             </div>
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="text-sm-end">
-                                            <a type="button" href="{% url 'compilation_create' %}"
-                                               class="btn btn-success btn-rounded waves-effect waves-light mb-2 me-2">
-                                                <i class="mdi mdi-plus me-1"></i> Новый пост
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
 
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -202,9 +144,10 @@
             var form_data = new FormData(this);
             form_data.append('text', editor_compilation.getData())
             form_data.append('complete', $('#is_complted').is(':checked'))
+            form_data.append('compilation_id', $('#compilation_id').val())
             headers = {'X-CSRFToken': '{{ csrf_token }}'};
             $.ajax({
-                url: '{% url 'compilation_detail' pk=compilation.pk %}',
+                url: '{% url 'compilation_create' %}',
                 type: 'POST',
                 data: form_data,
                 dataType: 'json',
@@ -213,35 +156,18 @@
                 headers: headers,
                 contentType: false,
                 success: function (data) {
-                    alertify.success("Сохранено")
+                    alertify.success("Сохранено");
+                    if ($('#compilation_id').val() == undefined){
+                        $('#gid-form').html(data.gid);
+                    }
+
                 },
                 error: function (data) {
                     alertify.error("Ошибка при сохранении")
                 }
             })
         })
-        $('#final-form').on('submit', function (event) {
-            event.preventDefault();
-            var form_data = new FormData(this);
-            form_data.append('text', editor_gid.getData())
-            headers = {'X-CSRFToken': '{{ csrf_token }}'};
-            $.ajax({
-                url: '{% url 'compilation_final_detail' pk=compilation.pk %}',
-                type: 'POST',
-                data: form_data,
-                dataType: 'json',
-                cache: false,
-                processData: false,
-                headers: headers,
-                contentType: false,
-                success: function (data) {
-                    alertify.success("Сохранено")
-                },
-                error: function (data) {
-                    alertify.error("Ошибка при сохранении")
-                }
-            })
-        })
+
 
     </script>
 
@@ -251,7 +177,7 @@
 
     <script>
         let editor_compilation;
-        let editor_gid;
+
 
         ClassicEditor.create(
             document.querySelector("#ckeditor-classic"),
@@ -261,33 +187,7 @@
         ).then(function (e) {
             e.ui.view.editable.element.style.height = "200px"
             editor_compilation = e;
-            var content = '<p>{{ compilation.text }}</p>';
-            content = content.replaceAll('&lt;', '<');
-            content = content.replaceAll('&gt;', '>');
-            const viewFragment = e.data.processor.toView(content);
-            const modelFragment = e.data.toModel(viewFragment);
-
-            e.model.insertContent(modelFragment);
-        }).catch(function (e) {
-            console.error(e)
-        });
-
-        ClassicEditor.create(
-            document.querySelector("#ckeditor-gid"),
-            {
-
-                toolbar: ['bold', 'italic', 'link', 'numberedList', 'bulletedList', 'undo', 'redo']
-            },
-        ).then(function (e) {
-            e.ui.view.editable.element.style.height = "200px"
-            editor_gid = e;
-            var content = '<p>{{ compilation.finalcompilation_set.first.text }}</p>';
-            content = content.replaceAll('&lt;', '<');
-            content = content.replaceAll('&gt;', '>');
-            const viewFragment = e.data.processor.toView(content);
-            const modelFragment = e.data.toModel(viewFragment);
-
-            e.model.insertContent(modelFragment);
+            e.setData('{{ compilation.text }}');
         }).catch(function (e) {
             console.error(e)
         });

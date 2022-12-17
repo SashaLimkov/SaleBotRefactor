@@ -3,6 +3,37 @@ import math
 from PIL import Image, ImageFont, ImageDraw
 import random
 
+from apps.posts.models import Content
+
+
+def create_content(file_name: str, file: bytes, type_content: int, to: str, to_id: int) -> Content:
+    """Создает объект контента"""
+    if to == 'compilation':
+        content = Content.objects.create(type=type_content, compilation_id=to_id)
+    elif to == 'final_compilation':
+        content = Content.objects.create(type=type_content, final_compilation_id=to_id)
+    else:
+        content = Content.objects.create(type=type_content, post_id=to_id)
+    content.file.save(file_name, file)
+    content.save()
+    return content
+
+
+def update_or_create_content(file_name: str, file: bytes, type_content: int, to: str, to_id: int) -> Content:
+    """Обновляет объект контента"""
+    if to == 'compilation':
+        content = Content.objects.get_or_create(compilation_id=to_id,
+                                                defaults={'type': type_content})
+    elif to == 'final_compilation':
+        content = Content.objects.get_or_create(final_compilation_id=to_id,
+                                                defaults={'type': type_content})
+    else:
+        content = Content.objects.get_or_create(post_id=to_id,
+                                                defaults={'type': type_content})
+    content[0].file.save(file_name, file)
+    content[0].save()
+    return content
+
 
 def watermark(img_post, img_wm, position, t_wm=" "):
     try:
@@ -53,7 +84,7 @@ def watermark(img_post, img_wm, position, t_wm=" "):
             diagonal_length = int(math.sqrt((width**2) + (height**2)))
             diagonal_to_use = diagonal_length * DIAGONAL_PERCENTAGE
             font_size = int(diagonal_to_use / (message_length / FONT_RATIO))
-            font = ImageFont.truetype("bookmanoldstyle.ttf", font_size)
+            font = ImageFont.truetype("static/fonts/bookmanoldstyle.ttf", font_size)
             mark_width, mark_height = font.getsize(t_wm)
             watermark = Image.new("RGBA", (mark_width, mark_height), (0, 0, 0, 0))
             draw = ImageDraw.Draw(watermark)
@@ -65,7 +96,7 @@ def watermark(img_post, img_wm, position, t_wm=" "):
             img_post_p.paste(watermark, (px, py, px + wx, py + wy), watermark)
         else:
             font_size = 70
-            font = ImageFont.truetype("bookmanoldstyle.ttf", font_size)
+            font = ImageFont.truetype("static/fonts/bookmanoldstyle.ttf", font_size)
             mark_width, mark_height = font.getsize(t_wm)
             watermark = Image.new("RGBA", (mark_width, mark_height), (0, 0, 0, 0))
             draw = ImageDraw.Draw(watermark)
@@ -78,14 +109,7 @@ def watermark(img_post, img_wm, position, t_wm=" "):
                     py = int(height - y * 550) - 150
                     img_post_p.paste(watermark, (px, py, px + wx, py + wy), watermark)
 
-    splited: list = img_post.split("/")
-    print(splited)
-    name = splited[-1]
-    img_post_p = img_post_p.convert("RGB")
-    splited[-1] = str(random.randint(10000, 9999999)) + name
-    splited[-2] = "photos_gen"
-    splited.pop(-3)
-    print(splited)
-    print("/".join(splited))
-    img_post_p.save("/".join(splited))
-    return "/".join(splited)
+    file_name, file_format = img_post.split("/")[-1].split('.')
+    path = f'media/post_users/{file_name}_{random.randint(100000, 9999999)}.{file_format}'
+    img_post_p.save(path)
+    return path

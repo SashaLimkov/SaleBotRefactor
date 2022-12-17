@@ -32,8 +32,6 @@ class FinalCompilation(TimeBasedModel):
 
     message_id = models.BigIntegerField("ID Сообщения", blank=True, null=True)
 
-    datetime_send = models.DateTimeField("Время отправки")
-
     def __str__(self):
         return f"{self.compilation.name} | FINAL"
 
