@@ -1,7 +1,6 @@
 from aiogram import Dispatcher
 
 from bot.data import callback_data as cd
-from bot.filters import IsTrial, IsHelper
 from bot.handlers.main.subscriptions import buy_sub_or_add_helper, invoice, helper_sub, user_sub
 
 
