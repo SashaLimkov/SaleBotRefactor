@@ -16,7 +16,7 @@ def get_list_compilations_by_date(
 
 def get_compilation_by_id(compilation_id: int) -> Compilation:
     """Возвращает подборку по названию"""
-    return Compilation.objects.filter(pk=compilation_id).first()
+    return Compilation.objects.prefetch_related("contents").filter(pk=compilation_id).first()
 
 
 def get_search_compilations_queryset(search: str, filter_date: Q) -> Union[QuerySet, List[Compilation]]:

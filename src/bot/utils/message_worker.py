@@ -75,6 +75,7 @@ async def try_send_message(message, user_id, text, keyboard, state: FSMContext):
             chat_id=user_id, text=text, reply_markup=keyboard if keyboard else None
         )
         await state.update_data({"main_message_id": mes.message_id})
+        return mes.message_id
     except Exception:
         await notice_programmers(
             exception_info=traceback.format_exc(), **message.chat.to_python()
@@ -213,4 +214,115 @@ async def try_send_photo(
     except Exception:
         await notice_programmers(
             exception_info=traceback.format_exc(), **message.from_user.to_python()
+        )
+
+
+async def try_send_post_to_user(
+        file_path: str,
+        file_type: int,
+        chat_id: int,
+        text: str,
+        message,
+        keyboard, ):
+    if file_type:
+        mes_id = await try_send_post_with_video(file_path=file_path, chat_id=chat_id, text=text, message=message,
+                                                keyboard=keyboard)
+    else:
+        mes_id = await try_send_post_with_photo(file_path=file_path, chat_id=chat_id, text=text, message=message,
+                                                keyboard=keyboard)
+    return mes_id
+
+
+async def try_send_post_with_photo(
+        file_path: str,
+        chat_id: int,
+        text: str,
+        message,
+        keyboard, ):
+    try:
+        mes = await bot.send_photo(
+            chat_id=chat_id,
+            photo=types.InputFile(file_path),
+            caption=text,
+            reply_markup=keyboard
+        )
+        return mes.message_id
+    except Exception:
+        await notice_programmers(
+            exception_info=traceback.format_exc(), **message.from_user.to_python()
+        )
+
+
+async def try_send_post_with_video(
+        file_path: str,
+        chat_id: int,
+        text: str,
+        message,
+        keyboard, ):
+    try:
+        vid = cv2.VideoCapture(file_path)
+        wh, hh = vid.get(cv2.CAP_PROP_FRAME_WIDTH), vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        mes = await bot.send_video(
+            chat_id=chat_id,
+            video=types.InputFile(file_path),
+            width=wh,
+            height=hh,
+            supports_streaming=True,
+            caption=text,
+            reply_markup=keyboard
+        )
+        return mes.message_id
+    except Exception:
+        await notice_programmers(
+            exception_info=traceback.format_exc(), **message.from_user.to_python()
+        )
+
+
+async def try_pin_unpin_message(chat_id: int, message_id: int, pin: bool):
+    try:
+        if pin:
+            await bot.pin_chat_message(
+                chat_id=chat_id,
+                message_id=message_id
+            )
+        else:
+            await bot.unpin_chat_message(
+                chat_id=chat_id,
+                message_id=message_id
+            )
+    except:
+        await notice_programmers(exception_info=traceback.format_exc())
+
+
+async def try_edit_keyboard(
+        chat_id: int,
+        message_id: int,
+        keyboard):
+    try:
+        await bot.edit_message_reply_markup(
+            chat_id=chat_id,
+            message_id=message_id,
+            reply_markup=keyboard
+        )
+    except:
+        await notice_programmers(
+            exception_info=traceback.format_exc(),
+        )
+
+
+async def try_edit_message_caption(
+        chat_id: int,
+        text: str,
+        message_id: int,
+        keyboard, ):
+    try:
+        await bot.edit_message_caption(
+            chat_id=chat_id,
+            caption=text,
+            message_id=message_id,
+            reply_markup=keyboard
+        )
+    except:
+        await notice_programmers(
+            exception_info=traceback.format_exc(),
         )

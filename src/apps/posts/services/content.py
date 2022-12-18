@@ -40,13 +40,15 @@ def watermark(img_post, img_wm, position, t_wm=" "):
         img_post_p = Image.open(img_post)
     except:
         return img_post
-    if position == "[]":
+    if position == "center":
         pos = 1
+    elif position == "fill":
+        pos = 0
     else:
-        pos = position
+        return img_post
     if img_wm:
         img_wm = Image.open(img_wm)
-        position = int(pos)
+        position = pos
         if position == 1:
             img_wm = img_wm.resize((img_post_p.size[0] // 2, img_post_p.size[1] // 2))
             if img_wm.mode != "RGBA":
@@ -78,10 +80,10 @@ def watermark(img_post, img_wm, position, t_wm=" "):
         message_length = len(t_wm)
         opacity = int(256 * 0.3)
         angle = math.degrees(math.atan(height / width))
-        if int(pos) == 1:
+        if pos == 1:
             FONT_RATIO = 2
             DIAGONAL_PERCENTAGE = 0.7
-            diagonal_length = int(math.sqrt((width**2) + (height**2)))
+            diagonal_length = int(math.sqrt((width ** 2) + (height ** 2)))
             diagonal_to_use = diagonal_length * DIAGONAL_PERCENTAGE
             font_size = int(diagonal_to_use / (message_length / FONT_RATIO))
             font = ImageFont.truetype("static/fonts/bookmanoldstyle.ttf", font_size)
@@ -110,6 +112,6 @@ def watermark(img_post, img_wm, position, t_wm=" "):
                     img_post_p.paste(watermark, (px, py, px + wx, py + wy), watermark)
 
     file_name, file_format = img_post.split("/")[-1].split('.')
-    path = f'media/post_users/{file_name}_{random.randint(100000, 9999999)}.{file_format}'
+    path = f'{file_name}_{random.randint(100000, 9999999)}.{file_format}'
     img_post_p.save(path)
     return path
