@@ -121,6 +121,11 @@ def add_user_post(post_id: int, text: str, telegram_id: int) -> UserPost:
     )
 
 
+def get_user_post(post_id: int, telegram_id: int) -> UserPost:
+    """Возвращает пользовательский пост"""
+    return UserPost.objects.filter(post_id=post_id, telegram_id=telegram_id).first()
+
+
 def delete_user_post(post_id: int, telegram_id: int) -> None:
     """Удаляет пользовательский пост"""
     UserPost.objects.get(post_id=post_id, profile_id=telegram_id).delete()
