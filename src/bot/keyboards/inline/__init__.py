@@ -9,3 +9,4 @@ from .link_settings import *
 from .user_channels import *
 from .watermark import *
 from .subscriptions import *
+from .inline_and_posts import *

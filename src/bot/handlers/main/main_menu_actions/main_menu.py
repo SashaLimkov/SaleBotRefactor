@@ -45,7 +45,7 @@ async def main_menu_actions(
         text = get_message_by_name_for_user(
             name="select_date", telegram_id=user_id
         ).text
-        keyboard = await ik.get_date_menu()
+        keyboard = await ik.get_date_menu(callback_data=callback_data)
     elif user_action == 3:
         sub = get_user_active_subscription(user_id)
         text = get_message_by_name_for_user(

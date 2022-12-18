@@ -154,6 +154,7 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
                 keyboard=None,
                 state=state
             )
+            await state.update_data(inviter_id=False)
             return
         rate = get_rate_by_pk(rate_pk=int(data.get("selected_sub_pk"), 0))
         helper_days = get_user_active_subscription(telegram_id=inviter_id).days_left

@@ -7,6 +7,7 @@ MAIN_MENU = "get_mm"
 
 reg = CallbackData("reg", "action")
 mm = CallbackData("mm", "action")
+select_date = CallbackData("sd", "first_lvl", "date")
 settings_menu = CallbackData("sm", "first_lvl", "second_lvl")
 sub_menu = CallbackData("sub_m", "first_lvl", "second_lvl")
 rates_menu = CallbackData("rates_m", "first_lvl", "second_lvl", "third_lvl")
