@@ -6,6 +6,8 @@
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'libs/glightbox/dist/css/glightbox.min.css' %}">
 
+    <link href="{% static 'libs/choices.js/public/assets/styles/choices.min.css' %}" rel="stylesheet" type="text/css"/>
+
     <!-- alertifyjs Css -->
     <link href="{% static 'libs/alertifyjs/build/css/alertify.min.css' %}" rel="stylesheet" type="text/css"/>
 
@@ -19,156 +21,314 @@
     <!-- ============================================================== -->
     <div class="main-content">
 
-        <div class="page-content">
-            <div class="container-fluid">
+    <div class="page-content">
+        <div class="container-fluid">
 
-                <!-- start page title -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                            <h4 class="mb-sm-0 font-size-18">{{ compilation.name }}</h4>
+            <!-- start page title -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                        <h4 class="mb-sm-0 font-size-18">{{ compilation.name }}</h4>
 
-                            <div class="page-title-right">
-                                <ol class="breadcrumb m-0">
-                                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Главная</a></li>
-                                    <li class="breadcrumb-item"><a href="{% url 'compilation_list' %}">Подборки</a></li>
-                                    <li class="breadcrumb-item active">{{ compilation.name }}</li>
-                                </ol>
+                        <div class="page-title-right">
+                            <ol class="breadcrumb m-0">
+                                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Главная</a></li>
+                                <li class="breadcrumb-item"><a href="{% url 'compilation_list' %}">Подборки</a></li>
+                                <li class="breadcrumb-item active">{{ compilation.name }}</li>
+                            </ol>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- end page title -->
+            <div class="row">
+                <div class="col-md-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Обзор</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-img-top img-fluid">
+                                {% if compilation.contents.first.type == 0 %}
+                                    <a href="{{ compilation.contents.first.file.url }}" class="image-popup">
+                                        <img src="{{ compilation.contents.first.file.url }}" class="img-fluid"
+                                             alt="work-thumbnail">
+                                    </a>
+                                {% elif compilation.contents.first.type == 1 %}
+                                    <video controls="controls" style="width: 100%; height: auto; max-height: 100%;"
+                                           src="{{ compilation.contents.first.file.url }}"></video>
+                                {% endif %}
                             </div>
-
+                            <form id="compilation-form">
+                                <div class="mb-4">
+                                    <label class="form-label" for="default-input">Медиа</label>
+                                    <input class="form-control" type="file" id="media" name="media"
+                                           placeholder="Название">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label" for="default-input">Название</label>
+                                    <input class="form-control" type="text" id="name" name="name"
+                                           placeholder="Название" value="{{ compilation.name }}">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label" for="default-input">Дата</label>
+                                    <input class="form-control" type="text" id="date-compilation" name="date"
+                                           value="{{ compilation.date }}">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label" for="default-input">Текст</label>
+                                    <div id="ckeditor-classic"></div>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="form-check form-check-right">
+                                        {% if compilation.done %}
+                                            <input class="form-check-input" type="checkbox" id="is_complted"
+                                                   name="is_complted" checked>
+                                        {% else %}
+                                            <input class="form-check-input" type="checkbox" id="is_complted"
+                                                   name="is_complted">
+                                        {% endif %}
+                                        <label class="form-check-label" for="formCheckRight2">
+                                            Завершенный обзор
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="col-6">
+                                        <label for="example-datetime-local-input" class="form-label">Время
+                                            отправки</label>
+                                        <input class="form-control" type="datetime-local"
+                                               value="{{ compilation.datetime_send }}"
+                                               id="example-datetime-local-input" name="date_send">
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <button type="submit" id="compilation-submit" class="btn btn-primary">
+                                        Сохранить
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-                <!-- end page title -->
-                <div class="row">
-                    <div class="col-md-12 col-xl-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Обзор</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="card-img-top img-fluid">
-                                    {% if compilation.contents.first.type == 0 %}
-                                        <a href="{{ compilation.contents.first.file.url }}" class="image-popup">
-                                            <img src="{{ compilation.contents.first.file.url }}" class="img-fluid"
-                                                 alt="work-thumbnail">
-                                        </a>
-                                    {% elif compilation.contents.first.type == 1 %}
-                                        <video controls="controls" style="width: 100%; height: auto; max-height: 100%;"
-                                               src="{{ compilation.contents.first.file.url }}"></video>
-                                    {% endif %}
-                                </div>
-                                <form id="compilation-form">
-                                    <div class="mb-4">
-                                        <label class="form-label" for="default-input">Медиа</label>
-                                        <input class="form-control" type="file" id="media" name="media"
-                                               placeholder="Название">
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="form-label" for="default-input">Название</label>
-                                        <input class="form-control" type="text" id="name" name="name"
-                                               placeholder="Название" value="{{ compilation.name }}">
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="form-label" for="default-input">Дата</label>
-                                        <input class="form-control" type="text" id="date-compilation" name="date"
-                                               value="{{ compilation.date }}">
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="form-label" for="default-input">Текст</label>
-                                        <div id="ckeditor-classic"></div>
-                                    </div>
-                                    <div class="mb-4">
-                                        <div class="form-check form-check-right">
-                                            {% if compilation.done %}
-                                                <input class="form-check-input" type="checkbox" id="is_complted"
-                                                       name="is_complted" checked>
-                                            {% else %}
-                                                <input class="form-check-input" type="checkbox" id="is_complted"
-                                                       name="is_complted">
-                                            {% endif %}
-                                            <label class="form-check-label" for="formCheckRight2">
-                                                Завершенный обзор
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="mb-4">
-                                        <div class="col-6">
-                                            <label for="example-datetime-local-input" class="form-label">Время
-                                                отправки</label>
-                                            <input class="form-control" type="datetime-local"
-                                                   value="{{ compilation.datetime_send }}"
-                                                   id="example-datetime-local-input" name="date_send">
-                                        </div>
-                                    </div>
-                                    <div class="mb-4">
-                                        <button type="submit" id="compilation-submit" class="btn btn-primary">
-                                            Сохранить
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="col-md-12 col-xl-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Гид</h3>
+                <div class="col-md-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Гид</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-img-top img-fluid">
+                                {% if compilation.finalcompilation_set.first.contents.first.type == 0 %}
+                                    <a href="{{ compilation.finalcompilation_set.first.contents.first.file.url }}"
+                                       class="image-popup">
+                                        <img src="{{ compilation.finalcompilation_set.first.contents.first.file.url }}"
+                                             class="img-fluid"
+                                             alt="work-thumbnail">
+                                    </a>
+                                {% elif compilation.finalcompilation_set.first.contents.first.type == 1 %}
+                                    <video controls="controls" style="width: 100%; height: auto; max-height: 100%;"
+                                           src="{{ compilation.finalcompilation_set.first.contents.first.file.url }}"></video>
+                                {% endif %}
                             </div>
-                            <div class="card-body">
-                                <div class="card-img-top img-fluid">
-                                    {% if compilation.finalcompilation_set.first.contents.first.type == 0 %}
-                                        <a href="{{ compilation.finalcompilation_set.first.contents.first.file.url }}"
-                                           class="image-popup">
-                                            <img src="{{ compilation.finalcompilation_set.first.contents.first.file.url }}"
-                                                 class="img-fluid"
-                                                 alt="work-thumbnail">
-                                        </a>
-                                    {% elif compilation.finalcompilation_set.first.contents.first.type == 1 %}
-                                        <video controls="controls" style="width: 100%; height: auto; max-height: 100%;"
-                                               src="{{ compilation.finalcompilation_set.first.contents.first.file.url }}"></video>
-                                    {% endif %}
+                            <form id="final-form">
+                                <div class="mb-4">
+                                    <label class="form-label" for="default-input">Медиа</label>
+                                    <input class="form-control" type="file" id="media_final" name="media"
+                                           placeholder="Название">
                                 </div>
-                                <form id="final-form">
-                                    <div class="mb-4">
-                                        <label class="form-label" for="default-input">Медиа</label>
-                                        <input class="form-control" type="file" id="media_final" name="media"
-                                               placeholder="Название">
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="form-label" for="default-input">Текст</label>
-                                        <div id="ckeditor-gid"></div>
-                                    </div>
-                                    <div class="mb-4">
-                                        <button type="submit" class="btn btn-primary">Сохранить</button>
-                                    </div>
-                                </form>
-                            </div>
+                                <div class="mb-4">
+                                    <label class="form-label" for="default-input">Текст</label>
+                                    <div id="ckeditor-gid"></div>
+                                </div>
+                                <div class="mb-4">
+                                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12 col-xl-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Посты</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="text-sm-end">
-                                            <a type="button" href="{% url 'compilation_create' %}"
-                                               class="btn btn-success btn-rounded waves-effect waves-light mb-2 me-2">
-                                                <i class="mdi mdi-plus me-1"></i> Новый пост
-                                            </a>
-                                        </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-xl-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Посты</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="text-sm-end">
+                                        <a type="button" href="{% url 'compilation_create' %}"
+                                           class="btn btn-success btn-rounded waves-effect waves-light mb-2 me-2">
+                                            <i class="mdi mdi-plus me-1"></i> Новый пост
+                                        </a>
                                     </div>
                                 </div>
-                                <div class="row">
-
-                                </div>
                             </div>
+                            <div class="row">
+                                {% for post in posts %}
+                                    <div class="col-md-6 col-xl-3">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                {% if post.content.type == 0 %}
+                                                    <a href="{{ post.content.url }}" class="image-popup">
+                                                        <img src="{{ post.content.url }}" class="img-fluid"
+                                                             alt="work-thumbnail">
+                                                    </a>
+                                                {% elif post.content.type == 1 %}
+                                                    <video controls="controls"
+                                                           style="width: 100%; height: auto; max-height: 100%;"
+                                                           src="{{ post.content.url }}"></video>
+                                                {% endif %}
+                                            </div>
+                                            <div class="card-body">
+                                                <p>{{ post.text | safe }}</p>
+                                                <button type="button" class="btn btn-primary waves-effect waves-light"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target=".bs-example-modal-lg">Редактировать
+                                                </button>
+
+                                                <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog"
+                                                     aria-labelledby="myExtraLargeModalLabel"
+                                                     aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="myExtraLargeModalLabel">
+                                                                    Редактирование поста #{{ post.pk }}</h5>
+                                                                <button type="button" class="btn-close"
+                                                                        data-bs-dismiss="modal"
+                                                                        aria-label="Close"></button>
+
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <form action="{% url 'update_post' %}" method="POST">
+                                                                {% csrf_token %}
+                                                                    <div class="row">
+                                                                        <input type="hidden" value="{{ post.pk }}" name="post">
+                                                                        <input type="hidden" value="{{ compilation.pk }}" name="compilation">
+                                                                        <div class="mb-4">
+                                                                            <label for="example-datetime-local-input"
+                                                                                   class="form-label">Магазин</label>
+                                                                            <input class="form-control"
+                                                                                   type="text"
+                                                                                   name="shop"
+                                                                                   value="{{ post.obj.shop.name }}">
+                                                                        </div>
+                                                                        <div class="mb-4">
+                                                                            <label for="example-datetime-local-input"
+                                                                                   class="form-label">Медиа</label>
+                                                                            <input class="form-control"
+                                                                                   name="media"
+                                                                                   type="file">
+                                                                        </div>
+                                                                    </div>
+                                                                    <hr>
+                                                                    <div class="row" id="list_products">
+                                                                        {% for item in post.obj.items.all %}
+                                                                            <div class="card">
+                                                                                <h3 class="card-title">Товар</h3>
+                                                                                <div class="card-body">
+                                                                                    <div class="row">
+                                                                                        <div class="col-md-12 col-lg-6">
+                                                                                            <label for="example-datetime-local-input"
+                                                                                                   class="form-label">Название</label>
+                                                                                            <input class="form-control"
+                                                                                                   name="name_product_{{ item.pk }}"
+                                                                                                   type="text" value="{{ item.name }}">
+                                                                                        </div>
+                                                                                        <div class="col-md-12 col-lg-6">
+                                                                                            <label for="example-datetime-local-input"
+                                                                                                   class="form-label">Размеры</label>
+                                                                                            <input class="form-control"
+                                                                                                   name="sizes_{{ item.pk }}"
+                                                                                                   type="text" value="{{ item.sizes }}">
+                                                                                        </div>
+                                                                                        <div class="col-md-12 col-lg-12">
+                                                                                            <label for="example-datetime-local-input"
+                                                                                                   class="form-label">Ссылка</label>
+                                                                                            <input class="form-control"
+                                                                                                   name="link_{{ item.pk }}"
+                                                                                                   type="text" value="{{ item.link }}">
+                                                                                        </div>
+                                                                                        <div class="col-md-12 col-lg-12">
+                                                                                            <label for="example-datetime-local-input"
+                                                                                                   class="form-label">Описание</label>
+                                                                                            <textarea name="description_{{ item.pk }}"
+                                                                                                    class="form-control"
+                                                                                                    rows="3"> {{ item.description }}"</textarea>
+                                                                                        </div>
+                                                                                        <div class="col-md-12 col-lg-6">
+                                                                                            <label for="example-datetime-local-input"
+                                                                                                   class="form-label">Старая
+                                                                                                цена</label>
+                                                                                            <input class="form-control"
+                                                                                                   name="price_old_{{ item.pk }}"
+                                                                                                   type="number" value="{{ item.price_old | safe}}">
+                                                                                        </div>
+                                                                                        <div class="col-md-12 col-lg-6">
+                                                                                            <label for="example-datetime-local-input"
+                                                                                                   class="form-label">Новая
+                                                                                                цена</label>
+                                                                                            <input class="form-control"
+                                                                                                   name="price_new_{{ item.pk }}"
+                                                                                                   type="number" value="{{ item.price_new | safe}}">
+                                                                                        </div>
+                                                                                        <div class="col-md-12 col-lg-12">
+                                                                                            <br>
+                                                                                            <div class="text-sm-end">
+                                                                                                <a type="button"
+                                                                                                   href="{% url 'compilation_create' %}"
+                                                                                                   class="btn btn-danger waves-effect waves-light mb-2 me-2">
+                                                                                                    <i class="mdi mdi-delete"></i>Удалить
+                                                                                                </a>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                <br>
+                                                                <button type="button"
+                                                                        class="btn btn-success waves-effect waves-light"
+                                                                        id="add_product">
+                                                                    Добавить товар
+                                                                </button>
+                                                                <div class="row">
+                                                                    <div class="col-10">
+                                                                        <div class="text-sm-end">
+                                                                            <a type="button"
+                                                                               href="{% url 'compilation_create' %}"
+                                                                               class="btn btn-danger waves-effect waves-light mb-2 me-2">
+                                                                                <i class="mdi mdi-delete"></i>Удалить
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-2">
+                                                                        <div class="text-sm-end">
+                                                                            <button type="submit"
+                                                                               class="btn btn-primary waves-effect waves-light mb-2 me-2">
+                                                                                Сохранить
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                </form>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -186,6 +346,8 @@
 {% endblock content %}
 
 {% block extra_js %}
+    <script src="{% static 'libs/choices.js/public/assets/scripts/choices.min.js' %}"></script>
+
     <!-- ckeditor -->
     <script src="{% static 'libs/@ckeditor/ckeditor5-build-classic/build/ckeditor.js' %}"></script>
 
@@ -195,8 +357,16 @@
 
     <!-- alertifyjs js -->
     <script src="{% static 'libs/alertifyjs/build/alertify.min.js' %}"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.ui/1.13.2/jquery-ui.min.js"></script>
 
     <script>
+
+
+        var shops = ['dfgdfg', 'sdfgsdg', 'dfgdfgdf']
+        $('#choices-text').autocomplete({
+            source: shops
+        })
+
         $('#compilation-form').on('submit', function (event) {
             event.preventDefault();
             var form_data = new FormData(this);
@@ -298,6 +468,75 @@
             flatpickr("#date-compilation", {
                 defaultDate: new Date
             })
+        })
+    </script>
+    <script>
+        let counter = 0;
+        $('#add_product').on('click', function () {
+            let tmp = `<br><br><div class="card">
+                                                                            <h3 class="card-title">Товар</h3>
+                                                                            <div class="card-body">
+                                                                                <div class="row">
+                                                                                    <div class="col-md-12 col-lg-6">
+                                                                                        <label for="example-datetime-local-input"
+                                                                                               class="form-label">Название</label>
+                                                                                        <input class="form-control"
+                                                                                               name="name_product_add_${counter}"
+                                                                                               type="text">
+                                                                                    </div>
+                                                                                    <div class="col-md-12 col-lg-6">
+                                                                                        <label for="example-datetime-local-input"
+                                                                                               class="form-label">Размеры</label>
+                                                                                        <input class="form-control"
+                                                                                               name="sizes_add_${counter}"
+                                                                                               type="text">
+                                                                                    </div>
+                                                                                    <div class="col-md-12 col-lg-12">
+                                                                                        <label for="example-datetime-local-input"
+                                                                                               class="form-label">Ссылка</label>
+                                                                                        <input class="form-control"
+                                                                                               name="link_add_${counter}"
+                                                                                               type="text">
+                                                                                    </div>
+                                                                                    <div class="col-md-12 col-lg-12">
+                                                                                        <label for="example-datetime-local-input"
+                                                                                               class="form-label">Описание</label>
+                                                                                        <textarea class="form-control"
+                                                                                                  name="description_add_${counter}"
+                                                                                                  rows="3"></textarea>
+                                                                                    </div>
+                                                                                    <div class="col-md-12 col-lg-6">
+                                                                                        <label for="example-datetime-local-input"
+                                                                                               class="form-label">Старая
+                                                                                            цена</label>
+                                                                                        <input class="form-control"
+                                                                                               name="price_old_add_${counter}"
+                                                                                               type="number">
+                                                                                    </div>
+                                                                                    <div class="col-md-12 col-lg-6">
+                                                                                        <label for="example-datetime-local-input"
+                                                                                               class="form-label">Новая
+                                                                                            цена</label>
+                                                                                        <input class="form-control"
+                                                                                               name="price_new_add_${counter}"
+                                                                                               type="number">
+                                                                                    </div>
+                                                                                     <div class="col-md-12 col-lg-12">
+                                                                                        <br>
+                                                                                        <div class="text-sm-end">
+                                                                                            <a type="button"
+                                                                                               href=""
+                                                                                               class="btn btn-danger waves-effect waves-light mb-2 me-2">
+                                                                                                <i class="mdi mdi-delete"></i>Удалить
+                                                                                            </a>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>`
+            tmp = $(tmp);
+            $('#list_products').append(tmp);
+            counter = counter + 1;
         })
     </script>
 {% endblock extra_js %}

@@ -1,4 +1,4 @@
-async def round_num_to(num, round_lvl: int, currency: int) -> str:
+def round_num_to(num, round_lvl: int, currency: int) -> str:
     if not currency:
         r = f'{float("{:.2f}".format(num))}'
         return r if len(r.split(".")[-1]) == 2 else r + "0"

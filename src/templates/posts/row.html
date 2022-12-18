@@ -19,7 +19,7 @@
                 <h5 class="card-title-desc">{{ compilation.date }}</h5>
             </div>
             <div class="card-body">
-                <p class="card-text">{{ compilation.text }}</p>
+                <p class="card-text">{{ compilation.text | safe }}</p>
                 <a href="{% url 'compilation_detail' pk=compilation.pk %}"
                    class="btn btn-primary waves-effect waves-light">Перейти</a>
             </div>

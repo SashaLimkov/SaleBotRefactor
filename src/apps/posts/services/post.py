@@ -21,29 +21,26 @@ def get_posts_by_compilation_id(compilation_id: int) -> Union[QuerySet, List[Pos
 
 def get_formatted_posts_by_compilation_id(
         compilation_id: int,
-) -> List[Tuple[str, List[Tuple[str, str]]]]:
-    """Возвращает кортеж форматированных постов в формате Tuple['текст поста', Tuple['список медиа']]"""
+) -> list:
+    """Возвращает список с дополнительными полями (сформированный текст и контент)"""
     posts = get_posts_by_compilation_id(compilation_id)
-    result_list = []
+    result = []
     for post in posts:
-        contents = []
-        if not post.user_post.all():
-            post_text = post.compilation.name + "\n\n"
-            for item in post.items.all():
-                post_text += item.name + "\n"
-                post_text += item.sizes + "\n"
-                post_text += item.description + "\n"
-                post_text += (
-                    f"Цена: <b><s>{item.price_old}{post.shop.currency.sign}</s>➡️"
-                )
-                post_text += f"{item.price_new}{post.shop.currency.sign}</b>" + "\n"
-                post_text += item.link
-            for content in post.contents.all():
-                contents.append((content.type, content.file.path))
-        else:
-            post_text = post.user_post.all()[0].text
-        result_list.append((post_text, contents))
-    return result_list
+        contents = None
+        post_text = post.compilation.name + "\n\n"
+        for item in post.items.all():
+            post_text += item.name + "\n"
+            post_text += item.sizes + "\n"
+            post_text += item.description + "\n"
+            post_text += (
+                f"Цена: <b><s>{item.price_old}{post.shop.currency.sign}</s>➡️"
+            )
+            post_text += f"{item.price_new}{post.shop.currency.sign}</b>" + "\n"
+            post_text += item.link
+        for content in post.contents.all():
+            contents = {'url': content.file.url, 'type': content.type}
+        result.append({'text': post_text, 'content': contents, 'pk': post.pk, 'obj': post})
+    return result
 
 
 def get_formatted_user_settings_posts_by_compilation_id(
@@ -56,7 +53,7 @@ def get_formatted_user_settings_posts_by_compilation_id(
     result_user_list = []
     for post in posts:
         contents = []
-        if not post.user_post.all():
+        if not post.user_post.filter(profile_id=telegram_id):
             post_text = post.compilation.name + "\n\n"
             for item in post.items.all():
                 if settings.product_settings.name:
@@ -89,8 +86,8 @@ def get_formatted_user_settings_posts_by_compilation_id(
                         price_old = price_old + (price_old / 100 * settings.commission)
                         price_new = price_new + (price_new / 100 * settings.commission)
                     if settings.rounder:
-                        price_old = await round_num_to(price_old, settings.rounder, settings.currency)
-                        price_new = await round_num_to(price_new, settings.rounder, settings.currency)
+                        price_old = round_num_to(price_old, settings.rounder, settings.currency)
+                        price_new = round_num_to(price_new, settings.rounder, settings.currency)
                     post_text += f"Цена: <b><s>{price_old}{sign}</s>"
                     if price_new:
                         post_text += f"➡️{price_new}{sign}</b>" + "\n"
@@ -127,3 +124,7 @@ def add_user_post(post_id: int, text: str, telegram_id: int) -> UserPost:
 def delete_user_post(post_id: int, telegram_id: int) -> None:
     """Удаляет пользовательский пост"""
     UserPost.objects.get(post_id=post_id, profile_id=telegram_id).delete()
+
+
+def create_post():
+    pass

@@ -14,6 +14,7 @@ from apps.posts.models import Compilation, Content, FinalCompilation
 from django.core.paginator import Paginator
 
 from apps.posts.services.content import update_or_create_content, create_content
+from apps.posts.services.post import get_formatted_posts_by_compilation_id
 from apps.utils.services.paginator import get_paginator_context
 
 
@@ -62,7 +63,7 @@ class CompilationDetailView(DetailView):
         context = super().get_context_data()
         context['compilation'].datetime_send = datetime.date.strftime(context['compilation'].datetime_send,
                                                                       '%Y-%m-%dT%H:%M')
-        context['posts']
+        context['posts'] = get_formatted_posts_by_compilation_id(context['compilation'].pk)
         return context
 
     def post(self, request, pk):
@@ -186,3 +187,34 @@ class FinalCompilationCreateView(View):
             to_id=final_compilation.pk
         )
         return JsonResponse({'success': True})
+
+
+class PostUpdateView(View):
+    def post(self, request):
+        list_values_edit = []
+        list_values_add = []
+        for key in request.POST.keys():
+            if 'name_product' in key:
+                if 'add' in key:
+                    list_values_add.append(key.split('_')[-1])
+                else:
+                    list_values_edit.append(key.split('_')[-1])
+
+        for index in list_values_edit:
+            name = request.POST['name_product_' + index]
+            sizes = request.POST['sizes_' + index]
+            link = request.POST['link_' + index]
+            description = request.POST['description_' + index]
+            price_old = request.POST['price_old_' + index]
+            price_new = request.POST['price_new_' + index]
+
+        for index in list_values_add:
+            name = request.POST['name_product_add_' + index]
+            sizes = request.POST['sizes_add_' + index]
+            link = request.POST['link_add_' + index]
+            description = request.POST['description_add_' + index]
+            price_old = request.POST['price_old_add_' + index]
+            price_new = request.POST['price_new_add_' + index]
+
+        print(list_values_edit, list_values_add)
+        return JsonResponse({'data': True})
