@@ -1,6 +1,6 @@
 import datetime
 
-from django.views.generic import ListView, View
+from django.views.generic import ListView, View, TemplateView, DetailView
 
 from django.http import JsonResponse
 from django.template.loader import render_to_string
@@ -46,3 +46,8 @@ class ProfileTableView(View):
             'paginator': render_to_string('partials/paginator.html', context_paginator, request=request)
         }
         return JsonResponse(data)
+
+
+class ProfileDetailView(DetailView):
+    model = Profile
+    template_name = 'profiles/form.html'

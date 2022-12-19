@@ -1,6 +1,6 @@
 import datetime
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import ListView, View, DetailView, CreateView
 
 from django.http import JsonResponse
@@ -8,13 +8,15 @@ from django.template.loader import render_to_string
 
 from apps.posts.services.compilation import get_search_compilations_queryset, get_all_compilation_queryset, \
     get_content_compilation_queryset, get_date_range_compilation_filter, create_compilation, update_compilation, \
-    create_final_compilation, update_or_create_final_compilation
-from apps.posts.models import Compilation, Content, FinalCompilation
+    create_final_compilation, update_or_create_final_compilation, delete_final_compilation
+from apps.posts.models import Compilation, Content, FinalCompilation, Post
 
 from django.core.paginator import Paginator
 
 from apps.posts.services.content import update_or_create_content, create_content
-from apps.posts.services.post import get_formatted_posts_by_compilation_id
+from apps.posts.services.item import update_item, create_item
+from apps.posts.services.post import get_formatted_posts_by_compilation_id, update_post, create_post
+from apps.settings.services.currency import get_list_currency
 from apps.utils.services.paginator import get_paginator_context
 
 
@@ -64,6 +66,7 @@ class CompilationDetailView(DetailView):
         context['compilation'].datetime_send = datetime.date.strftime(context['compilation'].datetime_send,
                                                                       '%Y-%m-%dT%H:%M')
         context['posts'] = get_formatted_posts_by_compilation_id(context['compilation'].pk)
+        context['currency'] = get_list_currency()
         return context
 
     def post(self, request, pk):
@@ -80,10 +83,11 @@ class CompilationDetailView(DetailView):
                 to='compilation',
                 to_id=pk
             )
+        print(request.POST.get('text'))
         update_compilation(
             compilation_id=pk,
             name=request.POST.get('name'),
-            text=request.POST.get('text').replace('<p>', '').replace('</p>', ''),
+            text=request.POST.get('text').replace('<p>', '').replace('</p>', '<br>'),
             date=datetime.datetime.strptime(request.POST.get('date'), '%Y-%m-%d'),
             datetime_send=datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'),
             done=True if request.POST.get('complete') == 'true' else False
@@ -93,23 +97,29 @@ class CompilationDetailView(DetailView):
 
 class FinalCompilationSaveView(View):
     def post(self, request, pk):
-        final_compilation = update_or_create_final_compilation(
-            compilation_id=pk,
-            text=request.POST.get('text').replace('<p>', '').replace('</p>', '')
-        )[0]
-        if request.FILES.get('media'):
-            format_file = str(request.FILES.get('media')).split('.')[-1]
-            if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
-                type_content = 0
-            else:
-                type_content = 1
-            update_or_create_content(
-                file_name=str(request.FILES.get('media')),
-                file=request.FILES.get('media'),
-                type_content=type_content,
-                to='final_compilation',
-                to_id=final_compilation.pk
-            )
+        if request.POST.get('visible') == 'true':
+            final_compilation = update_or_create_final_compilation(
+                compilation_id=pk,
+                text=request.POST.get('text').replace('<p>', '').replace('</p>', '')
+            )[0]
+            if request.FILES.get('media'):
+                format_file = str(request.FILES.get('media')).split('.')[-1]
+                if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
+                    type_content = 0
+                else:
+                    type_content = 1
+                update_or_create_content(
+                    file_name=str(request.FILES.get('media')),
+                    file=request.FILES.get('media'),
+                    type_content=type_content,
+                    to='final_compilation',
+                    to_id=final_compilation.pk
+                )
+        else:
+            try:
+                delete_final_compilation(pk)
+            except:
+                pass
         return JsonResponse({'success': True})
 
 
@@ -168,29 +178,34 @@ class CompilationCreateView(View):
 
 class FinalCompilationCreateView(View):
     def post(self, request):
-        compilation_id = request.POST.get('compilation')
-        final_compilation = create_final_compilation(
-            compilation_id=int(compilation_id),
-            text=request.POST.get('text').replace('<p>', '').replace('</p>', '')
-        )
-        format_file = str(request.FILES.get('media')).split('.')[-1]
-        if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
-            type_content = 0
-        else:
-            type_content = 1
-        print(final_compilation)
-        create_content(
-            file_name=str(request.FILES.get('media')),
-            file=request.FILES.get('media'),
-            type_content=type_content,
-            to='final_compilation',
-            to_id=final_compilation.pk
-        )
+        if request.POST.get('visible') == 'true':
+            compilation_id = request.POST.get('compilation')
+            final_compilation = create_final_compilation(
+                compilation_id=int(compilation_id),
+                text=request.POST.get('text').replace('<p>', '').replace('</p>', '')
+            )
+            format_file = str(request.FILES.get('media')).split('.')[-1]
+            if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
+                type_content = 0
+            else:
+                type_content = 1
+            create_content(
+                file_name=str(request.FILES.get('media')),
+                file=request.FILES.get('media'),
+                type_content=type_content,
+                to='final_compilation',
+                to_id=final_compilation.pk
+            )
         return JsonResponse({'success': True})
+
 
 
 class PostUpdateView(View):
     def post(self, request):
+        print(request.POST)
+        compilation = int(request.POST.get('compilation'))
+        post = int(request.POST.get('post'))
+
         list_values_edit = []
         list_values_add = []
         for key in request.POST.keys():
@@ -199,6 +214,8 @@ class PostUpdateView(View):
                     list_values_add.append(key.split('_')[-1])
                 else:
                     list_values_edit.append(key.split('_')[-1])
+        print(list_values_add)
+        print(list_values_edit)
 
         for index in list_values_edit:
             name = request.POST['name_product_' + index]
@@ -206,7 +223,8 @@ class PostUpdateView(View):
             link = request.POST['link_' + index]
             description = request.POST['description_' + index]
             price_old = request.POST['price_old_' + index]
-            price_new = request.POST['price_new_' + index]
+            price_new = request.POST['price_new_' + index] if request.POST['price_new_' + index] else None
+            update_item(index, name, link, sizes, description, price_old, price_new)
 
         for index in list_values_add:
             name = request.POST['name_product_add_' + index]
@@ -214,7 +232,83 @@ class PostUpdateView(View):
             link = request.POST['link_add_' + index]
             description = request.POST['description_add_' + index]
             price_old = request.POST['price_old_add_' + index]
-            price_new = request.POST['price_new_add_' + index]
+            price_new = request.POST['price_new_add_' + index] if request.POST['price_new_add_' + index] else None
+            create_item(post, name, link, sizes, description, price_old, price_new)
 
-        print(list_values_edit, list_values_add)
-        return JsonResponse({'data': True})
+        format_file = str(request.FILES.get('media')).split('.')[-1]
+        if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
+            type_content = 0
+        else:
+            type_content = 1
+        if 'media' in request.FILES.keys():
+            update_or_create_content(
+                file_name=str(request.FILES.get('media')),
+                file=request.FILES.get('media'),
+                type_content=type_content,
+                to='post',
+                to_id=post
+            )
+
+        shop = request.POST.get('shop')
+        currency = request.POST.get('currency')
+        update_post(post, shop, currency)
+
+        return redirect('compilation_detail', pk=compilation)
+
+
+class PostCreateView(View):
+    def post(self, request):
+        compilation = int(request.POST.get('compilation'))
+        shop = request.POST.get('shop')
+        currency = request.POST.get('currency')
+        post = create_post(compilation, shop, currency).pk
+
+        list_values_add = []
+        for key in request.POST.keys():
+            if 'name_product' in key:
+                if 'add' in key:
+                    list_values_add.append(key.split('_')[-1])
+
+        for index in list_values_add:
+            name = request.POST['name_product_add_' + index]
+            sizes = request.POST['sizes_add_' + index]
+            link = request.POST['link_add_' + index]
+            description = request.POST['description_add_' + index]
+            price_old = request.POST['price_old_add_' + index]
+            price_new = request.POST['price_new_add_' + index] if request.POST['price_new_add_' + index] else None
+            create_item(post, name, link, sizes, description, price_old, price_new)
+
+        format_file = str(request.FILES.get('media')).split('.')[-1]
+        if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
+            type_content = 0
+        else:
+            type_content = 1
+        update_or_create_content(
+            file_name=str(request.FILES.get('media')),
+            file=request.FILES.get('media'),
+            type_content=type_content,
+            to='post',
+            to_id=post
+        )
+
+        return redirect('compilation_detail', pk=compilation)
+
+
+class CompilationDeleteView(View):
+    def post(self, request):
+        compilation_id = request.POST.get('compilation')
+        try:
+            Compilation.objects.get(pk=compilation_id).delete()
+        except:
+            pass
+        return JsonResponse({'status': True})
+
+
+class PostDeleteView(View):
+    def post(self, request):
+        post = request.POST.get('post')
+        try:
+            Post.objects.get(pk=post).delete()
+        except:
+            pass
+        return JsonResponse({'status': True})

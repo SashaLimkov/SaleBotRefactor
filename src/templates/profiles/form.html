@@ -1,22 +1,9 @@
 {% extends 'partials/base.html' %}
 {% load static %}
 
-{% block title %}Пользователи бота{% endblock title %} {"title": "Пользователи бота"})
+{% block title %}Пользователь{% endblock title %} {"title": "Пользователь"})
 
 {% block extra_css %}
-    <!-- DataTables -->
-    <link href="{% static 'libs/choices.js/public/assets/styles/choices.min.css' %}" rel="stylesheet" type="text/css"/>
-
-    <link href="{% static 'libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}" rel="stylesheet"
-          type="text/css"/>
-    <link href="{% static 'libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css' %}" rel="stylesheet"
-          type="text/css"/>
-
-    <!-- Responsive datatable examples -->
-    <link href="{% static 'libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}" rel="stylesheet"
-          type="text/css"/>
-
-
 
 {% endblock extra_css %}
 
@@ -33,12 +20,13 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                            <h4 class="mb-sm-0 font-size-18">Пользователи бота</h4>
+                            <h4 class="mb-sm-0 font-size-18">Пользователь {{ profile.telegram_id }}</h4>
 
                             <div class="page-title-right">
                                 <ol class="breadcrumb m-0">
                                     <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Главная</a></li>
-                                    <li class="breadcrumb-item active">Пользователи бота</li>
+                                    <li class="breadcrumb-item"><a href="{% url 'profile_list' %}">Пользователи</a></li>
+                                    <li class="breadcrumb-item active">Пользователь {{ profile.telegram_id }}</li>
                                 </ol>
                             </div>
 
@@ -46,10 +34,219 @@
                     </div>
                 </div>
                 <!-- end page title -->
+
                 <div class="row">
                     <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Общая информация</h3>
+                        </div>
                         <div class="card-body">
+                            <form>
 
+
+                                <div class="row">
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="mb-4">
+                                            <input class="form-check-input" type="checkbox" id="displayed"
+                                                   name="is_visible" checked>
+                                            <label class="form-check-label" for="formCheckRight2">
+                                                Активный
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="mb-4">
+                                            <input class="form-check-input" type="checkbox" id="displayed"
+                                                   name="is_visible">
+                                            <label class="form-check-label" for="formCheckRight2">
+                                                Помощник
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="mb-4">
+                                            <input class="form-check-input" type="checkbox" id="displayed"
+                                                   name="is_visible">
+                                            <label class="form-check-label" for="formCheckRight2">
+                                                Забанен
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="mb-4">
+                                            <input class="form-check-input" type="checkbox" id="displayed"
+                                                   name="is_visible">
+                                            <label class="form-check-label" for="formCheckRight2">
+                                                В чате
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Telegram ID</label>
+                                            <input class="form-control" type="number" name="name"
+                                                   placeholder="Telegram ID">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Telegram Username</label>
+                                            <input class="form-control" type="text" name="name"
+                                                   placeholder="Telegram Username">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Имя в Telegram</label>
+                                            <input class="form-control" type="text" name="name"
+                                                   placeholder="Имя в Telegram">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Фамилия в Telegram</label>
+                                            <input class="form-control" type="text" name="name"
+                                                   placeholder="Фамилия в Telegram">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Номер телефона</label>
+                                            <input class="form-control" type="text" name="name"
+                                                   placeholder="Номер телефона">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">ФИО</label>
+                                            <input class="form-control" type="text" name="name"
+                                                   placeholder="ФИО">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Дата регистрации</label>
+                                            <input class="form-control" type="text" name="name"
+                                                   placeholder="Дата регистрации">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Дата последней
+                                                активности</label>
+                                            <input class="form-control" type="text" name="name"
+                                                   placeholder="Дата последней активности">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Активность</label>
+                                            <input class="form-control" type="text" name="name"
+                                                   placeholder="Активность">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Пригласивший
+                                                пользователь</label>
+                                            <input class="form-control" type="text" name="name"
+                                                   placeholder="Пригласивший пользователь">
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <div class="text-sm-end">
+                                            <div class="row">
+                                                <div class="col-11">
+                                                    <button type="submit"
+                                                            class="btn btn-danger">
+                                                        Удалить
+                                                    </button>
+                                                </div>
+                                                <div class="col-1">
+                                                    <button type="submit"
+                                                            class="btn btn-primary">
+                                                        Сохранить
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        </form>
+                        <div class="card-header">
+                            <h3 class="card-title">Помощники</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="card">
+                                <div class="card-body">
+                                    <p><b>Помощник #</b></p>
+                                    <form>
+                                        <div class="row">
+                                            <div class="col-md-6 col-lg-5">
+                                                <div class="mb-4">
+                                                    <label class="form-label" for="default-input">Дата
+                                                        регистрации</label>
+                                                    <input class="form-control" type="text" name="name"
+                                                           placeholder="Дата регистрации">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-lg-5">
+                                                <div class="mb-4">
+                                                    <label class="form-label" for="default-input">Telegram ID</label>
+                                                    <input class="form-control" type="text" name="name"
+                                                           placeholder="Telegram ID">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-lg-2">
+                                                <div class="mb-4">
+                                                    <label class="form-label" for="default-input">ㅤ</label>
+                                                    <a type="button" class="form-control btn btn-primary">
+                                                        Перейти
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-header">
+                            <h3 class="card-title">Подписки</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table mb-0">
+
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Активна</th>
+                                        <th>Тариф</th>
+                                        <th>Время покупки</th>
+                                        <th>Время окончания</th>
+                                        <th>Чек</th>
+                                        <th>Осталось дней</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <th scope="row">1</th>
+                                        <td>
+                                            <span class="badge bg-success font-size-12">Активна</span>
+                                        </td>
+                                        <td>Тариф</td>
+                                        <td>Дата покупки</td>
+                                        <td>Дата окончания</td>
+                                        <td>Чек</td>
+                                        <td>Осталось дней</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

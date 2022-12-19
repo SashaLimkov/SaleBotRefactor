@@ -6,7 +6,7 @@
                 <label class="form-check-label" for="check_{{ item.pk }}"></label>
             </div>
         </td>
-        <td>{{ item.pk }}</td>
+        <td><a href="{% url 'user_detail' pk=item.pk %}">{{ item.pk }}</a></td>
         <td>{{ item.username }}</td>
 
         <td>{{ item.first_name }}</td>
@@ -18,7 +18,7 @@
                     <i class="mdi mdi-dots-horizontal font-size-18"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a href="#" class="dropdown-item"><i
+                    <li><a href="{% url 'user_detail' pk=item.pk %}" class="dropdown-item"><i
                             class="mdi mdi-pencil font-size-16 text-success me-1"></i>Изменить</a>
                     </li>
                     <li><a href="#" class="dropdown-item"><i

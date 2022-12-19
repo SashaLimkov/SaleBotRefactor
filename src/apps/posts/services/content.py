@@ -22,14 +22,15 @@ def create_content(file_name: str, file: bytes, type_content: int, to: str, to_i
 def update_or_create_content(file_name: str, file: bytes, type_content: int, to: str, to_id: int) -> Content:
     """Обновляет объект контента"""
     if to == 'compilation':
-        content = Content.objects.get_or_create(compilation_id=to_id,
-                                                defaults={'type': type_content})
+        content = Content.objects.update_or_create(compilation_id=to_id,
+                                                   defaults={'type': type_content})
+        print(content)
     elif to == 'final_compilation':
-        content = Content.objects.get_or_create(final_compilation_id=to_id,
-                                                defaults={'type': type_content})
+        content = Content.objects.update_or_create(final_compilation_id=to_id,
+                                                   defaults={'type': type_content})
     else:
-        content = Content.objects.get_or_create(post_id=to_id,
-                                                defaults={'type': type_content})
+        content = Content.objects.update_or_create(post_id=to_id,
+                                                   defaults={'type': type_content})
     content[0].file.save(file_name, file)
     content[0].save()
     return content

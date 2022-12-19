@@ -91,3 +91,12 @@ def update_or_create_final_compilation(compilation_id: int, text: str,) -> Final
     return FinalCompilation.objects.update_or_create(compilation_id=compilation_id,
                                                      defaults={'text': text})
 
+
+def delete_compilation(compilation_id: int) -> None:
+    """Удаляет существующую подборку"""
+    Compilation.objects.get(pk=compilation_id).delete()
+
+
+def delete_final_compilation(compilation_id: int) -> None:
+    """Удаляет существующее окончание подборки"""
+    Compilation.objects.get(pk=compilation_id).finalcompilation_set.first().delete()

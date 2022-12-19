@@ -4,6 +4,7 @@ from django.db.models import QuerySet
 
 from apps.posts.models import Post, UserPost
 from apps.posts.services.content import watermark
+from apps.posts.services.shop import get_or_create_shop
 from apps.settings.services.course import get_value_course_user_by_currency
 from apps.settings.services.currency import get_course_currency
 from apps.settings.services.settings_user import get_settings
@@ -25,21 +26,21 @@ def get_formatted_posts_by_compilation_id(
     """Возвращает список с дополнительными полями (сформированный текст и контент)"""
     posts = get_posts_by_compilation_id(compilation_id)
     result = []
-    for post in posts:
+    for index, post in enumerate(posts):
         contents = None
-        post_text = post.compilation.name + "\n\n"
+        post_text = post.shop.name + "<br><br>"
         for item in post.items.all():
-            post_text += item.name + "\n"
-            post_text += item.sizes + "\n"
-            post_text += item.description + "\n"
+            post_text += item.name + "<br>"
+            post_text += item.sizes + "<br>"
+            post_text += item.description + "<br>"
             post_text += (
                 f"Цена: <b><s>{item.price_old}{post.shop.currency.sign}</s>➡️"
             )
-            post_text += f"{item.price_new}{post.shop.currency.sign}</b>" + "\n"
-            post_text += item.link
+            post_text += f"{item.price_new}{post.shop.currency.sign}</b>" + "<br>"
+            post_text += f'<a href="{item.link}">{item.link}</a><br>'
         for content in post.contents.all():
             contents = {'url': content.file.url, 'type': content.type}
-        result.append({'text': post_text, 'content': contents, 'pk': post.pk, 'obj': post})
+        result.append({'text': post_text, 'content': contents, 'pk': post.pk, 'obj': post, 'id': index + 1})
     return result
 
 
@@ -54,7 +55,7 @@ def get_formatted_user_settings_posts_by_compilation_id(
     for post in posts:
         contents = []
         if not post.user_post.filter(profile_id=telegram_id):
-            post_text = post.compilation.name + "\n\n"
+            post_text = post.shop.name + "\n\n"
             for item in post.items.all():
                 if settings.product_settings.name:
                     if settings.hided_link and channel == 0:
@@ -131,5 +132,18 @@ def delete_user_post(post_id: int, telegram_id: int) -> None:
     UserPost.objects.get(post_id=post_id, profile_id=telegram_id).delete()
 
 
-def create_post():
-    pass
+def create_post(compilation_id: int, shop: str, currency_id: int):
+    """Создает пост привязанный к подборке"""
+    return Post.objects.create(
+        compilation_id=compilation_id,
+        shop=get_or_create_shop(shop, currency_id)
+    )
+
+
+def update_post(post_id: int, shop: str, currency_id: int):
+    """Обновляет пост привязанный к подборке"""
+    shop = get_or_create_shop(shop, currency_id)
+    post = Post.objects.get(pk=post_id)
+    post.shop = shop
+    post.save()
+    return post

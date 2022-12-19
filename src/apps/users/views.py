@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.views.generic import ListView, View
+from django.views.generic import ListView, View, DetailView
 
 from django.http import JsonResponse
 from django.template.loader import render_to_string
@@ -38,3 +38,8 @@ class UserTableView(View):
             'paginator': render_to_string('partials/paginator.html', context_paginator, request=request)
         }
         return JsonResponse(data)
+
+
+class UserDetailView(DetailView):
+    model = User
+    template_name = 'users/form.html'

@@ -1,10 +1,111 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'partials/base.html' %}
+{% load static %}
 
-</body>
-</html>
+{% block title %}Сотрудник{% endblock title %} {"title": "Сотрудник"})
+
+{% block extra_css %}
+
+{% endblock extra_css %}
+
+{% block content %}
+    <!-- ============================================================== -->
+    <!-- Start right Content here -->
+    <!-- ============================================================== -->
+    <div class="main-content">
+
+        <div class="page-content">
+            <div class="container-fluid">
+
+                <!-- start page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                            <h4 class="mb-sm-0 font-size-18">Сотрудник</h4>
+
+                            <div class="page-title-right">
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Главная</a></li>
+                                    <li class="breadcrumb-item"><a href="{% url 'user_list' %}">Сотрудники</a></li>
+                                    <li class="breadcrumb-item active">Сотрудник</li>
+                                </ol>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+
+                <div class="row">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Общая информация</h3>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="row">
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Username</label>
+                                            <input class="form-control" type="text" id="media_final" name="media"
+                                                   placeholder="Username">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Пароль</label>
+                                            <input class="form-control" type="text" id="media_final" name="media"
+                                                   placeholder="Пароль">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Имя</label>
+                                            <input class="form-control" type="text" id="media_final" name="media"
+                                                   placeholder="Имя">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Фамилия</label>
+                                            <input class="form-control" type="text" id="media_final" name="media"
+                                                   placeholder="Фамилия">
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <div class="text-sm-end">
+                                            <div class="row">
+                                                <div class="col-11">
+                                                    <button type="submit"
+                                                            class="btn btn-danger">
+                                                        Удалить
+                                                    </button>
+                                                </div>
+                                                <div class="col-1">
+                                                    <button type="submit"
+                                                            class="btn btn-primary">
+                                                        Сохранить
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- container-fluid -->
+        </div>
+        <!-- End Page-content -->
+
+
+        {% block footer %}
+            {% include 'partials/footer.html' %}
+        {% endblock footer %}
+    </div>
+    <!-- end main content-->
+{% endblock content %}
+
+{% block extra_js %}
+
+{% endblock extra_js %}
