@@ -1,9 +1,9 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from apps.message.services.message import get_message_by_name_for_user
-from apps.posts.services.compilation import get_list_compilations_by_date, get_compilation_by_id
+from apps.posts.services.compilation import get_list_compilations_by_date, get_compilation_by_id, get_final_compilation
 from apps.posts.services.post import get_formatted_user_settings_posts_by_compilation_id
-from bot.handlers.main.posts.posts import send_compilation
+from bot.handlers.main.posts.posts import send_compilation, send_final_compilation
 from bot.utils import message_worker as mw, deleter
 from bot.keyboards import inline as ik
 
@@ -25,12 +25,22 @@ async def send_posts(call: types.CallbackQuery, callback_data: dict, state: FSMC
     )
     if platform == "tg":
         if compilation and not send_all:
-            await send_compilation(
-                compilation_id=obj_id,
-                chat_id=channel_id,
-                message=call.message,
-                keyboard=None
-            )
+            print(compilation)
+            print(obj_id)
+            if compilation == 2:
+                await send_final_compilation(
+                    compilation_id=obj_id,
+                    chat_id=channel_id,
+                    message=call.message,
+                    keyboard=None
+                )
+            else:
+                await send_compilation(
+                    compilation_id=obj_id,
+                    chat_id=channel_id,
+                    message=call.message,
+                    keyboard=None
+                )
         else:
             compilation_id = int(data.get("compilation_id"))
             posts = get_formatted_user_settings_posts_by_compilation_id(compilation_id=compilation_id,
@@ -46,6 +56,14 @@ async def send_posts(call: types.CallbackQuery, callback_data: dict, state: FSMC
                 for post in posts:
                     if post[2] in send_post_pk_list:
                         await send_post(post=post, channel_id=channel_id, message=call.message)
+
+                if get_final_compilation(compilation_id=compilation_id):
+                    await send_final_compilation(
+                        compilation_id=compilation_id,
+                        chat_id=channel_id,
+                        message=call.message,
+                        keyboard=None
+                    )
             else:
                 for post in posts:
                     if post[-1] == obj_id:

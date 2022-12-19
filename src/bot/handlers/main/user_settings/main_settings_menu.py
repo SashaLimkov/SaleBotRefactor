@@ -44,8 +44,6 @@ async def main_settings_actions(
         ).text.format(selected_rounder=selected_rounder)
         keyboard = await ik.get_rounder_settings_menu(callback_data=callback_data)
     elif user_action == 4:
-        pass
-    elif user_action == 5:
         text, keyboard, photo = await return_text_and_keyboard_for_wm_settings(
             user_settings=user_settings, user_id=user_id, callback_data=callback_data
         )
@@ -60,14 +58,14 @@ async def main_settings_actions(
                 keyboard=keyboard
             )
             return
-    elif user_action == 6:
+    elif user_action == 5:
         text = get_message_by_name_for_user(
             name="product_settings", telegram_id=user_id
         ).text
         keyboard = await ik.get_product_settings_menu(
             callback_data=callback_data, telegram_id=user_id
         )
-    elif user_action == 7:
+    elif user_action == 6:
         user_signature = user_settings.signature
         text_db = get_message_by_name_for_user(
             name="user_signature", telegram_id=user_id
@@ -80,14 +78,14 @@ async def main_settings_actions(
         keyboard = await ik.get_signature_menu(
             callback_data=callback_data, user_signature=user_signature
         )
-    elif user_action == 8:
+    elif user_action == 7:
         text = get_message_by_name_for_user(
             name="link_settings", telegram_id=user_id
         ).text
         keyboard = await ik.get_link_settings_menu(
             callback_data=callback_data, telegram_id=user_id
         )
-    elif user_action == 9:
+    elif user_action == 8:
         text = get_message_by_name_for_user(
             name="channel_settings", telegram_id=user_id
         ).text

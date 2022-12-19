@@ -2,8 +2,9 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from apps.message.services.message import get_message_by_name_for_user
-from apps.posts.services.compilation import get_compilation_by_id
+from apps.posts.services.compilation import get_compilation_by_id, get_final_compilation
 from apps.posts.services.post import get_formatted_user_settings_posts_by_compilation_id, add_user_post
+from apps.profiles.services.profile import get_profile_is_helper, get_profile_by_telegram_id
 from bot.keyboards import inline as ik
 from bot.states.MainMenu import MainMenu
 from bot.states.Posts import PostStates
@@ -22,7 +23,7 @@ async def sender_anons(message: types.Message, state: FSMContext):
     text = get_message_by_name_for_user(name="wait_for_posts", telegram_id=user_id).text
     done = get_message_by_name_for_user(name="all_posts_loaded").text
     await message.delete()
-    wait_mes = await mw.try_edit_message(
+    await mw.try_edit_message(
         message=message,
         user_id=user_id,
         text=text,
@@ -56,6 +57,14 @@ async def sender_anons(message: types.Message, state: FSMContext):
         )
         delete_messages_list.append(mes_id)
         send_post_pk_list.append(post_pk)
+
+    final_comp_mes_id = await send_final_compilation(
+        compilation_id=compilation_id, chat_id=user_id, message=message,
+        keyboard=await ik.get_compilations_menu(callback_data=callback_data,
+                                                post_id=compilation_id, is_in=True,
+                                                comp_or_post=2)
+    )
+    delete_messages_list.append(final_comp_mes_id)
     done_mes = await mw.try_send_message(
         message=message,
         user_id=user_id,
@@ -85,6 +94,21 @@ async def send_compilation(compilation_id: int, chat_id: int, message: types.Mes
     return mes_id
 
 
+async def send_final_compilation(compilation_id: int, chat_id: int, message: types.Message, keyboard):
+    final_compilation = get_final_compilation(compilation_id=compilation_id)
+    final_compilation_file = final_compilation.contents.first()
+    final_compilation_file_type = final_compilation_file.type
+    mes_id = await mw.try_send_post_to_user(
+        file_path=final_compilation_file.file.path,
+        file_type=final_compilation_file_type,
+        chat_id=chat_id,
+        text=f"{final_compilation}\n{final_compilation.text}",
+        message=message,
+        keyboard=keyboard
+    )
+    return mes_id
+
+
 async def edit_is_send_post(call: types.CallbackQuery, callback_data: dict, state: FSMContext):
     data = await state.get_data()
     user_id = call.message.chat.id
@@ -99,7 +123,8 @@ async def edit_is_send_post(call: types.CallbackQuery, callback_data: dict, stat
         keyboard = await ik.get_compilations_menu(
             callback_data=callback_data,
             is_in=new_send_status,
-            post_id=obj_id
+            post_id=obj_id,
+            comp_or_post=compilation
         )
         await state.update_data(send_compilation_list=send_compilation_list)
     else:
@@ -142,13 +167,24 @@ async def get_post_or_compilation(call: types.CallbackQuery, callback_data: dict
     compilation = int(callback_data["comp_or_post"])
     obj_id = int(callback_data["post_id"])
     if compilation:
-        compilation = get_compilation_by_id(compilation_id=obj_id)
-        text = compilation.text
-        keyboard = await ik.get_compilations_menu(
-            callback_data=callback_data,
-            is_in=obj_id in data.get("send_compilation_list"),
-            post_id=obj_id
-        )
+        print(compilation)
+        if compilation == 2:
+            f_compilation = get_final_compilation(compilation_id=obj_id)
+            text = f_compilation.text
+            keyboard = await ik.get_compilations_menu(
+                callback_data=callback_data,
+                is_in=obj_id in data.get("send_compilation_list"),
+                post_id=obj_id,
+                comp_or_post=compilation
+            )
+        else:
+            compilation = get_compilation_by_id(compilation_id=obj_id)
+            text = compilation.text
+            keyboard = await ik.get_compilations_menu(
+                callback_data=callback_data,
+                is_in=obj_id in data.get("send_compilation_list"),
+                post_id=obj_id
+            )
     else:
         posts = get_formatted_user_settings_posts_by_compilation_id(compilation_id=data.get("compilation_id"),
                                                                     telegram_id=user_id, )
@@ -220,11 +256,20 @@ async def keep_updated_post(message: types.Message, state: FSMContext):
     callback_data = data.get("callback_data")
     user_id = message.chat.id
     if "text" in message:
-        add_user_post(
-            post_id=int(callback_data["post_id"]),
-            text=message.text,
-            telegram_id=user_id
-        )
+        if get_profile_is_helper(telegram_id=user_id):
+            helper = get_profile_by_telegram_id(user_id)
+            inviter_id = helper.inviting_user.telegram_id
+            add_user_post(
+                post_id=int(callback_data["post_id"]),
+                text=message.text,
+                telegram_id=inviter_id
+            )
+        else:
+            add_user_post(
+                post_id=int(callback_data["post_id"]),
+                text=message.text,
+                telegram_id=user_id
+            )
         await mw.try_edit_message_caption(
             text=message.text,
             chat_id=user_id,

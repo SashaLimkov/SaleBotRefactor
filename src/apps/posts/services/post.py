@@ -114,7 +114,7 @@ def get_formatted_user_settings_posts_by_compilation_id(
                     contents.append((content.type, content.file.path))
             post_text = post.user_post.all()[0].text
         result_user_list.append((post_text, contents, post.pk))
-    result_user_list.reverse()
+    # result_user_list.reverse()
     return result_user_list
 
 

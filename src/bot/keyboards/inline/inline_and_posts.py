@@ -35,7 +35,7 @@ async def get_select_compilation_menu(callback_data: dict):
     )
 
 
-async def get_compilations_menu(callback_data: dict, is_in: bool, post_id: int):
+async def get_compilations_menu(callback_data: dict, is_in: bool, post_id: int, comp_or_post=1):
     keyboard = await get_base_keyboard(
         keyboard_options={
             "row_width": 1,
@@ -47,7 +47,7 @@ async def get_compilations_menu(callback_data: dict, is_in: bool, post_id: int):
             cd=cd.turn_on_or_off_post.new(
                 action=callback_data["action"],
                 date=callback_data["date"],
-                comp_or_post=1,
+                comp_or_post=comp_or_post,
                 post_id=post_id,
                 status=not is_in
             )
@@ -59,7 +59,7 @@ async def get_compilations_menu(callback_data: dict, is_in: bool, post_id: int):
             cd=cd.send_one_or_all.new(
                 action=callback_data["action"],
                 date=callback_data["date"],
-                comp_or_post=1,
+                comp_or_post=comp_or_post,
                 post_id=post_id,
                 send_one_or_all=0
             )
@@ -71,7 +71,7 @@ async def get_compilations_menu(callback_data: dict, is_in: bool, post_id: int):
             cd=cd.send_one_or_all.new(
                 action=callback_data["action"],
                 date=callback_data["date"],
-                comp_or_post=1,
+                comp_or_post=comp_or_post,
                 post_id=post_id,
                 send_one_or_all=1
             )
