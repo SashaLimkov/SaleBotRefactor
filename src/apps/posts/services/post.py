@@ -46,8 +46,8 @@ def get_formatted_posts_by_compilation_id(
 
 def get_formatted_user_settings_posts_by_compilation_id(
         compilation_id: int, telegram_id: int, channel=0
-) -> List[Tuple[str, List[Tuple[str, str]]]]:
-    """Возвращает посты на основе настроек пользователя в формате Tuple['текст поста', Tuple['список медиа']]
+) -> List[Tuple[str, List[Tuple[str, str]], int]]:
+    """Возвращает посты на основе настроек пользователя в формате Tuple['текст поста', Tuple['список медиа'], post.pk]
     Аргумент channel, принимает значение 0 - отправка в TG и 1 - отправка в ВК"""
     posts = get_posts_by_compilation_id(compilation_id)
     settings = get_settings(telegram_id)
@@ -55,8 +55,9 @@ def get_formatted_user_settings_posts_by_compilation_id(
     for post in posts:
         contents = []
         if not post.user_post.filter(profile_id=telegram_id):
-            post_text = post.shop.name + "\n\n"
-            for item in post.items.all():
+            post_items = post.items.all()
+            post_text = f"{post.compilation.name}\n\n" if post_items else ""
+            for item in post_items:
                 if settings.product_settings.name:
                     if settings.hided_link and channel == 0:
                         post_text += f'<a href="{item.link}">{item.name}</a>\n'
@@ -100,14 +101,21 @@ def get_formatted_user_settings_posts_by_compilation_id(
                 if settings.signature:
                     post_text += "\n\n" + settings.signature
             for content in post.contents.all():
-                if settings.logo or settings.text_logo and content.type == 0:
+                if (settings.logo or settings.text_logo) and content.type == 0:
                     contents.append((0, watermark(content.file.path, settings.logo,
                                                   settings.logo_position, settings.text_logo)))
                 else:
                     contents.append((content.type, content.file.path))
         else:
+            for content in post.contents.all():
+                if (settings.logo or settings.text_logo) and content.type == 0:
+                    contents.append((0, watermark(content.file.path, settings.logo,
+                                                  settings.logo_position, settings.text_logo)))
+                else:
+                    contents.append((content.type, content.file.path))
             post_text = post.user_post.all()[0].text
-        result_user_list.append((post_text, contents))
+        result_user_list.append((post_text, contents, post.pk))
+    result_user_list.reverse()
     return result_user_list
 
 
@@ -132,18 +140,5 @@ def delete_user_post(post_id: int, telegram_id: int) -> None:
     UserPost.objects.get(post_id=post_id, profile_id=telegram_id).delete()
 
 
-def create_post(compilation_id: int, shop: str, currency_id: int):
-    """Создает пост привязанный к подборке"""
-    return Post.objects.create(
-        compilation_id=compilation_id,
-        shop=get_or_create_shop(shop, currency_id)
-    )
-
-
-def update_post(post_id: int, shop: str, currency_id: int):
-    """Обновляет пост привязанный к подборке"""
-    shop = get_or_create_shop(shop, currency_id)
-    post = Post.objects.get(pk=post_id)
-    post.shop = shop
-    post.save()
-    return post
+def create_post():
+    pass

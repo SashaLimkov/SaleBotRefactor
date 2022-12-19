@@ -16,5 +16,8 @@ def setup(dp: Dispatcher):
     subscriptions.setup(dp)
     posts.setup(dp)
     dp.register_message_handler(
+        commands.anons, filters.CommandStart(deep_link="select_section"), state="*"
+    )
+    dp.register_message_handler(
         commands.start_command, filters.CommandStart(), state="*"
     )

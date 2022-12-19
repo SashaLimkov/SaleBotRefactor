@@ -7,7 +7,14 @@ MAIN_MENU = "get_mm"
 
 reg = CallbackData("reg", "action")
 mm = CallbackData("mm", "action")
-select_date = CallbackData("sd", "first_lvl", "date")
+select_date = CallbackData("sd", "action", "date")
+change_post = CallbackData("change_p", "action", "date", "comp_or_post", "post_id")
+turn_on_or_off_post = CallbackData("turn_o_o", "action", "date", "comp_or_post", "post_id", "status")
+send_one_or_all = CallbackData("soop", "action", "date", "comp_or_post", "post_id", "send_one_or_all")
+select_platform = CallbackData("sp", "action", "date", "comp_or_post", "post_id", "send_one_or_all", "platform")
+select_channel = CallbackData("sc", "action", "date", "comp_or_post", "post_id", "send_one_or_all", "platform",
+                              "channel_id")
+get_post_by_id = CallbackData("gpbic", "action", "date", "comp_or_post", "post_id")
 settings_menu = CallbackData("sm", "first_lvl", "second_lvl")
 sub_menu = CallbackData("sub_m", "first_lvl", "second_lvl")
 rates_menu = CallbackData("rates_m", "first_lvl", "second_lvl", "third_lvl")

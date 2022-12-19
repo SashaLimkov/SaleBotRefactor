@@ -70,7 +70,7 @@ async def get_date_menu(callback_data: dict):
     yesterday = str(await get_datetime("yt")).split(" ")[0]
     today = str(await get_datetime("td")).split(" ")[0]
     days = (three_days_before_today, the_day_before_yesterday, yesterday, today)
-    buttons = [{"text": day, "callback_data": cd.select_date.new(first_lvl=callback_data["action"], date=day)} for
+    buttons = [{"text": day, "callback_data": cd.select_date.new(action=callback_data["action"], date=day)} for
                day in days]
     buttons.append({"text": "◀ Назад", "callback_data": cd.MAIN_MENU})
     return await get_base_keyboard(
