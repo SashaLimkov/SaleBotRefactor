@@ -100,3 +100,8 @@ def delete_compilation(compilation_id: int) -> None:
 def delete_final_compilation(compilation_id: int) -> None:
     """Удаляет существующее окончание подборки"""
     Compilation.objects.get(pk=compilation_id).finalcompilation_set.first().delete()
+
+
+def get_final_compilation(compilation_id: int) -> FinalCompilation:
+    """Возвращает окончания подборки"""
+    return Compilation.objects.get(pk=compilation_id).finalcompilation_set.first()
