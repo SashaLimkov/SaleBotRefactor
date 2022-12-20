@@ -3,7 +3,6 @@ from pathlib import Path
 
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.files import JSONStorage
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from core import settings
 

@@ -167,7 +167,6 @@ async def get_post_or_compilation(call: types.CallbackQuery, callback_data: dict
     compilation = int(callback_data["comp_or_post"])
     obj_id = int(callback_data["post_id"])
     if compilation:
-        print(compilation)
         if compilation == 2:
             f_compilation = get_final_compilation(compilation_id=obj_id)
             text = f_compilation.text

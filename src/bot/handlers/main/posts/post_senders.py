@@ -25,8 +25,6 @@ async def send_posts(call: types.CallbackQuery, callback_data: dict, state: FSMC
     )
     if platform == "tg":
         if compilation and not send_all:
-            print(compilation)
-            print(obj_id)
             if compilation == 2:
                 await send_final_compilation(
                     compilation_id=obj_id,
@@ -67,6 +65,7 @@ async def send_posts(call: types.CallbackQuery, callback_data: dict, state: FSMC
             else:
                 for post in posts:
                     if post[-1] == obj_id:
+
                         await send_post(post=post, channel_id=channel_id, message=call.message)
                         break
 
