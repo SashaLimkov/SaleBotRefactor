@@ -44,7 +44,7 @@
                                     <div class="flex-grow-1">
                                         <span class="text-muted mb-3 lh-1 d-block text-truncate">Количество пользователей</span>
                                         <h4 class="mb-3">
-                                            <span class="counter-value" data-target="354">0</span>
+                                            <span class="counter-value" data-target="120">0</span>
                                         </h4>
                                     </div>
 
@@ -65,7 +65,7 @@
                                     <div class="flex-grow-1">
                                         <span class="text-muted mb-3 lh-1 d-block text-truncate">Доход за месяц</span>
                                         <h4 class="mb-3">
-                                            <span class="counter-value" data-target="354">0</span>₽
+                                            <span class="counter-value" data-target="180000">0</span>₽
                                         </h4>
                                     </div>
                                 </div>
@@ -81,7 +81,7 @@
                                     <div class="flex-grow-1">
                                         <span class="text-muted mb-3 lh-1 d-block text-truncate">Средняя активность</span>
                                         <h4 class="mb-3">
-                                            <span class="counter-value" data-target="20.5">0</span>
+                                            <span class="counter-value" data-target="29.5">0</span>
                                         </h4>
                                     </div>
 
@@ -172,7 +172,7 @@
         }
 
         var barchartColors = getChartColorsArray("#mini-chart1"), options = {
-            series: [31, 40],
+            series: [90, 30],
             labels: ['С подпиской', 'Без подписки'],
             chart: {type: "donut", height: 110},
             colors: barchartColors,
@@ -182,7 +182,7 @@
         chart.render()
 
         var barchartColors = getChartColorsArray("#mini-chart2"), options = {
-            series: [31, 40],
+            series: [22, 15],
             labels: ['С подпиской', 'Без подписки'],
             chart: {type: "donut", height: 110},
             colors: barchartColors,
@@ -195,11 +195,11 @@
             chart: {height: 350, type: "area", toolbar: {show: !1}},
             dataLabels: {enabled: !1},
             stroke: {curve: "smooth", width: 3},
-            series: [{name: "series1", data: [34, 40, 28, 52, 42, 109, 100]}],
+            series: [{name: "series1", data: [49, 58, 68, 70, 90, 115, 130]}],
             colors: splneAreaColors,
             xaxis: {
                 type: "datetime",
-                categories: ["2018-09-19T00:00:00", "2018-09-19T01:30:00", "2018-09-19T02:30:00", "2018-09-19T03:30:00", "2018-09-19T04:30:00", "2018-09-19T05:30:00", "2018-09-19T06:30:00"]
+                categories: ["2022-11-01", "2022-11-02", "2022-11-03", "2022-11-04", "2022-11-05", "2022-11-06", "2022-11-07"]
             },
             grid: {borderColor: "#f1f1f1"},
             tooltip: {x: {format: "dd/MM/yy HH:mm"}}
@@ -211,9 +211,9 @@
             colors: lineDatalabelColors,
             dataLabels: {enabled: !1},
             stroke: {width: [3, 3], curve: "straight"},
-            series: [{name: "С подпиской", data: [26, 24, 32, 36, 33, 31, 33]}, {
+            series: [{name: "С подпиской", data: [70, 80, 90, 85, 93, 95, 90]}, {
                 name: "Без подписки",
-                data: [14, 11, 16, 12, 17, 13, 12]
+                data: [30, 21, 24, 22, 25, 27, 30]
             }],
             grid: {row: {colors: ["transparent", "transparent"], opacity: .2}, borderColor: "#f1f1f1"},
             markers: {style: "inverted", size: 0},
@@ -229,10 +229,10 @@
             plotOptions: {bar: {borderRadius: 10, dataLabels: {position: "top"}}},
             dataLabels: {
                 enabled: !0, formatter: function (e) {
-                    return e + "%"
+                    return e
                 }, offsetY: -22, style: {fontSize: "12px", colors: ["#304758"]}
             },
-            series: [{name: "Inflation", data: [2.5, 3.2, 5, 10.1, 4.2, 3.8, 3, 2.4, 4, 1.2, 3.5, .8]}],
+            series: [{name: "Активность", data: [15, 17, 16, 20, 23, 19, 21, 18, 15, 25, 23, 29.5]}],
             colors: columnDatalabelColors,
             grid: {borderColor: "#f1f1f1"},
             xaxis: {
@@ -258,12 +258,12 @@
             yaxis: {
                 axisBorder: {show: !1}, axisTicks: {show: !1}, labels: {
                     show: !1, formatter: function (e) {
-                        return e + "%"
+                        return e
                     }
                 }
             },
             title: {
-                text: "Monthly Inflation in Argentina, 2002",
+                text: "Активность пользователей по неделям",
                 floating: !0,
                 offsetY: 330,
                 align: "center",
@@ -276,7 +276,7 @@
             chart: {height: 350, type: "area", toolbar: {show: !1}},
             dataLabels: {enabled: !1},
             stroke: {curve: "smooth", width: 3},
-            series: [{name: "series1", data: [34, 40, 28, 52, 42, 109, 100]}],
+            series: [{name: "Получено за месяц", data: [140000, 160000, 190000, 170000, 186000, 190000, 180000]}],
             colors: splneAreaColors,
             xaxis: {
                 type: "datetime",

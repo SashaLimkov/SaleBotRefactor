@@ -20,6 +20,30 @@ def get_posts_by_compilation_id(compilation_id: int) -> Union[QuerySet, List[Pos
     )
 
 
+def get_formatted_channel_posts_by_compilation_id(compilation_id: int) -> list:
+    """Возвращает список с сформированным текстом для постов"""
+    posts = get_posts_by_compilation_id(compilation_id)
+    result = []
+    for index, post in enumerate(posts):
+        contents = None
+        post_text = post.shop.name + "\n\n"
+        for item in post.items.all():
+            post_text += item.name + "\n" if item.name else ''
+            post_text += item.sizes + "\n" if item.sizes else ''
+            post_text += item.description + "\n" if item.description else ''
+            post_text += (
+                f"Цена: <b><s>{item.price_old}{post.shop.currency.sign}</s>➡️"
+            )
+            post_text += f"{item.price_new}{post.shop.currency.sign}</b>" + "\n"
+            post_text += f'{item.link}\n'
+        for content in post.contents.all():
+
+            contents = [(content.type, content.file.path)]
+        result.append((post_text, contents, post))
+
+    return result
+
+
 def get_formatted_posts_by_compilation_id(
         compilation_id: int,
 ) -> list:
@@ -30,12 +54,14 @@ def get_formatted_posts_by_compilation_id(
         contents = None
         post_text = post.shop.name + "<br><br>"
         for item in post.items.all():
-            post_text += item.name + "<br>"
-            post_text += item.sizes + "<br>"
-            post_text += item.description + "<br>"
-            post_text += (
-                f"Цена: <b><s>{item.price_old}{post.shop.currency.sign}</s>➡️"
-            )
+            post_text += item.name + "<br>" if item.name else ''
+            post_text += item.sizes + "<br>" if item.sizes else ''
+            post_text += item.description + "<br>" if item.description else ''
+            price_old = item.price_old
+            price_new = item.price_new
+            post_text += f"Цена: <b><s>{price_old}{post.shop.currency}</s>"
+            if price_new:
+                post_text += f"➡️{price_new}{post.shop.currency}</b>" + "\n"
             post_text += f"{item.price_new}{post.shop.currency.sign}</b>" + "<br>"
             post_text += f'<a href="{item.link}">{item.link}</a><br>'
         for content in post.contents.all():
@@ -63,9 +89,9 @@ def get_formatted_user_settings_posts_by_compilation_id(
                     else:
                         post_text += item.name + "\n"
                 if settings.product_settings.sizes:
-                    post_text += item.sizes + "\n"
+                    post_text += item.sizes + "\n" if item.sizes else ''
                 if settings.product_settings.description:
-                    post_text += item.description + "\n"
+                    post_text += item.description + "\n" if item.description else ''
                 if settings.product_settings.price:
                     if settings.currency == 0:
                         price_old = item.price_old
@@ -89,7 +115,7 @@ def get_formatted_user_settings_posts_by_compilation_id(
                     if settings.rounder:
                         price_old = round_num_to(price_old, settings.rounder, settings.currency)
                         price_new = round_num_to(price_new, settings.rounder, settings.currency)
-                    post_text += f"Цена: <b><s>{price_old}{sign}</s>"
+                    post_text += f"<b><s>{price_old}{sign}</s>"
                     if price_new:
                         post_text += f"➡️{price_new}{sign}</b>" + "\n"
                 if settings.product_settings.link:

@@ -11,9 +11,9 @@ services:
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_DB=task_tl_db
-      - POSTGRES_USER=task_tl
-      - POSTGRES_PASSWORD=task_tl_password
+      - POSTGRES_DB=sale_bot_db
+      - POSTGRES_USER=sale_bot
+      - POSTGRES_PASSWORD=pandora121
     volumes:
       - ./db:/var/lib/postgresql/data
     networks:

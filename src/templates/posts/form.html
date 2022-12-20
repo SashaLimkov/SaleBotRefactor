@@ -246,13 +246,6 @@
                                                     </button>
                                                     <div class="row">
                                                         <div class="col-10">
-                                                            <div class="text-sm-end">
-                                                                <a type="button"
-                                                                   href="{% url 'compilation_create' %}"
-                                                                   class="btn btn-danger waves-effect waves-light mb-2 me-2">
-                                                                    <i class="mdi mdi-delete"></i>Удалить
-                                                                </a>
-                                                            </div>
                                                         </div>
                                                         <div class="col-2">
                                                             <div class="text-sm-end">
@@ -421,7 +414,7 @@
                                                                                     <div class="col-md-12 col-lg-12">
                                                                                         <br>
                                                                                         <div class="text-sm-end">
-                                                                                            <button id="delete_product_{{ post.pk }}"
+                                                                                            <button type="button" onclick="delete_product_post({{ item.pk }}, {{ post.pk }})"
                                                                                                class="btn btn-danger waves-effect waves-light mb-2 me-2">
                                                                                                 <i class="mdi mdi-delete"></i>Удалить
                                                                                             </button>
@@ -441,7 +434,7 @@
                                                                 <div class="row">
                                                                     <div class="col-10">
                                                                         <div class="text-sm-end">
-                                                                            <button id="delete_post_modal_{{ post.pk }}" data-bs-dismiss="modal"
+                                                                            <button onclick="delete_post({{ post.pk }})" data-bs-dismiss="modal"
                                                                                class="btn btn-danger waves-effect waves-light mb-2 me-2">
                                                                                 <i class="mdi mdi-delete"></i>Удалить
                                                                             </button>
@@ -672,7 +665,7 @@
                                                                                         <br>
                                                                                         <div class="text-sm-end">
                                                                                             <button type="button"
-                                                                                                id="delete_product_new_${counter}"
+                                                                                                id="delete_product_new_${counter}" onclick="delete_product(${counter})"
                                                                                                class="btn btn-danger waves-effect waves-light mb-2 me-2 product-new">
                                                                                                 <i class="mdi mdi-delete"></i>Удалить
                                                                                             </button>
@@ -741,8 +734,8 @@
                                                                                      <div class="col-md-12 col-lg-12">
                                                                                         <br>
                                                                                         <div class="text-sm-end">
-                                                                                            <button type="button"
-                                                                                                id="delete_product_new_${counter}"
+                                                                                            <button type="button" value="${counter}"
+                                                                                                id="delete_product_new_add" onclick="delete_product(${counter})"
                                                                                                class="btn btn-danger waves-effect waves-light mb-2 me-2 product-new">
                                                                                                 <i class="mdi mdi-delete"></i>Удалить
                                                                                             </button>
@@ -772,17 +765,12 @@
             })
             $('#post_div_{{ post.pk }}').remove()
         })
-        $(`.product-new`).on('click', function () {
-
-            $(`#product_card_new_${counter}`).remove()
-        })
-
-        $('#delete_product_{{ post.pk }}').on('click', function () {
-            headers = {'X-CSRFToken': '{{ csrf_token }}'};
+        function delete_post(post) {
+                headers = {'X-CSRFToken': '{{ csrf_token }}'};
             $.ajax({
                 url: '{% url 'delete_post' %}',
                 type: 'POST',
-                data: {'post': {{ post.pk }} },
+                data: {'post': post },
                 dataType: 'json',
                 headers: headers,
                 success: function (data) {
@@ -792,8 +780,32 @@
                     alertify.error("Ошибка при сохранении")
                 }
             })
-            $('#product_card_{{ post.pk }}').remove()
-        })
+            $(`#post_div_${post}`).remove()
+        }
+
+
+
         {% endfor %}
+        function delete_product (counter) {
+
+            $(`#product_card_new_${counter}`).remove()
+        }
+        function delete_product_post (item_id, post) {
+            headers = {'X-CSRFToken': '{{ csrf_token }}'};
+            $.ajax({
+                url: '{% url 'delete_item' %}',
+                type: 'POST',
+                data: {'item': item_id },
+                dataType: 'json',
+                headers: headers,
+                success: function (data) {
+                    alertify.success("Удалено")
+                },
+                error: function (data) {
+                    alertify.error("Ошибка при сохранении")
+                }
+            })
+            $(`#product_card_${item_id}`).remove()
+        }
     </script>
 {% endblock extra_js %}

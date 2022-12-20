@@ -1,4 +1,6 @@
 import traceback
+import unicodedata
+from html import unescape
 
 import cv2
 from aiogram import types
@@ -224,6 +226,7 @@ async def try_send_post_to_user(
         text: str,
         message=None,
         keyboard=None):
+    text = unicodedata.normalize('NFKC', unescape(text.replace('<br>', '\n')))
     if file_type:
         mes_id = await try_send_post_with_video(file_path=file_path, chat_id=chat_id, text=text, message=message,
                                                 keyboard=keyboard)

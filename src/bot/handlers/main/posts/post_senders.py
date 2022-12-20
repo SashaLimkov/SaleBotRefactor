@@ -2,7 +2,8 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from apps.message.services.message import get_message_by_name_for_user
 from apps.posts.services.compilation import get_list_compilations_by_date, get_compilation_by_id, get_final_compilation
-from apps.posts.services.post import get_formatted_user_settings_posts_by_compilation_id
+from apps.posts.services.post import get_formatted_user_settings_posts_by_compilation_id, get_user_post
+from apps.profiles.services.profile import get_profile_is_helper, get_profile_by_telegram_id
 from bot.handlers.main.posts.posts import send_compilation, send_final_compilation
 from bot.utils import message_worker as mw, deleter
 from bot.keyboards import inline as ik
@@ -41,8 +42,14 @@ async def send_posts(call: types.CallbackQuery, callback_data: dict, state: FSMC
                 )
         else:
             compilation_id = int(data.get("compilation_id"))
-            posts = get_formatted_user_settings_posts_by_compilation_id(compilation_id=compilation_id,
-                                                                        telegram_id=user_id, )
+            if get_profile_is_helper(telegram_id=user_id):
+                helper = get_profile_by_telegram_id(user_id)
+                inviting_user = helper.inviting_user.telegram_id
+                posts = get_formatted_user_settings_posts_by_compilation_id(compilation_id=compilation_id,
+                                                                            telegram_id=inviting_user, )
+            else:
+                posts = get_formatted_user_settings_posts_by_compilation_id(compilation_id=compilation_id,
+                                                                            telegram_id=user_id, )
             if send_all:
                 if compilation_id in send_compilation_list:
                     await send_compilation(

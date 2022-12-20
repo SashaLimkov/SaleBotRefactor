@@ -9,6 +9,8 @@ from bot.keyboards import inline as ik
 from bot.states.MainMenu import MainMenu
 from bot.states.Posts import PostStates
 from bot.utils import message_worker as mw
+from html import unescape
+import unicodedata
 
 
 async def sender_anons(message: types.Message, state: FSMContext):
@@ -83,11 +85,12 @@ async def send_compilation(compilation_id: int, chat_id: int, message: types.Mes
     compilation = get_compilation_by_id(compilation_id=compilation_id)
     compilation_file = compilation.contents.first()
     compilation_file_type = compilation_file.type
+    text = unicodedata.normalize('NFKC', unescape(compilation.text.replace('<br>', '\n')))
     mes_id = await mw.try_send_post_to_user(
         file_path=compilation_file.file.path,
         file_type=compilation_file_type,
         chat_id=chat_id,
-        text=f"{compilation}\n{compilation.text}",
+        text=f"{compilation.name}\n\n{text}",
         message=message,
         keyboard=keyboard
     )
@@ -98,11 +101,12 @@ async def send_final_compilation(compilation_id: int, chat_id: int, message: typ
     final_compilation = get_final_compilation(compilation_id=compilation_id)
     final_compilation_file = final_compilation.contents.first()
     final_compilation_file_type = final_compilation_file.type
+    text = unicodedata.normalize('NFKC', unescape(final_compilation.text.replace('<br>', '\n')))
     mes_id = await mw.try_send_post_to_user(
         file_path=final_compilation_file.file.path,
         file_type=final_compilation_file_type,
         chat_id=chat_id,
-        text=f"{final_compilation}\n{final_compilation.text}",
+        text=f"{text}",
         message=message,
         keyboard=keyboard
     )
@@ -169,7 +173,7 @@ async def get_post_or_compilation(call: types.CallbackQuery, callback_data: dict
     if compilation:
         if compilation == 2:
             f_compilation = get_final_compilation(compilation_id=obj_id)
-            text = f_compilation.text
+            text = unicodedata.normalize('NFKC', unescape(f_compilation.text.replace('<br>', '\n')))
             keyboard = await ik.get_compilations_menu(
                 callback_data=callback_data,
                 is_in=obj_id in data.get("send_compilation_list"),
@@ -178,7 +182,7 @@ async def get_post_or_compilation(call: types.CallbackQuery, callback_data: dict
             )
         else:
             compilation = get_compilation_by_id(compilation_id=obj_id)
-            text = compilation.text
+            text = unicodedata.normalize('NFKC', unescape(compilation.text.replace('<br>', '\n')))
             keyboard = await ik.get_compilations_menu(
                 callback_data=callback_data,
                 is_in=obj_id in data.get("send_compilation_list"),

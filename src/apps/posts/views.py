@@ -1,15 +1,19 @@
 import datetime
+import traceback
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
+from django.utils import timezone
 from django.views.generic import ListView, View, DetailView, CreateView
 
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
 
 from apps.posts.services.compilation import get_search_compilations_queryset, get_all_compilation_queryset, \
     get_content_compilation_queryset, get_date_range_compilation_filter, create_compilation, update_compilation, \
     create_final_compilation, update_or_create_final_compilation, delete_final_compilation
-from apps.posts.models import Compilation, Content, FinalCompilation, Post
+from apps.posts.models import Compilation, Content, FinalCompilation, Post, Item
 
 from django.core.paginator import Paginator
 
@@ -20,13 +24,13 @@ from apps.settings.services.currency import get_list_currency
 from apps.utils.services.paginator import get_paginator_context
 
 
-class CompilationListView(ListView):
+class CompilationListView(LoginRequiredMixin, ListView):
     model = Compilation
     template_name = 'posts/list.html'
     context_object_name = 'compilations'
 
 
-class CompilationTableView(View):
+class CompilationTableView(LoginRequiredMixin, View):
     def post(self, request):
         queryset = None
 
@@ -56,7 +60,7 @@ class CompilationTableView(View):
         return JsonResponse(data)
 
 
-class CompilationDetailView(DetailView):
+class CompilationDetailView(LoginRequiredMixin, DetailView):
     model = Compilation
     template_name = 'posts/form.html'
     context_object_name = 'compilation'
@@ -83,19 +87,20 @@ class CompilationDetailView(DetailView):
                 to='compilation',
                 to_id=pk
             )
-        print(request.POST.get('text'))
+        datetime_send = datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M')
+
         update_compilation(
             compilation_id=pk,
             name=request.POST.get('name'),
             text=request.POST.get('text').replace('<p>', '').replace('</p>', '<br>'),
             date=datetime.datetime.strptime(request.POST.get('date'), '%Y-%m-%d'),
-            datetime_send=datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'),
+            datetime_send=datetime_send,
             done=True if request.POST.get('complete') == 'true' else False
         )
         return JsonResponse({'success': True})
 
 
-class FinalCompilationSaveView(View):
+class FinalCompilationSaveView(LoginRequiredMixin, View):
     def post(self, request, pk):
         if request.POST.get('visible') == 'true':
             final_compilation = update_or_create_final_compilation(
@@ -123,7 +128,7 @@ class FinalCompilationSaveView(View):
         return JsonResponse({'success': True})
 
 
-class CompilationCreateView(View):
+class CompilationCreateView(LoginRequiredMixin, View):
     def get(self, requet):
         return render(requet, 'posts/form_create.html')
 
@@ -176,7 +181,7 @@ class CompilationCreateView(View):
         return JsonResponse({'success': True, 'gid': gid})
 
 
-class FinalCompilationCreateView(View):
+class FinalCompilationCreateView(LoginRequiredMixin, View):
     def post(self, request):
         if request.POST.get('visible') == 'true':
             compilation_id = request.POST.get('compilation')
@@ -199,8 +204,7 @@ class FinalCompilationCreateView(View):
         return JsonResponse({'success': True})
 
 
-
-class PostUpdateView(View):
+class PostUpdateView(LoginRequiredMixin, View):
     def post(self, request):
         print(request.POST)
         compilation = int(request.POST.get('compilation'))
@@ -256,7 +260,7 @@ class PostUpdateView(View):
         return redirect('compilation_detail', pk=compilation)
 
 
-class PostCreateView(View):
+class PostCreateView(LoginRequiredMixin, View):
     def post(self, request):
         compilation = int(request.POST.get('compilation'))
         shop = request.POST.get('shop')
@@ -294,9 +298,9 @@ class PostCreateView(View):
         return redirect('compilation_detail', pk=compilation)
 
 
-class CompilationDeleteView(View):
+class CompilationDeleteView(LoginRequiredMixin, View):
     def post(self, request):
-        compilation_id = request.POST.get('compilation')
+        compilation_id = int(request.POST.get('compilation'))
         try:
             Compilation.objects.get(pk=compilation_id).delete()
         except:
@@ -304,11 +308,21 @@ class CompilationDeleteView(View):
         return JsonResponse({'status': True})
 
 
-class PostDeleteView(View):
+class PostDeleteView(LoginRequiredMixin, View):
     def post(self, request):
-        post = request.POST.get('post')
+        post = int(request.POST.get('post'))
         try:
             Post.objects.get(pk=post).delete()
         except:
             pass
+        return JsonResponse({'status': True})
+
+
+class ProductDeleteView(LoginRequiredMixin, View):
+    def post(self, request):
+        item = int(request.POST.get('item'))
+        try:
+            Item.objects.get(pk=item).delete()
+        except:
+            print(traceback.format_exc())
         return JsonResponse({'status': True})

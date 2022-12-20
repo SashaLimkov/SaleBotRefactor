@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, View, TemplateView, DetailView
 
 from django.http import JsonResponse
@@ -13,13 +14,13 @@ from apps.profiles.services.profile import get_search_profiles_queryset, get_all
 from apps.utils.services.paginator import get_paginator_context
 
 
-class ProfileListView(ListView):
+class ProfileListView(LoginRequiredMixin, ListView):
     model = Profile
     template_name = 'profiles/list.html'
     context_object_name = 'profiles'
 
 
-class ProfileTableView(View):
+class ProfileTableView(LoginRequiredMixin, View):
     def post(self, request):
         queryset = None
         search = request.POST.get('search', '')
@@ -48,6 +49,6 @@ class ProfileTableView(View):
         return JsonResponse(data)
 
 
-class ProfileDetailView(DetailView):
+class ProfileDetailView(LoginRequiredMixin, DetailView):
     model = Profile
     template_name = 'profiles/form.html'

@@ -47,8 +47,13 @@
                                 <div class="row">
                                     <div class="col-md-6 col-lg-3">
                                         <div class="mb-4">
-                                            <input class="form-check-input" type="checkbox" id="displayed"
-                                                   name="is_visible" checked>
+                                            {% if profile.is_active %}
+                                                <input class="form-check-input" type="checkbox" id="displayed"
+                                                       name="is_visible" checked>
+                                            {% else %}
+                                                <input class="form-check-input" type="checkbox" id="displayed"
+                                                       name="is_visible" >
+                                            {% endif %}
                                             <label class="form-check-label" for="formCheckRight2">
                                                 Активный
                                             </label>
@@ -56,8 +61,13 @@
                                     </div>
                                     <div class="col-md-6 col-lg-3">
                                         <div class="mb-4">
-                                            <input class="form-check-input" type="checkbox" id="displayed"
+                                            {% if profile.is_helper %}
+                                                <<input class="form-check-input" type="checkbox" id="displayed"
+                                                   name="is_visible" checked>
+                                            {% else %}
+                                                <input class="form-check-input" type="checkbox" id="displayed"
                                                    name="is_visible">
+                                            {% endif %}
                                             <label class="form-check-label" for="formCheckRight2">
                                                 Помощник
                                             </label>
@@ -65,8 +75,13 @@
                                     </div>
                                     <div class="col-md-6 col-lg-3">
                                         <div class="mb-4">
-                                            <input class="form-check-input" type="checkbox" id="displayed"
+                                            {% if profile.is_blocked %}
+                                                <<input class="form-check-input" type="checkbox" id="displayed"
+                                                   name="is_visible" checked>
+                                            {% else %}
+                                                <input class="form-check-input" type="checkbox" id="displayed"
                                                    name="is_visible">
+                                            {% endif %}
                                             <label class="form-check-label" for="formCheckRight2">
                                                 Забанен
                                             </label>
@@ -74,8 +89,13 @@
                                     </div>
                                     <div class="col-md-6 col-lg-3">
                                         <div class="mb-4">
-                                            <input class="form-check-input" type="checkbox" id="displayed"
+                                            {% if profile.in_chat %}
+                                                <<input class="form-check-input" type="checkbox" id="displayed"
+                                                   name="is_visible" checked>
+                                            {% else %}
+                                                <input class="form-check-input" type="checkbox" id="displayed"
                                                    name="is_visible">
+                                            {% endif %}
                                             <label class="form-check-label" for="formCheckRight2">
                                                 В чате
                                             </label>
@@ -87,49 +107,49 @@
                                         <div class="mb-4">
                                             <label class="form-label" for="default-input">Telegram ID</label>
                                             <input class="form-control" type="number" name="name"
-                                                   placeholder="Telegram ID">
+                                                   placeholder="Telegram ID" value="{{ profile.telegram_id }}">
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-lg-6">
                                         <div class="mb-4">
                                             <label class="form-label" for="default-input">Telegram Username</label>
                                             <input class="form-control" type="text" name="name"
-                                                   placeholder="Telegram Username">
+                                                   placeholder="Telegram Username" value="{{ profile.username }}">
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-lg-6">
                                         <div class="mb-4">
                                             <label class="form-label" for="default-input">Имя в Telegram</label>
                                             <input class="form-control" type="text" name="name"
-                                                   placeholder="Имя в Telegram">
+                                                   placeholder="Имя в Telegram" value="{{ profile.first_name }}">
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-lg-6">
                                         <div class="mb-4">
                                             <label class="form-label" for="default-input">Фамилия в Telegram</label>
                                             <input class="form-control" type="text" name="name"
-                                                   placeholder="Фамилия в Telegram">
+                                                   placeholder="Фамилия в Telegram"value="{{ profile.last_name }}">
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-lg-6">
                                         <div class="mb-4">
                                             <label class="form-label" for="default-input">Номер телефона</label>
                                             <input class="form-control" type="text" name="name"
-                                                   placeholder="Номер телефона">
+                                                   placeholder="Номер телефона" value="{{ profile.phone }}">
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-lg-6">
                                         <div class="mb-4">
                                             <label class="form-label" for="default-input">ФИО</label>
                                             <input class="form-control" type="text" name="name"
-                                                   placeholder="ФИО">
+                                                   placeholder="ФИО" value="{{ profile.full_name }}">
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-lg-6">
                                         <div class="mb-4">
                                             <label class="form-label" for="default-input">Дата регистрации</label>
                                             <input class="form-control" type="text" name="name"
-                                                   placeholder="Дата регистрации">
+                                                   placeholder="Дата регистрации" value="{{ profile.registration_date }}">
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-lg-6">
@@ -137,14 +157,14 @@
                                             <label class="form-label" for="default-input">Дата последней
                                                 активности</label>
                                             <input class="form-control" type="text" name="name"
-                                                   placeholder="Дата последней активности">
+                                                   placeholder="Дата последней активности" value="{{ profile.last_action_date }}">
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-lg-6">
                                         <div class="mb-4">
                                             <label class="form-label" for="default-input">Активность</label>
                                             <input class="form-control" type="text" name="name"
-                                                   placeholder="Активность">
+                                                   placeholder="Активность" value="{{ profile.activity }}">
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-lg-6">
@@ -152,7 +172,7 @@
                                             <label class="form-label" for="default-input">Пригласивший
                                                 пользователь</label>
                                             <input class="form-control" type="text" name="name"
-                                                   placeholder="Пригласивший пользователь">
+                                                   placeholder="Пригласивший пользователь"  value="{{ profile.inviting_user.telegram_id }}">
                                         </div>
                                     </div>
                                     <div class="mb-4">
@@ -181,38 +201,40 @@
                             <h3 class="card-title">Помощники</h3>
                         </div>
                         <div class="card-body">
-                            <div class="card">
-                                <div class="card-body">
-                                    <p><b>Помощник #</b></p>
-                                    <form>
-                                        <div class="row">
-                                            <div class="col-md-6 col-lg-5">
-                                                <div class="mb-4">
-                                                    <label class="form-label" for="default-input">Дата
-                                                        регистрации</label>
-                                                    <input class="form-control" type="text" name="name"
-                                                           placeholder="Дата регистрации">
+                            {% for helper in profile.profile_set.all %}
+                                <div class="card">
+                                    <div class="card-body">
+                                        <p><b>Помощник #{{ helper.pk }}</b></p>
+                                        <form>
+                                            <div class="row">
+                                                <div class="col-md-6 col-lg-5">
+                                                    <div class="mb-4">
+                                                        <label class="form-label" for="default-input">Дата
+                                                            регистрации</label>
+                                                        <input class="form-control" type="text" name="name"
+                                                               placeholder="Дата регистрации" value="{{ helper.registration_date }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-lg-5">
+                                                    <div class="mb-4">
+                                                        <label class="form-label" for="default-input">Telegram ID</label>
+                                                        <input class="form-control" type="text" name="name" value="{{ helper.telegram_id }}"
+                                                               placeholder="Telegram ID">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-lg-2">
+                                                    <div class="mb-4">
+                                                        <label class="form-label" for="default-input">ㅤ</label>
+                                                        <a type="button" class="form-control btn btn-primary">
+                                                            Перейти
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 col-lg-5">
-                                                <div class="mb-4">
-                                                    <label class="form-label" for="default-input">Telegram ID</label>
-                                                    <input class="form-control" type="text" name="name"
-                                                           placeholder="Telegram ID">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 col-lg-2">
-                                                <div class="mb-4">
-                                                    <label class="form-label" for="default-input">ㅤ</label>
-                                                    <a type="button" class="form-control btn btn-primary">
-                                                        Перейти
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
+                            {% endfor %}
                         </div>
                         <div class="card-header">
                             <h3 class="card-title">Подписки</h3>
@@ -233,18 +255,24 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <th scope="row">1</th>
-                                        <td>
-                                            <span class="badge bg-success font-size-12">Активна</span>
-                                        </td>
-                                        <td>Тариф</td>
-                                        <td>Дата покупки</td>
-                                        <td>Дата окончания</td>
-                                        <td>Чек</td>
-                                        <td>Осталось дней</td>
-                                    </tr>
-                                    </tbody>
+                                    {% for sub in profile.subscription_set.all %}
+                                        <tr>
+                                            <th scope="row">{{ sub.pk }}</th>
+                                            <td>
+                                                {% if sub.active %}
+                                                    <span class="badge bg-success font-size-12">Активна</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger font-size-12">Не активна</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ sub.rate.name }}</td>
+                                            <td>{{ sub.datetime_buy }}</td>
+                                            <td>{{ sub.datetime_end }}</td>
+                                            <td>{{ sub.cheque }}</td>
+                                            <td>{{ sub.days_left }}</td>
+                                        </tr>
+                                        </tbody>
+                                    {% endfor %}
                                 </table>
                             </div>
                         </div>
