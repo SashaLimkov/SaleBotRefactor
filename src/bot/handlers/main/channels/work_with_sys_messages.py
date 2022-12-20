@@ -5,7 +5,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from apps.message.services.message import get_message_by_name_for_user
-from apps.profiles.services.profile import get_profile_by_telegram_id
+from apps.profiles.services.profile import get_profile_by_telegram_id, get_profile_is_helper
 from apps.profiles.services.subscription import get_user_active_subscription
 from apps.settings.services.chanel import delete_channel_telegram, add_channel_telegram, get_list_telegram_channels
 from bot.states.MainMenu import MainMenu
@@ -38,8 +38,9 @@ async def fix_my_chats(update: types.ChatMemberUpdated):
                     channel_id=channel_id,
                 )
     else:
-        add_channel_telegram(
-            telegram_id=user_id,
-            name=update.chat.full_name,
-            channel_id=channel_id
-        )
+        if not get_profile_is_helper(telegram_id=user_id):
+            add_channel_telegram(
+                telegram_id=user_id,
+                name=update.chat.full_name,
+                channel_id=channel_id
+            )
