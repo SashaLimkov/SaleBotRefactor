@@ -222,8 +222,8 @@ async def try_send_post_to_user(
         file_type: int,
         chat_id: int,
         text: str,
-        message,
-        keyboard, ):
+        message=None,
+        keyboard=None):
     if file_type:
         mes_id = await try_send_post_with_video(file_path=file_path, chat_id=chat_id, text=text, message=message,
                                                 keyboard=keyboard)
