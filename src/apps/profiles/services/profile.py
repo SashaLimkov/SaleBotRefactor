@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Any, Union, List, Optional
 
+from django.utils import timezone
+
 from apps.profiles.services.subscription import create_user_subscription
 from apps.settings.services.settings_product_user import add_product_settings
 from apps.settings.services.settings_user import add_settings
@@ -72,7 +74,7 @@ def update_last_action_date_profile(telegram_id: int) -> None:
     """Обновляет время последнего действия пользователя и инкрементирует количество действий"""
     profile = Profile.objects.filter(telegram_id=telegram_id).first()
     if profile:
-        profile.last_action_date = get_datetime_now()
+        profile.last_action_date = timezone.now()
         profile.count_actions_in_current_day += 1
         profile.save()
     else:

@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+
 from apps.utils.models import TimeBasedModel
 from apps.utils.services.date_time import get_datetime_now
 
@@ -13,7 +15,7 @@ class Subscription(TimeBasedModel):
         on_delete=models.CASCADE,
         verbose_name="Пользователь",
     )
-    datetime_buy = models.DateTimeField("Время покупки", default=get_datetime_now())
+    datetime_buy = models.DateTimeField("Время покупки", default=timezone.now)
     datetime_end = models.DateTimeField("Время окончания подиски")
     cheque = models.CharField("Чек", max_length=255, null=True, blank=True)
     rate = models.ForeignKey(

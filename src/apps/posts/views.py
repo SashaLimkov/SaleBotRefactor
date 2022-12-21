@@ -1,6 +1,10 @@
+import asyncio
 import datetime
 import traceback
+import unicodedata
+from html import unescape
 
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.utils import timezone
@@ -19,9 +23,10 @@ from django.core.paginator import Paginator
 
 from apps.posts.services.content import update_or_create_content, create_content
 from apps.posts.services.item import update_item, create_item
-from apps.posts.services.post import get_formatted_posts_by_compilation_id, update_post, create_post
+from apps.posts.services.post import get_formatted_posts_by_compilation_id, update_post, create_post, get_post_text
 from apps.settings.services.currency import get_list_currency
 from apps.utils.services.paginator import get_paginator_context
+from bot.utils.message_worker import try_edit_message_caption
 
 
 class CompilationListView(LoginRequiredMixin, ListView):
@@ -88,8 +93,7 @@ class CompilationDetailView(LoginRequiredMixin, DetailView):
                 to_id=pk
             )
         datetime_send = datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M')
-
-        update_compilation(
+        compilation = update_compilation(
             compilation_id=pk,
             name=request.POST.get('name'),
             text=request.POST.get('text').replace('<p>', '').replace('</p>', '<br>'),
@@ -97,6 +101,11 @@ class CompilationDetailView(LoginRequiredMixin, DetailView):
             datetime_send=datetime_send,
             done=True if request.POST.get('complete') == 'true' else False
         )
+        if compilation.message_id:
+            print(123)
+            text = unicodedata.normalize('NFKC', unescape(compilation.text.replace('<br>', '\n')))
+            asyncio.run(try_edit_message_caption(settings.CHANNEL, text, compilation.message_id, None))
+
         return JsonResponse({'success': True})
 
 
@@ -107,6 +116,9 @@ class FinalCompilationSaveView(LoginRequiredMixin, View):
                 compilation_id=pk,
                 text=request.POST.get('text').replace('<p>', '').replace('</p>', '')
             )[0]
+            if final_compilation.message_id:
+                text = unicodedata.normalize('NFKC', unescape(final_compilation.text.replace('<br>', '\n')))
+                asyncio.run(try_edit_message_caption(settings.CHANNEL, text, final_compilation.message_id, None))
             if request.FILES.get('media'):
                 format_file = str(request.FILES.get('media')).split('.')[-1]
                 if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
@@ -133,52 +145,29 @@ class CompilationCreateView(LoginRequiredMixin, View):
         return render(requet, 'posts/form_create.html')
 
     def post(self, request):
-        compilation_id = request.POST.get('compilation_id')
-        if compilation_id != 'undefined':
-            compilation = update_compilation(
-                compilation_id=int(compilation_id),
+        print(request.POST)
+        compilation = create_compilation(
                 name=request.POST.get('name'),
                 text=request.POST.get('text').replace('<p>', '').replace('</p>', ''),
                 date=datetime.datetime.strptime(request.POST.get('date'), '%Y-%m-%d'),
                 datetime_send=datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'),
                 done=True if request.POST.get('complete') == 'true' else False
-            )
-            if request.FILES.get('media'):
-                format_file = str(request.FILES.get('media')).split('.')[-1]
-                if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
-                    type_content = 0
-                else:
-                    type_content = 1
-                update_or_create_content(
-                    file_name=str(request.FILES.get('media')),
-                    file=request.FILES.get('media'),
-                    type_content=type_content,
-                    to='compilation',
-                    to_id=compilation.id
-                )
+        )
+        format_file = str(request.FILES.get('media')).split('.')[-1]
+        if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
+            type_content = 0
         else:
-            compilation = create_compilation(
-                name=request.POST.get('name'),
-                text=request.POST.get('text').replace('<p>', '').replace('</p>', ''),
-                date=datetime.datetime.strptime(request.POST.get('date'), '%Y-%m-%d'),
-                datetime_send=datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'),
-                done=True if request.POST.get('complete') == 'true' else False
-            )
-            format_file = str(request.FILES.get('media')).split('.')[-1]
-            if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
-                type_content = 0
-            else:
-                type_content = 1
-            create_content(
+            type_content = 1
+        create_content(
                 file_name=str(request.FILES.get('media')),
                 file=request.FILES.get('media'),
                 type_content=type_content,
                 to='compilation',
                 to_id=compilation.id
-            )
+        )
 
-        gid = render_to_string('posts/form_gid.html', {'compilation_id': compilation.pk}, request=request)
-        return JsonResponse({'success': True, 'gid': gid})
+        #gid = render_to_string('posts/form_gid.html', {'compilation_id': compilation.pk}, request=request)
+        return redirect('compilation_detail', compilation.id)
 
 
 class FinalCompilationCreateView(LoginRequiredMixin, View):
@@ -255,7 +244,10 @@ class PostUpdateView(LoginRequiredMixin, View):
 
         shop = request.POST.get('shop')
         currency = request.POST.get('currency')
-        update_post(post, shop, currency)
+        post = update_post(post, shop, currency)
+
+        if post.message_id:
+            asyncio.run(try_edit_message_caption(settings.CHANNEL, get_post_text(post), post.message_id, None))
 
         return redirect('compilation_detail', pk=compilation)
 

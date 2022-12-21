@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from apps.utils.models import TimeBasedModel
 from apps.utils.services.date_time import get_datetime_now
@@ -24,10 +25,10 @@ class Profile(TimeBasedModel):
     full_name = models.CharField("ФИО", max_length=255)
 
     registration_date = models.DateTimeField(
-        "Дата регистрации", default=get_datetime_now()
+        "Дата регистрации", default=timezone.now
     )
     last_action_date = models.DateTimeField(
-        "Дата последней активности", default=get_datetime_now()
+        "Дата последней активности", default=timezone.now
     )
 
     activity = models.FloatField("Активность", default=0.0)

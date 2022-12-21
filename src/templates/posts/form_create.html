@@ -47,25 +47,27 @@
                                 <h3 class="card-title">Обзор</h3>
                             </div>
                             <div class="card-body">
-                                <form id="compilation-form">
+                                <form id="compilation-form" action="{% url 'compilation_create' %}" method="POST"
+                                                      enctype="multipart/form-data" class="needs-validation" novalidate>
+                                {% csrf_token %}
                                     <div class="mb-4">
                                         <label class="form-label" for="default-input">Медиа</label>
                                         <input class="form-control" type="file" id="media" name="media"
-                                               placeholder="Название">
+                                               placeholder="Название" required>
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label" for="default-input">Название</label>
                                         <input class="form-control" type="text" id="name" name="name"
-                                               placeholder="Название" value="">
+                                               placeholder="Название" value="" required>
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label" for="default-input">Дата</label>
                                         <input class="form-control" type="text" id="date-compilation" name="date"
-                                               value="">
+                                               value="" required>
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label" for="default-input">Текст</label>
-                                        <div id="ckeditor-classic"></div>
+                                        <textarea value="text" id="ckeditor-classic"></textarea>
                                     </div>
                                     <div class="mb-4">
                                         <div class="form-check form-check-right">
@@ -91,7 +93,7 @@
                                         </div>
                                     </div>
                                     <div class="mb-4">
-                                        <button type="submit" id="compilation-submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary">
                                             Сохранить
                                         </button>
                                     </div>
@@ -100,18 +102,6 @@
                         </div>
                     </div>
                     <div class="col-md-12 col-xl-6" id="gid-form">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 col-xl-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Посты</h3>
-                            </div>
-                            <div class="card-body">
-
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -139,35 +129,31 @@
     <script src="{% static 'libs/alertifyjs/build/alertify.min.js' %}"></script>
 
     <script>
-        $('#compilation-form').on('submit', function (event) {
-            event.preventDefault();
-            var form_data = new FormData(this);
-            form_data.append('text', editor_compilation.getData())
-            form_data.append('complete', $('#is_complted').is(':checked'))
-            form_data.append('compilation_id', $('#compilation_id').val())
-            headers = {'X-CSRFToken': '{{ csrf_token }}'};
-            $.ajax({
-                url: '{% url 'compilation_create' %}',
-                type: 'POST',
-                data: form_data,
-                dataType: 'json',
-                cache: false,
-                processData: false,
-                headers: headers,
-                contentType: false,
-                success: function (data) {
-                    alertify.success("Сохранено");
-                    if ($('#compilation_id').val() == undefined){
-                        $('#gid-form').html(data.gid);
-                    }
-
-                },
-                error: function (data) {
-                    alertify.error("Ошибка при сохранении")
-                }
-            })
-        })
-
+        {#$('#compilation-form').on('submit', function (event) {#}
+        {#    event.preventDefault();#}
+        {#    var form_data = new FormData(this);#}
+        {#    form_data.append('text', editor_compilation.getData())#}
+        {#    form_data.append('complete', $('#is_complted').is(':checked'))#}
+        {#    form_data.append('compilation_id', $('#compilation_id').val())#}
+        {#    headers = {'X-CSRFToken': '{{ csrf_token }}'};#}
+        {#    $.ajax({#}
+        {#        url: '{% url 'compilation_create' %}',#}
+        {#        type: 'POST',#}
+        {#        data: form_data,#}
+        {#        dataType: 'json',#}
+        {#        cache: false,#}
+        {#        processData: false,#}
+        {#        headers: headers,#}
+        {#        contentType: false,#}
+        {#        success: function (data) {#}
+        {#            alertify.success("Сохранено");#}
+        {#        },#}
+        {#        error: function (data) {#}
+        {#            alertify.error("Ошибка при сохранении")#}
+        {#        }#}
+        {#    })#}
+        {#})#}
+        {##}
 
     </script>
 

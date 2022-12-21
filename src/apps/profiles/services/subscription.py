@@ -2,6 +2,7 @@ import datetime
 from typing import Optional, List, Union
 
 from django.db.models import QuerySet
+from django.utils import timezone
 
 from apps.profiles.models import Subscription, Rate, Profile
 from apps.utils.services.date_time import get_datetime_now
@@ -24,7 +25,7 @@ def create_user_subscription(telegram_id: int, cheque: str, rate: str, helper_da
     rate = Rate.objects.get(name=rate)
     return Subscription.objects.create(
         profile_id=telegram_id,
-        datetime_end=get_datetime_now() + datetime.timedelta(days=helper_days if helper_days else rate.count_day_sub),
+        datetime_end=timezone.now() + datetime.timedelta(days=helper_days if helper_days else rate.count_day_sub),
         cheque=cheque,
         rate=rate,
         days_left=helper_days if helper_days else rate.count_day_sub,
