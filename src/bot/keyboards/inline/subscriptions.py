@@ -156,7 +156,7 @@ async def get_helper_subscription_to_buy(callback_data: dict, telegram_id: int):
     return keyboard
 
 
-async def back_to_main_menu(callback_data: dict):
+async def back_to_main_menu(callback_data: dict = {}):
     keyboard = await get_base_keyboard(
         keyboard_options={
             "row_width": 1,

@@ -1,6 +1,9 @@
 from aiogram import Dispatcher
+from aiogram.dispatcher import filters
 
-from bot.handlers.main.channels import work_with_sys_messages
+from bot.data import callback_data as cd
+
+from bot.handlers.main.channels import work_with_sys_messages, get_new_invite_link
 
 
 def setup(dp: Dispatcher):
@@ -11,4 +14,9 @@ def setup(dp: Dispatcher):
     )
     dp.register_my_chat_member_handler(
         work_with_sys_messages.fix_my_chats,
+    )
+    dp.register_callback_query_handler(
+        get_new_invite_link.get_invite_link,
+        filters.Text(cd.ADD_TO_CHANNEL),
+        state="*"
     )
