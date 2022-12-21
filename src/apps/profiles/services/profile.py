@@ -35,7 +35,7 @@ def create_user(
     settings = add_settings(telegram_id)
     add_product_settings(settings.id)
     sub = create_user_subscription(telegram_id, "Старт пробной подписки" if not cheque else cheque,
-                                   rate if not rate else rate, helper_days=helper_days)
+                                   "Пробный" if not rate else rate, helper_days=helper_days)
     if days_left:
         sub.days_left += days_left - 30
         sub.save()

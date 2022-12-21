@@ -1,4 +1,5 @@
 from aiogram import Dispatcher
+from aiogram.types import ContentType
 
 from bot.data import callback_data as cd
 from bot.handlers.main.subscriptions import buy_sub_or_add_helper, invoice, helper_sub, user_sub
@@ -21,12 +22,14 @@ def setup(dp: Dispatcher):
         state="*"
     )
     dp.register_callback_query_handler(
+        invoice.create_invoice_to_rate,
+        cd.pay_menu_helper.filter(),
+        state="*"
+    )
+    dp.register_callback_query_handler(
         helper_sub.buy_sub_to_helper,
         cd.rate_for_helper_menu.filter(),
         state="*"
     )
-    dp.register_callback_query_handler(
-        helper_sub.success_sub_helper,
-        cd.pay_menu_helper.filter(),
-        state="*"
-    )
+    dp.register_pre_checkout_query_handler(invoice.check_payment, state='*')
+    dp.register_message_handler(invoice.oplata_ok, content_types=ContentType.SUCCESSFUL_PAYMENT, state='*')

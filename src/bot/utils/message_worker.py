@@ -46,9 +46,9 @@ async def try_send_invoice(message, user_id, keyboard, state, main_message_id, *
             chat_id=user_id,
             message_id=main_message_id
         )
+
         mes = await bot.send_invoice(
             chat_id=user_id,
-            reply_markup=keyboard,
             **kwargs,
         )
         await state.update_data({"main_message_id": mes.message_id})

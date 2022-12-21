@@ -39,10 +39,9 @@ async def buy_sub_to_helper(call: types.CallbackQuery, callback_data: dict, stat
     )
 
 
-async def success_sub_helper(call: types.CallbackQuery, callback_data: dict, state: FSMContext):
+async def success_sub_helper(user_id, message, callback_data: dict, state: FSMContext):
     data = await state.get_data()
     main_message_id = data.get("main_message_id", False)
-    user_id = call.message.chat.id
     selected_sub_pk = int(callback_data["rate_pk"])
     inviter_id = int(callback_data["inviter_id"])
     identifier = random.randint(999999, 99999999)
@@ -56,7 +55,7 @@ async def success_sub_helper(call: types.CallbackQuery, callback_data: dict, sta
     keyboard = await ik.back_to_main_menu(callback_data=callback_data)
     await mw.send_confirmed_message(chat_id=user_id, text=text)
     await mw.try_send_message(
-        message=call.message,
+        message=message,
         user_id=user_id,
         text="Вернуться в главное меню",
         keyboard=keyboard,

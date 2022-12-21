@@ -180,7 +180,9 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
     else:
         if user_id in all_users:
             if all_users[user_id] > 3:
-                rate = get_rate_by_pk(1)
+                print(13123123123)
+                rate = get_rate_by_pk(2)
+                print(rate.name)
                 user = create_user(
                     telegram_id=user_id,
                     phone=phone,
@@ -193,6 +195,7 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
                     cheque=rate.description
                 )
             else:
+                print(99999)
                 user = create_user(
                     telegram_id=user_id,
                     phone=phone,
