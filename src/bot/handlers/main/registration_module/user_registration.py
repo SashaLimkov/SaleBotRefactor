@@ -8,6 +8,7 @@ from apps.profiles.services.rate import get_rate_by_pk
 from apps.profiles.services.subscription import get_user_active_subscription
 from apps.settings.services.chanel import get_list_telegram_channels, add_channel_telegram
 from apps.settings.services.deep_link import get_deep_link_by_identifier_and_tg_id, close_deep_link_identifier_and_tg_id
+from bot.config import all_users
 from bot.keyboards import inline as ik
 from bot.keyboards import reply as rk
 from bot.states.Registration import UserRegistration
@@ -177,14 +178,39 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
         close_deep_link_identifier_and_tg_id(identifier=identifier, tg_id=inviter_id)
 
     else:
-        user = create_user(
-            telegram_id=user_id,
-            phone=phone,
-            full_name=fio,
-            first_name=first_name,
-            last_name=last_name if last_name else "",
-            username=username if username else "",
-        )
+        if user_id in all_users:
+            if all_users[user_id] > 3:
+                rate = get_rate_by_pk(1)
+                user = create_user(
+                    telegram_id=user_id,
+                    phone=phone,
+                    full_name=fio,
+                    first_name=first_name,
+                    last_name=last_name if last_name else "",
+                    username=username if username else "",
+                    days_left=int(all_users[user_id]),
+                    rate=rate.name,
+                    cheque=rate.description
+                )
+            else:
+                user = create_user(
+                    telegram_id=user_id,
+                    phone=phone,
+                    full_name=fio,
+                    first_name=first_name,
+                    last_name=last_name if last_name else "",
+                    username=username if username else "",
+                    days_left=int(all_users[user_id]),
+                )
+        else:
+            user = create_user(
+                telegram_id=user_id,
+                phone=phone,
+                full_name=fio,
+                first_name=first_name,
+                last_name=last_name if last_name else "",
+                username=username if username else "",
+            )
     if user:
         await deleter.try_delete_message(chat_id=user_id, message_id=main_message_id)
         await try_send_video(
