@@ -37,16 +37,17 @@ async def inline_compilations(inline_query: types.InlineQuery, state: FSMContext
     compilations_list = get_list_compilations_by_date(date=date)
     if compilations_list:
         for index, compilation in enumerate(compilations_list):
-            result_id: str = hashlib.md5(str(index).encode()).hexdigest()
-            results.append(
-                InlineQueryResultArticle(
-                    id=result_id,
-                    title=f"{'✅' if compilation.done else '⏳'} {compilation.date} | {compilation.name}",
-                    input_message_content=InputTextMessageContent(
-                        f"{compilation.name}|:|{compilation.pk}"
-                    ),
+            if compilation.message_id:
+                result_id: str = hashlib.md5(str(index).encode()).hexdigest()
+                results.append(
+                    InlineQueryResultArticle(
+                        id=result_id,
+                        title=f"{'✅' if compilation.done else '⏳'} {compilation.date} | {compilation.name}",
+                        input_message_content=InputTextMessageContent(
+                            f"{compilation.name}|:|{compilation.pk}"
+                        ),
+                    )
                 )
-            )
     switch_text = "Выбрать дату релиза >>"
     return await inline_query.answer(
         results,

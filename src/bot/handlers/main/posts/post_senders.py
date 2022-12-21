@@ -72,7 +72,6 @@ async def send_posts(call: types.CallbackQuery, callback_data: dict, state: FSMC
             else:
                 for post in posts:
                     if post[-1] == obj_id:
-
                         await send_post(post=post, channel_id=channel_id, message=call.message)
                         break
 
