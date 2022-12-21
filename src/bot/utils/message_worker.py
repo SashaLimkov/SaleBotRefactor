@@ -225,14 +225,15 @@ async def try_send_post_to_user(
         chat_id: int,
         text: str,
         message=None,
-        keyboard=None):
+        keyboard=None,
+        message_id: int = 0):
     text = unicodedata.normalize('NFKC', unescape(text.replace('<br>', '\n')))
     if file_type:
         mes_id = await try_send_post_with_video(file_path=file_path, chat_id=chat_id, text=text, message=message,
-                                                keyboard=keyboard)
+                                                keyboard=keyboard, message_id=message_id)
     else:
         mes_id = await try_send_post_with_photo(file_path=file_path, chat_id=chat_id, text=text, message=message,
-                                                keyboard=keyboard)
+                                                keyboard=keyboard, message_id=message_id)
     return mes_id
 
 
@@ -241,14 +242,24 @@ async def try_send_post_with_photo(
         chat_id: int,
         text: str,
         message,
-        keyboard, ):
+        keyboard,
+        message_id: int, ):
     try:
-        mes = await bot.send_photo(
-            chat_id=chat_id,
-            photo=types.InputFile(file_path),
-            caption=text,
-            reply_markup=keyboard
-        )
+        if message_id:
+            mes = await bot.edit_message_media(
+                chat_id=chat_id,
+                photo=types.InputFile(file_path),
+                caption=text,
+                reply_markup=keyboard,
+                message_id=message_id
+            )
+        else:
+            mes = await bot.send_photo(
+                chat_id=chat_id,
+                photo=types.InputFile(file_path),
+                caption=text,
+                reply_markup=keyboard
+            )
         return mes.message_id
     except Exception:
         await notice_programmers(
@@ -261,19 +272,32 @@ async def try_send_post_with_video(
         chat_id: int,
         text: str,
         message,
-        keyboard, ):
+        keyboard,
+        message_id: int, ):
     try:
         vid = cv2.VideoCapture(file_path)
         wh, hh = vid.get(cv2.CAP_PROP_FRAME_WIDTH), vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
-        mes = await bot.send_video(
-            chat_id=chat_id,
-            video=types.InputFile(file_path),
-            width=wh,
-            height=hh,
-            supports_streaming=True,
-            caption=text,
-            reply_markup=keyboard
-        )
+        if message_id:
+            mes = await bot.edit_message_media(
+                chat_id=chat_id,
+                video=types.InputFile(file_path),
+                width=wh,
+                height=hh,
+                supports_streaming=True,
+                caption=text,
+                reply_markup=keyboard,
+                message_id=message_id
+            )
+        else:
+            mes = await bot.send_video(
+                chat_id=chat_id,
+                video=types.InputFile(file_path),
+                width=wh,
+                height=hh,
+                supports_streaming=True,
+                caption=text,
+                reply_markup=keyboard
+            )
         return mes.message_id
     except Exception:
         await notice_programmers(

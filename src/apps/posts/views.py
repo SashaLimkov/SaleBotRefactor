@@ -103,6 +103,7 @@ class CompilationDetailView(LoginRequiredMixin, DetailView):
         )
         if compilation.message_id:
             print(123)
+            # compilation.contents.first()
             text = unicodedata.normalize('NFKC', unescape(compilation.text.replace('<br>', '\n')))
             asyncio.run(try_edit_message_caption(settings.CHANNEL, text, compilation.message_id, None))
 
