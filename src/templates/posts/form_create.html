@@ -67,7 +67,7 @@
                                     </div>
                                     <div class="mb-4">
                                         <label class="form-label" for="default-input">Текст</label>
-                                        <textarea value="text" id="ckeditor-classic"></textarea>
+                                        <textarea name="text" id="ckeditor-classic"></textarea>
                                     </div>
                                     <div class="mb-4">
                                         <div class="form-check form-check-right">
@@ -173,7 +173,10 @@
         ).then(function (e) {
             e.ui.view.editable.element.style.height = "200px"
             editor_compilation = e;
-            e.setData('{{ compilation.text }}');
+            e.model.document.on( 'change:data', ( evt, data ) => {
+            console.log( data );
+            $('#ckeditor-classic').html( e.getData() );
+        } );
         }).catch(function (e) {
             console.error(e)
         });

@@ -55,6 +55,7 @@ LOCAL_APPS = [
     'apps.posts',
     'apps.settings',
     'apps.utils',
+    'apps.users'
 ]
 
 THIRD_PARTY_APPS = [

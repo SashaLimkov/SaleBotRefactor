@@ -1,0 +1,12 @@
+<div class="card-header" id="media_{{ form }}_div">
+    {% if content.type == 0 %}
+        <a href="{{ content.file.url }}" class="image-popup">
+            <img src="{{ content.file.url }}" class="img-fluid"
+                 alt="work-thumbnail">
+        </a>
+    {% elif content.type == 1 %}
+        <video controls="controls"
+               style="width: 100%; height: auto; max-height: 100%;"
+               src="{{ content.file.url }}"></video>
+    {% endif %}
+</div>

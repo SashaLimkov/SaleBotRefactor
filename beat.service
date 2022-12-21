@@ -1,0 +1,12 @@
+[Unit]
+Descripiton=Beat
+
+[Service]
+WorkingDirectory=/home/sale_bot/src
+User=root
+ExecStart=/home/sale_bot/venv/bin/celery -A core beat -l debug -S django_celery_beat.schedulers.DatabaseScheduler
+TimeoutSec=5
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

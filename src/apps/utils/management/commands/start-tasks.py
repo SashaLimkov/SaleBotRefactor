@@ -32,7 +32,7 @@ class Command(BaseCommand):
             PeriodicTask.objects.create(
                 name=f"Send Compilations",
                 task="send_post",
-                interval=IntervalSchedule.objects.get_or_create(every=10, period=IntervalSchedule.SECONDS)[0],
+                interval=IntervalSchedule.objects.get_or_create(every=3, period=IntervalSchedule.MINUTES)[0],
                 start_time=timezone.now(),
             )
             print("Start periodic tasks - COMPLETE")

@@ -58,7 +58,7 @@ class UserAuthView(View):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('dashboard')
+            return redirect('compilation_list')
         else:
             return render(request, 'auth/auth-login.html', context={'error': True})
 

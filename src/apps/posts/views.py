@@ -25,6 +25,7 @@ from apps.posts.services.content import update_or_create_content, create_content
 from apps.posts.services.item import update_item, create_item
 from apps.posts.services.post import get_formatted_posts_by_compilation_id, update_post, create_post, get_post_text
 from apps.settings.services.currency import get_list_currency
+from apps.users.services.logs import create_log
 from apps.utils.services.paginator import get_paginator_context
 from bot.utils.message_worker import try_edit_message_caption
 
@@ -79,13 +80,14 @@ class CompilationDetailView(LoginRequiredMixin, DetailView):
         return context
 
     def post(self, request, pk):
+        content = (None, None)
         if request.FILES.get('media'):
             format_file = str(request.FILES.get('media')).split('.')[-1]
             if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
                 type_content = 0
             else:
                 type_content = 1
-            update_or_create_content(
+            content = update_or_create_content(
                 file_name=str(request.FILES.get('media')),
                 file=request.FILES.get('media'),
                 type_content=type_content,
@@ -101,22 +103,27 @@ class CompilationDetailView(LoginRequiredMixin, DetailView):
             datetime_send=datetime_send,
             done=True if request.POST.get('complete') == 'true' else False
         )
+        create_log(request.user, 5, compilation)
         if compilation.message_id:
             print(123)
             # compilation.contents.first()
             text = unicodedata.normalize('NFKC', unescape(compilation.text.replace('<br>', '\n')))
             asyncio.run(try_edit_message_caption(settings.CHANNEL, text, compilation.message_id, None))
 
-        return JsonResponse({'success': True})
+        media = render_to_string('posts/media.html', context={'form': 'gid', 'content': content[0]})
+        return JsonResponse({'success': True, 'media': media})
 
 
 class FinalCompilationSaveView(LoginRequiredMixin, View):
     def post(self, request, pk):
+        print(request.POST)
+        content = (None, None)
         if request.POST.get('visible') == 'true':
             final_compilation = update_or_create_final_compilation(
                 compilation_id=pk,
                 text=request.POST.get('text').replace('<p>', '').replace('</p>', '')
             )[0]
+            create_log(request.user, 8, final_compilation)
             if final_compilation.message_id:
                 text = unicodedata.normalize('NFKC', unescape(final_compilation.text.replace('<br>', '\n')))
                 asyncio.run(try_edit_message_caption(settings.CHANNEL, text, final_compilation.message_id, None))
@@ -126,7 +133,7 @@ class FinalCompilationSaveView(LoginRequiredMixin, View):
                     type_content = 0
                 else:
                     type_content = 1
-                update_or_create_content(
+                content = update_or_create_content(
                     file_name=str(request.FILES.get('media')),
                     file=request.FILES.get('media'),
                     type_content=type_content,
@@ -138,7 +145,11 @@ class FinalCompilationSaveView(LoginRequiredMixin, View):
                 delete_final_compilation(pk)
             except:
                 pass
-        return JsonResponse({'success': True})
+
+
+        media = render_to_string('posts/media.html', context={'form': 'gid', 'content': content[0]})
+
+        return JsonResponse({'success': True, 'media': media})
 
 
 class CompilationCreateView(LoginRequiredMixin, View):
@@ -154,6 +165,7 @@ class CompilationCreateView(LoginRequiredMixin, View):
                 datetime_send=datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'),
                 done=True if request.POST.get('complete') == 'true' else False
         )
+        create_log(request.user, 3, compilation)
         format_file = str(request.FILES.get('media')).split('.')[-1]
         if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
             type_content = 0
@@ -173,12 +185,14 @@ class CompilationCreateView(LoginRequiredMixin, View):
 
 class FinalCompilationCreateView(LoginRequiredMixin, View):
     def post(self, request):
+        print(request.POST)
         if request.POST.get('visible') == 'true':
             compilation_id = request.POST.get('compilation')
             final_compilation = create_final_compilation(
                 compilation_id=int(compilation_id),
                 text=request.POST.get('text').replace('<p>', '').replace('</p>', '')
             )
+            create_log(request.user, 3, final_compilation)
             format_file = str(request.FILES.get('media')).split('.')[-1]
             if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
                 type_content = 0
@@ -208,8 +222,6 @@ class PostUpdateView(LoginRequiredMixin, View):
                     list_values_add.append(key.split('_')[-1])
                 else:
                     list_values_edit.append(key.split('_')[-1])
-        print(list_values_add)
-        print(list_values_edit)
 
         for index in list_values_edit:
             name = request.POST['name_product_' + index]
@@ -247,6 +259,8 @@ class PostUpdateView(LoginRequiredMixin, View):
         currency = request.POST.get('currency')
         post = update_post(post, shop, currency)
 
+        create_log(request.user, 1, post)
+
         if post.message_id:
             asyncio.run(try_edit_message_caption(settings.CHANNEL, get_post_text(post), post.message_id, None))
 
@@ -258,7 +272,11 @@ class PostCreateView(LoginRequiredMixin, View):
         compilation = int(request.POST.get('compilation'))
         shop = request.POST.get('shop')
         currency = request.POST.get('currency')
-        post = create_post(compilation, shop, currency).pk
+        post = create_post(compilation, shop, currency)
+
+        create_log(request.user, 0, post)
+
+        post = post.pk
 
         list_values_add = []
         for key in request.POST.keys():
@@ -295,7 +313,9 @@ class CompilationDeleteView(LoginRequiredMixin, View):
     def post(self, request):
         compilation_id = int(request.POST.get('compilation'))
         try:
-            Compilation.objects.get(pk=compilation_id).delete()
+            x = Compilation.objects.get(pk=compilation_id)
+            create_log(request.user, 4, x)
+            x.delete()
         except:
             pass
         return JsonResponse({'status': True})
@@ -305,7 +325,9 @@ class PostDeleteView(LoginRequiredMixin, View):
     def post(self, request):
         post = int(request.POST.get('post'))
         try:
-            Post.objects.get(pk=post).delete()
+            x = Post.objects.get(pk=post)
+            create_log(request.user, 2, x)
+            x.delete()
         except:
             pass
         return JsonResponse({'status': True})
