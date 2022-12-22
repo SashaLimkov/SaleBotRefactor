@@ -1,0 +1,192 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block title %}Новая подборка{% endblock title %} {"title": "Новая подборка"})
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'libs/glightbox/dist/css/glightbox.min.css' %}">
+
+    <!-- alertifyjs Css -->
+    <link href="{% static 'libs/alertifyjs/build/css/alertify.min.css' %}" rel="stylesheet" type="text/css"/>
+
+    <!-- alertifyjs default themes  Css -->
+    <link href="{% static 'libs/alertifyjs/build/css/themes/default.min.css' %}" rel="stylesheet" type="text/css"/>
+{% endblock extra_css %}
+
+{% block content %}
+    <!-- ============================================================== -->
+    <!-- Start right Content here -->
+    <!-- ============================================================== -->
+    <div class="main-content">
+
+        <div class="page-content">
+            <div class="container-fluid">
+
+                <!-- start page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                            <h4 class="mb-sm-0 font-size-18">Новая подборка</h4>
+
+                            <div class="page-title-right">
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Главная</a></li>
+                                    <li class="breadcrumb-item"><a href="{% url 'compilation_list' %}">Подборки</a></li>
+                                    <li class="breadcrumb-item active">Новая подборка</li>
+                                </ol>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+                <div class="row">
+                    <div class="col-md-12 col-xl-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Обзор</h3>
+                            </div>
+                            <div class="card-body">
+                                <form id="compilation-form" action="{% url 'compilation_create' %}" method="POST"
+                                                      enctype="multipart/form-data" class="needs-validation" novalidate>
+                                {% csrf_token %}
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Медиа</label>
+                                        <input class="form-control" type="file" id="media" name="media"
+                                               placeholder="Название" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Название</label>
+                                        <input class="form-control" type="text" id="name" name="name"
+                                               placeholder="Название" value="" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Дата</label>
+                                        <input class="form-control" type="text" id="date-compilation" name="date"
+                                               value="" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Текст</label>
+                                        <textarea name="text" id="ckeditor-classic"></textarea>
+                                    </div>
+                                    <div class="mb-4">
+                                        <div class="form-check form-check-right">
+                                            {% if compilation.done %}
+                                                <input class="form-check-input" type="checkbox" id="is_complted"
+                                                       name="is_complted" checked>
+                                            {% else %}
+                                                <input class="form-check-input" type="checkbox" id="is_complted"
+                                                       name="is_complted">
+                                            {% endif %}
+                                            <label class="form-check-label" for="formCheckRight2">
+                                                Завершить обзор
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <div class="col-6">
+                                            <label for="example-datetime-local-input" class="form-label">Время
+                                                отправки</label>
+                                            <input class="form-control" type="datetime-local"
+                                                   value=""
+                                                   id="example-datetime-local-input" name="date_send">
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            Сохранить
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-xl-6" id="gid-form">
+                    </div>
+                </div>
+
+            </div> <!-- container-fluid -->
+        </div>
+        <!-- End Page-content -->
+
+
+        {% block footer %}
+            {% include 'partials/footer.html' %}
+        {% endblock footer %}
+    </div>
+    <!-- end main content-->
+{% endblock content %}
+
+{% block extra_js %}
+    <!-- ckeditor -->
+    <script src="{% static 'libs/@ckeditor/ckeditor5-build-classic/build/ckeditor.js' %}"></script>
+
+    <script src="{% static 'libs/glightbox/dist/js/glightbox.min.js' %}"></script>
+
+    <script src="{% static 'libs/flatpickr/dist/flatpickr.min.js' %}"></script>
+
+    <!-- alertifyjs js -->
+    <script src="{% static 'libs/alertifyjs/build/alertify.min.js' %}"></script>
+
+    <script>
+        {#$('#compilation-form').on('submit', function (event) {#}
+        {#    event.preventDefault();#}
+        {#    var form_data = new FormData(this);#}
+        {#    form_data.append('text', editor_compilation.getData())#}
+        {#    form_data.append('complete', $('#is_complted').is(':checked'))#}
+        {#    form_data.append('compilation_id', $('#compilation_id').val())#}
+        {#    headers = {'X-CSRFToken': '{{ csrf_token }}'};#}
+        {#    $.ajax({#}
+        {#        url: '{% url 'compilation_create' %}',#}
+        {#        type: 'POST',#}
+        {#        data: form_data,#}
+        {#        dataType: 'json',#}
+        {#        cache: false,#}
+        {#        processData: false,#}
+        {#        headers: headers,#}
+        {#        contentType: false,#}
+        {#        success: function (data) {#}
+        {#            alertify.success("Сохранено");#}
+        {#        },#}
+        {#        error: function (data) {#}
+        {#            alertify.error("Ошибка при сохранении")#}
+        {#        }#}
+        {#    })#}
+        {#})#}
+        {##}
+
+    </script>
+
+    <script>
+        lightbox = GLightbox({selector: ".image-popup", title: !1})
+    </script>
+
+    <script>
+        let editor_compilation;
+
+
+        ClassicEditor.create(
+            document.querySelector("#ckeditor-classic"),
+            {
+                toolbar: ['bold', 'italic', 'link', 'numberedList', 'bulletedList', 'undo', 'redo']
+            },
+        ).then(function (e) {
+            e.ui.view.editable.element.style.height = "200px"
+            editor_compilation = e;
+            e.model.document.on( 'change:data', ( evt, data ) => {
+            console.log( data );
+            $('#ckeditor-classic').html( e.getData() );
+        } );
+        }).catch(function (e) {
+            console.error(e)
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            flatpickr("#date-compilation", {
+                defaultDate: new Date
+            })
+        })
+    </script>
+{% endblock extra_js %}

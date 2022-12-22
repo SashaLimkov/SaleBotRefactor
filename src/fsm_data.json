@@ -1,0 +1,39 @@
+{
+    "390959255": {
+        "390959255": {
+            "state": "MainMenu:MAIN_MENU",
+            "data": {
+                "main_message_id": 488342,
+                "fio": "asd",
+                "phone": "+79991629654",
+                "callback_data": {
+                    "@": "sd",
+                    "action": "2",
+                    "date": "2022-12-22"
+                }
+            },
+            "bucket": {}
+        }
+    },
+    "932591272": {
+        "932591272": {
+            "state": "UserRegistration:MENU",
+            "data": {
+                "main_message_id": 488257,
+                "fio": "refgterge",
+                "phone": "+79961234615"
+            },
+            "bucket": {}
+        }
+    },
+    "922903946": {
+        "922903946": {
+            "state": "UserRegistration:PHONE_NUMBER",
+            "data": {
+                "main_message_id": 488333,
+                "fio": "\u0410\u0440\u0442\u0430\u043c\u043e\u043d\u043e\u0432\u0430 \u0415\u043b\u0435\u043d\u0430 \u0421\u0435\u0440\u0433\u0435\u0435\u0432\u043d\u0430"
+            },
+            "bucket": {}
+        }
+    }
+}

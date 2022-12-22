@@ -1,0 +1,697 @@
+import os
+import sys
+
+sys.path.insert(0, "%s/../" % os.path.dirname(os.path.abspath(__file__)))
+
+import pytest
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from ..easy_inline_kb.keyboard import EasyInlineKeyboard
+
+
+def test_keyboards_is_none():
+    assert isinstance(EasyInlineKeyboard.combine(), InlineKeyboardMarkup)
+    assert EasyInlineKeyboard.combine().__dict__ == InlineKeyboardMarkup().__dict__
+
+
+def test_keyboards_is_single_keyboard():
+    kb = EasyInlineKeyboard(
+        items=list(range(0, 4)), copy_text_to_callback=True
+    ).keyboard
+    result = EasyInlineKeyboard.combine(keyboards=kb)
+
+    assert isinstance(result, InlineKeyboardMarkup)
+    assert result.__dict__ == kb.__dict__
+
+
+def test_keyboards_is_multi_keyboards():
+    kb_1 = EasyInlineKeyboard(
+        items=list(range(0, 4)), copy_text_to_callback=True
+    ).keyboard
+    kb_2 = EasyInlineKeyboard(
+        items=list(range(10, 15)), copy_text_to_callback=True
+    ).keyboard
+
+    result = EasyInlineKeyboard.combine(keyboards=(kb_1, kb_2))
+    assert isinstance(result, InlineKeyboardMarkup)
+
+    result = EasyInlineKeyboard.combine(keyboards=(kb_1, None, kb_2))
+    assert isinstance(result, InlineKeyboardMarkup)
+
+    with pytest.raises(TypeError) as _:
+        EasyInlineKeyboard.combine(keyboards=(kb_1, 1))
+
+
+def test_not_keyboard_for_merge():
+    """
+    :return:
+    """
+    with pytest.raises(TypeError) as _:
+        EasyInlineKeyboard.merge_keyboards_data(keyboards="not_a_keyboard")
+
+
+def test_merge_two_keyboard_into_one_out_of_limits():
+    """
+    :return:
+    """
+    k1 = EasyInlineKeyboard(items=list(range(60)), copy_text_to_callback=True)
+    k2 = EasyInlineKeyboard(items=list(range(60)), copy_text_to_callback=True)
+
+    with pytest.raises(ValueError) as _:
+        EasyInlineKeyboard.combine(keyboards=(k1.keyboard, k2.keyboard))
+
+
+def test_pass_string_with_copy_to_callback():
+    """
+    :return:
+    """
+    result = EasyInlineKeyboard(items="Text", copy_text_to_callback=True).keyboard
+    assert isinstance(result, InlineKeyboardMarkup)
+    assert dict(result)["inline_keyboard"] == [
+        [{"callback_data": "Text", "text": "Text"}]
+    ]
+
+
+def test_pass_string_without_copy_to_callback():
+    """
+    :return:
+    """
+    with pytest.raises(Exception) as _:
+        assert isinstance(
+            EasyInlineKeyboard(items="Text", copy_text_to_callback=False).keyboard,
+            InlineKeyboardMarkup,
+        )
+
+
+def test_pass_one_button():
+    """
+    :return:
+    """
+    result = EasyInlineKeyboard(
+        items=InlineKeyboardButton(**{"text": "text", "callback_data": "callback_data"})
+    ).keyboard
+    assert isinstance(result, InlineKeyboardMarkup)
+    assert dict(result)["inline_keyboard"] == [
+        [{"text": "text", "callback_data": "callback_data"}]
+    ]
+
+
+def test_pass_one_item_dict_with_text_field():
+    """
+    :return:
+    """
+    result = EasyInlineKeyboard(
+        items={"text": "text", "callback_data": "callback_data"}
+    ).keyboard
+    assert isinstance(result, InlineKeyboardMarkup)
+    assert dict(result)["inline_keyboard"] == [
+        [{"text": "text", "callback_data": "callback_data"}]
+    ]
+
+
+def test_pass_one_item_dict_without_text_field():
+    """
+    :return:
+    """
+    result = EasyInlineKeyboard(
+        items={
+            "word": "callback_data",
+        }
+    ).keyboard
+    assert isinstance(result, InlineKeyboardMarkup)
+    assert dict(result)["inline_keyboard"] == [
+        [{"text": "word", "callback_data": "callback_data"}]
+    ]
+
+
+def test_pass_multi_item_dict_without_text_field():
+    """
+    :return:
+    """
+    with pytest.raises(ValueError) as _:
+        wrong_dict = {
+            "word_1": "callback_data_1",
+            "word_2": "callback_data_1",
+        }
+        keyboa = EasyInlineKeyboard(items=wrong_dict)
+        keyboa()
+
+
+def test_pass_one_row():
+    """
+    :return:
+    """
+    start = 0
+    stop = 8
+    result = EasyInlineKeyboard(
+        items=list(range(start, stop)),
+        front_marker="FRONT_",
+        copy_text_to_callback=True,
+    ).keyboard
+    assert isinstance(result, InlineKeyboardMarkup)
+    assert len(dict(result)["inline_keyboard"]) == stop
+    assert dict(result)["inline_keyboard"][0][0]["callback_data"] == "FRONT_%s" % start
+
+
+def test_pass_structure():
+    """
+    :return:
+    """
+    result = EasyInlineKeyboard(
+        items=[list(range(4)), list(range(2, 5)), "string", {"t": "cbd"}],
+        front_marker="STRUCTURE_",
+        copy_text_to_callback=True,
+    ).keyboard
+
+    assert isinstance(result, InlineKeyboardMarkup)
+    assert len(dict(result)["inline_keyboard"]) == 4
+    assert dict(result)["inline_keyboard"][0][0]["callback_data"] == "STRUCTURE_0"
+    assert dict(result)["inline_keyboard"][1][0]["callback_data"] == "STRUCTURE_2"
+    assert dict(result)["inline_keyboard"][2][0]["callback_data"] == "STRUCTURE_string"
+    assert dict(result)["inline_keyboard"][3][0]["callback_data"] == "STRUCTURE_cbd"
+
+
+def test_auto_keyboa_maker_alignment():
+    result = EasyInlineKeyboard(
+        items=list(range(0, 36)), copy_text_to_callback=True, alignment=True
+    ).keyboard
+    assert isinstance(result, InlineKeyboardMarkup)
+
+    with pytest.raises(TypeError) as _:
+        keyboa = EasyInlineKeyboard(
+            items=list(range(0, 36)),
+            copy_text_to_callback=True,
+            alignment="alignment",
+        )
+        keyboa()
+
+    with pytest.raises(ValueError) as _:
+        keyboa = EasyInlineKeyboard(
+            items=list(range(0, 36)), copy_text_to_callback=True, alignment=[-1, 0]
+        )
+        keyboa()
+
+    with pytest.raises(ValueError) as _:
+        keyboa = EasyInlineKeyboard(
+            items=list(range(0, 36)),
+            copy_text_to_callback=True,
+            alignment=[10, 11, 12],
+        )
+        keyboa()
+
+    result = EasyInlineKeyboard(
+        items=list(range(0, 36)),
+        copy_text_to_callback=True,
+        alignment=[
+            3,
+            4,
+            6,
+        ],
+    ).keyboard
+    assert isinstance(result, InlineKeyboardMarkup)
+
+    result = EasyInlineKeyboard(
+        items=list(range(0, 36)),
+        copy_text_to_callback=True,
+        alignment=True,
+        alignment_reverse=True,
+    ).keyboard
+    assert isinstance(result, InlineKeyboardMarkup)
+
+    result = EasyInlineKeyboard(
+        items=list(range(0, 36)),
+        copy_text_to_callback=True,
+        alignment=[
+            3,
+            4,
+            6,
+        ],
+        alignment_reverse=True,
+    ).keyboard
+    assert isinstance(result, InlineKeyboardMarkup)
+
+    result = EasyInlineKeyboard(
+        items=list(range(0, 36)),
+        copy_text_to_callback=True,
+        alignment=[
+            5,
+            7,
+        ],
+        alignment_reverse=True,
+    ).keyboard
+    assert isinstance(result, InlineKeyboardMarkup)
+
+
+def test_auto_keyboa_maker_items_in_row():
+    result = EasyInlineKeyboard(
+        items=list(range(0, 36)), copy_text_to_callback=True, items_in_row=6
+    ).keyboard
+    assert isinstance(result, InlineKeyboardMarkup)
+    assert len(dict(result)["inline_keyboard"]) == 6
+
+
+def test_slice():
+    result = EasyInlineKeyboard(
+        items=list(range(0, 36)), copy_text_to_callback=True
+    ).slice(slice_=slice(0, 12))
+    assert len(result.inline_keyboard) == 12
+
+
+def test_minimal_kb_with_copy_text_to_callback_specified_none():
+    keyboa = EasyInlineKeyboard(items=list(range(0, 6)))
+    result = keyboa.keyboard
+    assert isinstance(result, InlineKeyboardMarkup)
+
+
+def test_minimal_kb_with_items_out_of_limits():
+    with pytest.raises(ValueError) as _:
+        EasyInlineKeyboard(items=list(range(0, 120)))
+
+
+def test_minimal_kb_with_copy_text_to_callback_specified_true():
+    keyboa = EasyInlineKeyboard(items=list(range(0, 6)), copy_text_to_callback=True)
+    result = keyboa.keyboard
+    assert isinstance(result, InlineKeyboardMarkup)
+
+
+def test_minimal_kb_with_copy_text_to_callback_specified_false():
+    keyboa = EasyInlineKeyboard(items=list(range(0, 6)), copy_text_to_callback=False)
+    with pytest.raises(ValueError) as _:
+        keyboa()
+
+
+@pytest.mark.parametrize("items_in_row", [2, 3, 4, 6])
+def test_minimal_kb_with_fixed_items_in_row(items_in_row):
+    keyboa = EasyInlineKeyboard(
+        items=list(range(0, 12)), items_in_row=items_in_row
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    assert len(kb_rows) == 12 / items_in_row
+
+
+def test_minimal_kb_with_front_marker():
+    keyboa = EasyInlineKeyboard(items=list(range(0, 3)), front_marker="front_").keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "front_0",
+        "front_1",
+        "front_2",
+    ]
+
+
+def test_minimal_kb_with_front_marker_and_copy_text_to_callback():
+    keyboa = EasyInlineKeyboard(
+        items=list(range(0, 3)), front_marker="front_", copy_text_to_callback=True
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "front_0",
+        "front_1",
+        "front_2",
+    ]
+
+
+def test_minimal_kb_with_back_marker():
+    keyboa = EasyInlineKeyboard(items=list(range(0, 3)), back_marker="_back").keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "0_back",
+        "1_back",
+        "2_back",
+    ]
+
+
+def test_minimal_kb_with_back_marker_out_of_limits():
+    with pytest.raises(ValueError) as _:
+        marker_65 = "_1234567890123456789012345678901234567890123456789012345678901234"
+        keyboa = EasyInlineKeyboard(items=list(range(0, 3)), back_marker=marker_65)
+        keyboa()
+
+
+def test_minimal_kb_with_back_marker_out_of_limits_with_text():
+    with pytest.raises(ValueError) as _:
+        marker_64 = "1234567890123456789012345678901234567890123456789012345678901234"
+        keyboa = EasyInlineKeyboard(
+            items=list(range(0, 3)), back_marker=marker_64, copy_text_to_callback=True
+        )
+        keyboa()
+
+
+def test_minimal_kb_with_empty_back_marker():
+    with pytest.raises(ValueError) as _:
+        keyboa = EasyInlineKeyboard(
+            items=list(range(0, 3)), back_marker=str(), copy_text_to_callback=False
+        )
+        keyboa()
+
+
+def test_minimal_kb_with_back_marker_and_copy_text_to_callback():
+    keyboa = EasyInlineKeyboard(
+        items=list(range(0, 3)), back_marker="_back", copy_text_to_callback=True
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "0_back",
+        "1_back",
+        "2_back",
+    ]
+
+
+def test_minimal_kb_with_front_and_back_markers():
+    keyboa = EasyInlineKeyboard(
+        items=list(range(0, 3)), front_marker="front_", back_marker="_back"
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "front_0_back",
+        "front_1_back",
+        "front_2_back",
+    ]
+
+
+def test_minimal_kb_with_front_and_back_markers_and_copy_text_to_callback():
+    keyboa = EasyInlineKeyboard(
+        items=list(range(0, 3)),
+        copy_text_to_callback=True,
+        front_marker="front_",
+        back_marker="_back",
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "front_0_back",
+        "front_1_back",
+        "front_2_back",
+    ]
+
+
+def test_minimal_kb_with_front_and_back_markers_and_copy_text_to_callback_is_false():
+    keyboa = EasyInlineKeyboard(
+        items=list(range(0, 3)),
+        copy_text_to_callback=False,
+        front_marker="front_",
+        back_marker="_back",
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "front__back",
+        "front__back",
+        "front__back",
+    ]
+
+
+def test_minimal_kb_with_alignment_true():
+    keyboa = EasyInlineKeyboard(items=list(range(0, 12)), alignment=True).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    assert 12 / len(kb_rows) == 3
+
+
+def test_minimal_kb_with_items_in_row():
+    keyboa = EasyInlineKeyboard(items=list(range(0, 12)), items_in_row=6).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    assert 12 / len(kb_rows) == 6
+
+
+def test_minimal_kb_with_items_in_row_out_of_limits():
+    with pytest.raises(ValueError) as _:
+        keyboa = EasyInlineKeyboard(items=list(range(0, 12)), items_in_row=12)
+        keyboa()
+
+
+def test_minimal_kb_with_alignment_true_slice():
+    keyboa = EasyInlineKeyboard(items=list(range(0, 12)), alignment=True).slice(
+        slice_=slice(0, 6)
+    )
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    assert 6 / len(kb_rows) == 3
+
+
+def test_minimal_kb_with_alignment_true_and_reversed_alignment_true():
+    keyboa = EasyInlineKeyboard(
+        items=list(range(0, 12)), alignment=True, alignment_reverse=True
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    assert 12 / len(kb_rows) == 4
+
+
+def test_minimal_kb_with_alignment_specified():
+    keyboa = EasyInlineKeyboard(
+        items=list(range(0, 12)), alignment=range(2, 7)
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    assert 12 / len(kb_rows) == 2
+
+
+def test_minimal_kb_with_alignment_specified_out_of_limits():
+    with pytest.raises(ValueError) as _:
+        keyboa = EasyInlineKeyboard(items=list(range(0, 12)), alignment=range(0, 12))
+        keyboa()
+
+
+def test_minimal_kb_with_alignment_specified_and_reversed_alignment_true():
+    keyboa = EasyInlineKeyboard(
+        items=list(range(0, 12)), alignment=range(2, 7), alignment_reverse=True
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    assert 12 / len(kb_rows) == 6
+
+
+def test_minimal_kb_with_reversed_alignment_true():
+    # usually there is no needs and no sense for doing so
+    keyboa = EasyInlineKeyboard(
+        items=list(range(0, 12)), alignment_reverse=True
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    assert 12 / len(kb_rows) == 1
+
+
+def test_minimal_kb_with_all_parameters_specified_reversed_range_true():
+    keyboa = EasyInlineKeyboard(
+        items=list(range(0, 12)),
+        alignment=range(2, 7),
+        copy_text_to_callback=True,
+        front_marker="front_",
+        back_marker="_back",
+        alignment_reverse=True,
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    assert len(kb_rows) == 2
+
+    items_in_row = 12 / len(kb_rows)
+    assert items_in_row == 6
+
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "front_0_back",
+        "front_6_back",
+    ]
+
+
+def test_minimal_kb_with_all_parameters_specified_reversed_range_false():
+    keyboa = EasyInlineKeyboard(
+        items=list(range(0, 12)),
+        alignment=range(2, 7),
+        copy_text_to_callback=True,
+        front_marker="front_",
+        back_marker="_back",
+        alignment_reverse=False,
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    assert len(kb_rows) == 6
+
+    items_in_row = 12 / len(kb_rows)
+    assert items_in_row == 2
+
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "front_0_back",
+        "front_2_back",
+        "front_4_back",
+        "front_6_back",
+        "front_8_back",
+        "front_10_back",
+    ]
+
+
+def test_structured_kb():
+    keyboa = EasyInlineKeyboard(
+        items=[
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ],
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    assert len(kb_rows) == 3
+
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "1",
+        "4",
+        "7",
+    ]
+
+
+def test_structured_kb_with_alignment():
+    with pytest.raises(TypeError) as _:
+        keyboa = EasyInlineKeyboard(
+            items=[
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+            ],
+            alignment=True,
+        )
+        keyboa()
+
+
+def test_structured_kb_with_items_in_row():
+    with pytest.raises(TypeError) as _:
+        keyboa = EasyInlineKeyboard(
+            items=[
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+            ],
+            items_in_row=6,
+        )
+        keyboa()
+
+
+def test_structured_kb_with_front_marker():
+    keyboa = EasyInlineKeyboard(
+        items=[
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ],
+        copy_text_to_callback=True,
+        front_marker="front_",
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "front_1",
+        "front_4",
+        "front_7",
+    ]
+
+
+def test_structured_kb_with_front_marker_no_copy_text_to_callback():
+    keyboa = EasyInlineKeyboard(
+        items=[
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ],
+        front_marker="front_",
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "front_1",
+        "front_4",
+        "front_7",
+    ]
+
+
+def test_kb_from_tuples():
+    keyboa = EasyInlineKeyboard(
+        items=[
+            (1, "a"),
+            (2, "b"),
+            (3, "c"),
+            (4, "d"),
+            (5, "e"),
+            (6, "f"),
+        ]
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == ["a", "b", "c", "d", "e", "f"]
+
+
+def test_kb_from_tuples_with_front_marker():
+    keyboa = EasyInlineKeyboard(
+        items=[
+            (1, "a"),
+            (2, "b"),
+            (3, "c"),
+            (4, "d"),
+            (5, "e"),
+            (6, "f"),
+        ],
+        front_marker="front_",
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "front_a",
+        "front_b",
+        "front_c",
+        "front_d",
+        "front_e",
+        "front_f",
+    ]
+
+
+def test_kb_from_tuples_with_back_marker_and_items_in_row():
+    keyboa = EasyInlineKeyboard(
+        items=[
+            (1, "a"),
+            (2, "b"),
+            (3, "c"),
+            (4, "d"),
+            (5, "e"),
+            (6, "f"),
+        ],
+        back_marker="_back",
+        items_in_row=2,
+    ).keyboard
+    kb_rows = dict(keyboa).get("inline_keyboard")
+    callbacks = [bnt[0].get("callback_data") for bnt in kb_rows]
+    assert callbacks == [
+        "a_back",
+        "c_back",
+        "e_back",
+    ]
+
+
+def test_kb_with_items_in_row_and_last_buttons():
+    keyboa = EasyInlineKeyboard(
+        items=[
+            (1, "a"),
+            (2, "b"),
+            (3, "c"),
+            (4, "d"),
+            (5, "e"),
+            (6, "f"),
+            (7, "g"),
+        ],
+        items_in_row=2,
+    ).keyboard
+    assert len(keyboa.inline_keyboard) == 4
+
+
+def test_kb_is_callable():
+    keyboa = EasyInlineKeyboard(
+        items=[
+            (1, "a"),
+            (2, "b"),
+            (3, "c"),
+            (4, "d"),
+            (5, "e"),
+            (6, "f"),
+        ],
+        back_marker="_is_callable",
+        items_in_row=2,
+    )
+    assert isinstance(keyboa(), InlineKeyboardMarkup)
+    assert keyboa.keyboard.as_json() == keyboa().as_json() == keyboa.slice().as_json()
+    assert keyboa.slice(slice(3)).as_json() == keyboa(slice(3)).as_json()
+    assert keyboa.slice(slice(2, 4, 2)).as_json() == keyboa(slice(2, 4, 2)).as_json()

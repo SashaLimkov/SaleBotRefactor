@@ -1,0 +1,63 @@
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Гид</h3>
+    </div>
+    <div class="card-body">
+        <form id="final-form">
+            <input type="hidden" value="{{ compilation_id }}" id="compilation_id" name="compilation">
+            <div class="mb-4">
+                <label class="form-label" for="default-input">Медиа</label>
+                <input class="form-control" type="file" id="media_final" name="media"
+                       placeholder="Название">
+            </div>
+            <div class="mb-4">
+                <label class="form-label" for="default-input">Текст</label>
+                <div id="ckeditor-gid"></div>
+            </div>
+            <div class="mb-4">
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        let editor_gid;
+
+        ClassicEditor.create(
+            document.querySelector("#ckeditor-gid"),
+            {
+
+                toolbar: ['bold', 'italic', 'link', 'numberedList', 'bulletedList', 'undo', 'redo']
+            },
+        ).then(function (e) {
+            e.ui.view.editable.element.style.height = "200px"
+            editor_gid = e;
+
+            e.model.insertContent(modelFragment);
+        }).catch(function (e) {
+            console.error(e)
+        });
+
+        $('#final-form').on('submit', function (event) {
+            event.preventDefault();
+            var form_data = new FormData(this);
+            form_data.append('text', editor_gid.getData())
+            headers = {'X-CSRFToken': '{{ csrf_token }}'};
+            $.ajax({
+                url: '{% url 'compilation_final_create' %}',
+                type: 'POST',
+                data: form_data,
+                dataType: 'json',
+                cache: false,
+                processData: false,
+                headers: headers,
+                contentType: false,
+                success: function (data) {
+                    alertify.success("Сохранено")
+                },
+                error: function (data) {
+                    alertify.error("Ошибка при сохранении")
+                }
+            })
+        })
+    </script>
+</div>

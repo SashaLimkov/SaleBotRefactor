@@ -1,0 +1,129 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block title %}Подборки{% endblock title %} {"title": "Подборки"})
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'libs/glightbox/dist/css/glightbox.min.css'%}">
+{% endblock %}
+
+{% block content %}
+    <!-- ============================================================== -->
+    <!-- Start right Content here -->
+    <!-- ============================================================== -->
+    <div class="main-content">
+
+        <div class="page-content">
+            <div class="container-fluid">
+
+                <!-- start page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                            <h4 class="mb-sm-0 font-size-18">Подборки</h4>
+
+                            <div class="page-title-right">
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Главная</a></li>
+                                    <li class="breadcrumb-item active">Подборки</li>
+                                </ol>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+                <div class="row">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-3">
+                                    <div class="search-box me-2 mb-2 d-inline-block">
+                                        <div class="position-relative">
+                                            <input type="text" class="form-control" id="search" placeholder="Поиск...">
+                                            <i class="bx bx-search-alt search-icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="search-box">
+                                        <div class="position-relative">
+                                            <input type="text" class="form-control" id="datepicker-range">
+                                            <i class="bx bx-calendar-event search-icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-sm-end">
+                                        <a type="button" href="{% url 'compilation_create' %}"
+                                                class="btn btn-success btn-rounded waves-effect waves-light mb-2 me-2">
+                                            <i class="mdi mdi-plus me-1"></i> Новая подборка
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" id="data">
+                            </div>
+                            <ul class="pagination pagination-rounded justify-content-end mb-2" id="paginator">
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- container-fluid -->
+        </div>
+        <!-- End Page-content -->
+
+
+        {% block footer %}
+            {% include 'partials/footer.html' %}
+        {% endblock footer %}
+    </div>
+    <!-- end main content-->
+{% endblock content %}
+
+{% block extra_js %}
+    <script src="{% static 'libs/glightbox/dist/js/glightbox.min.js'%}"></script>
+
+    <script src="{% static 'libs/flatpickr/dist/flatpickr.min.js'%}"></script>
+
+
+    <script>
+        var loadThisContent = function (page = 1) {
+            $.ajax({
+                url: '{% url 'table_compilations' %}',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    "search": $('#search').val(),
+                    'date-range': $('#datepicker-range').val(),
+                    'page': page
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log($(this))
+                    $('#data').html(data.rows);
+                    $('#paginator').html(data.paginator);
+                }
+            })
+        };
+        $('#search').keyup(function () {
+            loadThisContent()
+        })
+        $('#datepicker-range').change(function (){
+            loadThisContent()
+        })
+    </script>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+            loadThisContent()
+            flatpickr("#datepicker-range", {
+                mode: "range",
+                defaultDate: new Date
+            })
+        })
+
+    </script>
+
+{% endblock extra_js %}

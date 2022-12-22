@@ -1,0 +1,81 @@
+{% load static %}
+{% block left_sidebar %}
+        <!-- ========== Left Sidebar Start ========== -->
+        <div class="vertical-menu">
+
+            <div data-simplebar class="h-100">
+
+                <!--- Sidemenu -->
+                <div id="sidebar-menu">
+                    <!-- Left Menu Start -->
+                    <ul class="metismenu list-unstyled" id="side-menu">
+
+
+                        {% if user.is_superuser %}
+                            <li class="menu-title" data-key="t-menu">Меню</li>
+                        <li>
+                            <a href="{% url 'dashboard' %}">
+                                <i data-feather="trending-up"></i>
+{#                                <span class="badge rounded-pill bg-soft-success text-success float-end">9+</span>#}
+                                <span data-key="t-dashboard">Статистика</span>
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        <li class="menu-title" data-key="t-apps">Посты</li>
+
+                        <li>
+                            <a href="{% url 'compilation_list'%}">
+                                <i data-feather="package"></i>
+                                <span data-key="t-chat">Подборки</span>
+                            </a>
+                        </li>
+
+{#                        <li>#}
+{#                            <a href="{% url 'dashboard'%}">#}
+{#                                <i data-feather="trello"></i>#}
+{#                                <span data-key="t-chat">Посты</span>#}
+{#                            </a>#}
+{#                        </li>#}
+
+
+                        {% if user.is_superuser %}
+                            <li class="menu-title" data-key="t-pages">Бот</li>
+                            <li>
+                                <a href="{% url 'profile_list' %}">
+                                    <i data-feather="users"></i>
+                                    <span data-key="t-horizontal">Пользователи</span>
+                                </a>
+                            </li>
+                        {% endif %}
+{#                        <li>#}
+{#                            <a href="{% url 'rates' %}">#}
+{#                                <i data-feather="dollar-sign"></i>#}
+{#                                <span data-key="t-horizontal">Тарифы</span>#}
+{#                            </a>#}
+{#                        </li>#}
+
+{#                        <li class="menu-title mt-2" data-key="t-components">Администрирование</li>#}
+{##}
+{#                        <li>#}
+{#                            <a href="{% url 'user_list' %}">#}
+{#                                <i data-feather="user-check"></i>#}
+{#                                <span data-key="t-horizontal">Сотрудники</span>#}
+{#                            </a>#}
+{#                        </li>#}
+
+{#                        <li>#}
+{#                            <a href="{% url 'settings' %}">#}
+{#                                <i data-feather="sliders"></i>#}
+{#                                <span data-key="t-horizontal">Настройки</span>#}
+{#                            </a>#}
+{#                        </li>#}
+
+                    </ul>
+
+                </div>
+                <!-- Sidebar -->
+            </div>
+        </div>
+        <!-- Left Sidebar End -->
+{% endblock left_sidebar %}

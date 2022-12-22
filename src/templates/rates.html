@@ -1,0 +1,200 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block title %}Тарифы{% endblock title %} {"title": "Тарифы"})
+
+{% block extra_css %}
+
+{% endblock extra_css %}
+
+{% block content %}
+    <!-- ============================================================== -->
+    <!-- Start right Content here -->
+    <!-- ============================================================== -->
+    <div class="main-content">
+
+        <div class="page-content">
+            <div class="container-fluid">
+
+                <!-- start page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                            <h4 class="mb-sm-0 font-size-18">Тарифы</h4>
+
+                            <div class="page-title-right">
+                                <ol class="breadcrumb m-0">
+                                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Главная</a></li>
+                                    <li class="breadcrumb-item active">Тарифы</li>
+                                </ol>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- end page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="text-sm-end">
+                            <button type="button" id="add_rate"
+                                    class="btn btn-success btn-rounded waves-effect waves-light mb-2 me-2">
+                                <i class="mdi mdi-plus me-1"></i> Добавить тариф
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="list_rates">
+                    {% for rate in rates %}
+                        <div class="col-md-12 col-lg-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Тариф #1</h3>
+                                </div>
+                                <div class="card-body">
+                                    <form id="compilation-form" class="needs-validation" novalidate>
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Название</label>
+                                            <input class="form-control" type="text" name="name"
+                                                   placeholder="Название" value="{{ rate.name }}">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Описание</label>
+                                            <textarea name="description" class="form-control" rows="6">
+                                                {{ rate.description }}"
+                                            </textarea>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Цена</label>
+                                            <input class="form-control" type="number" name="price"
+                                                   placeholder="Цена" value="{{ rate.price | safe }}">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label" for="default-input">Количество дней</label>
+                                            <input class="form-control" type="number" name="name"
+                                                   placeholder="Количество дней" value="{{ rate.count_day_sub }}">
+                                        </div>
+                                        <div class="mb-4">
+                                            {% if rate.displayed %}
+                                                <input class="form-check-input" type="checkbox" id="displayed"
+                                                       name="is_visible" checked>
+                                            {% else %}
+                                                <input class="form-check-input" type="checkbox" id="displayed"
+                                                       name="is_visible" >
+                                            {% endif %}
+                                            <label class="form-check-label" for="formCheckRight2">
+                                                Отображается в боте
+                                            </label>
+                                        </div>
+                                        <div class="mb-4">
+                                            <div class="text-sm-end">
+                                                <div class="row">
+                                                    <div class="col-9">
+                                                        <button type="submit"
+                                                                class="btn btn-danger">
+                                                            Удалить
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <button type="submit"
+                                                                class="btn btn-primary">
+                                                            Сохранить
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div> <!-- container-fluid -->
+        </div>
+        <!-- End Page-content -->
+
+
+        {% block footer %}
+            {% include 'partials/footer.html' %}
+        {% endblock footer %}
+    </div>
+    <!-- end main content-->
+{% endblock content %}
+
+{% block extra_js %}
+    <script src="{% static 'libs/pristinejs/dist/pristine.min.js' %}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.addEventListener("load", function () {
+                var e = document.getElementsByClassName("needs-validation");
+                Array.prototype.filter.call(e, function (t) {
+                    t.addEventListener("submit", function (e) {
+                        !1 === t.checkValidity() && (e.preventDefault(), e.stopPropagation()), t.classList.add("was-validated")
+                    }, !1)
+                })
+            })
+        })
+    </script>
+    <script>
+        $('#add_rate').on('click', function () {
+            tmp = `<div class="col-md-12 col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Новый тариф</h3>
+                            </div>
+                            <div class="card-body">
+                                <form id="compilation-form" class="needs-validation" novalidate>
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Название</label>
+                                        <input class="form-control" type="text" name="name"
+                                               placeholder="Название">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Описание</label>
+                                        <textarea name="description" class="form-control">
+                                        </textarea>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Цена</label>
+                                        <input class="form-control" type="number" name="price"
+                                               placeholder="Цена">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label" for="default-input">Количество дней</label>
+                                        <input class="form-control" type="number" name="name"
+                                               placeholder="Количество дней">
+                                    </div>
+                                    <div class="mb-4">
+                                        <input class="form-check-input" type="checkbox" id="displayed"
+                                               name="is_visible" checked>
+                                        <label class="form-check-label" for="formCheckRight2">
+                                            Отображается в боте
+                                        </label>
+                                    </div>
+                                    <div class="mb-4">
+                                        <div class="text-sm-end">
+                                            <div class="row">
+                                                <div class="col-9">
+                                                    <button type="submit"
+                                                            class="btn btn-danger">
+                                                        Удалить
+                                                    </button>
+                                                </div>
+                                                <div class="col-3">
+                                                    <button type="submit"
+                                                            class="btn btn-primary">
+                                                        Сохранить
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>`
+            tmp = $(tmp);
+            $('#list_rates').append(tmp);
+        })
+    </script>
+{% endblock extra_js %}

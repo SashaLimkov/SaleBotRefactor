@@ -1,0 +1,62 @@
+{% extends "auth/base.html" %}
+{% load static %}
+{% block title %}Login{% endblock title %}
+{% block content %}
+                <div class="auth-full-page-content d-flex p-sm-5 p-4">
+                    <div class="w-100">
+                        <div class="d-flex flex-column h-100">
+                            <div class="mb-4 mb-md-5 text-center">
+                                <a href="{% url 'dashboard' %}" class="d-block auth-logo">
+                                    <img src="{% static 'images/logo-lg-auth.svg' %}" alt="" height="50">
+                                </a>
+                            </div>
+                            <div class="auth-content my-auto">
+                                <div class="text-center">
+                                    <h5 class="mb-0">С возвращением!</h5>
+                                    <p class="text-muted mt-2">Авторизуйтесь для работы с панелью</p>
+                                    {% if error %}
+                                        <p class="text-danger">Неправильное имя пользователя или пароль</p>
+                                    {% endif %}
+                                </div>
+                                <form class="mt-4 pt-2" method="POST" action="{% url 'login' %}">
+                                    {% csrf_token %}
+                                    <div class="form-floating form-floating-custom mb-4">
+                                        <input type="text" class="form-control" name="input-username" placeholder="Введите имя пользователя">
+                                        <label for="input-username">Имя пользователя</label>
+                                        <div class="form-floating-icon">
+                                           <i data-feather="users"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-floating form-floating-custom mb-4 auth-pass-inputgroup">
+                                        <input type="password" class="form-control pe-5" name="password-input" placeholder="Введите пароль">
+                                        
+                                        <button type="button" class="btn btn-link position-absolute h-100 end-0 top-0" id="password-addon">
+                                            <i class="mdi mdi-eye-outline font-size-18 text-muted"></i>
+                                        </button>
+                                        <label for="input-password">Пароль</label>
+                                        <div class="form-floating-icon">
+                                            <i data-feather="lock"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <button class="btn btn-primary w-100 waves-effect waves-light" type="submit">Войти</button>
+                                    </div>
+                                </form>
+
+
+
+                            </div>
+                            <div class="mt-4 mt-md-5 text-center">
+                                <p class="mb-0">© <script>document.write(new Date().getFullYear())</script>CommIT</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end auth full page content -->
+{% endblock content %}
+{% block extra_js %}
+<script src="{% static 'js/pages/pass-addon.init.js'%}"></script>
+{% endblock extra_js %}
+        
