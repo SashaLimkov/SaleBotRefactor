@@ -28,14 +28,15 @@ def get_post_text(post):
         post_text += item.description + "\n" if item.description else ''
         price_old = item.price_old
         price_new = item.price_new
-        post_text += f"<b><s>{price_old}{post.shop.currency}</s>"
         if price_new:
-            post_text += f"➡️{price_new}{post.shop.currency}</b>"
+            post_text += f"<b><s>{price_old}{post.shop.currency.sign}</s></b>"
+            post_text += f"<b>➡️{price_new}{post.shop.currency.sign}</b>"
+        else:
+            post_text += f"<b>{price_old}{post.shop.currency}</b>"
+
         post_text += '\n'
-        post_text += f"{item.price_new}{post.shop.currency.sign}</b>" + "\n"
         post_text += f'{item.link}\n'
     return post_text
-
 
 
 def get_formatted_channel_posts_by_compilation_id(compilation_id: int) -> list:
@@ -67,10 +68,11 @@ def get_formatted_posts_by_compilation_id(
             post_text += item.description + "<br>" if item.description else ''
             price_old = item.price_old
             price_new = item.price_new
-            post_text += f"<b><s>{price_old}{post.shop.currency}</s>"
             if price_new:
-                post_text += f"➡️{price_new}{post.shop.currency}</b>"
-            post_text += f"<br>{item.price_new}{post.shop.currency.sign}</b>" + "<br>"
+                post_text += f"<b><s>{price_old}{post.shop.currency}</s></b>"
+                post_text += f"➡️<b>{price_new}{post.shop.currency}</b>"
+            else:
+                post_text += f"<b>{price_old}{post.shop.currency}</b>"
             post_text += f'<a href="{item.link}">{item.link}</a><br>'
         for content in post.contents.all():
             contents = {'url': content.file.url, 'type': content.type}
@@ -101,9 +103,10 @@ def get_formatted_user_settings_posts_by_compilation_id(
                 if settings.product_settings.description:
                     post_text += item.description + "\n" if item.description else ''
                 if settings.product_settings.price:
+                    price_new = (0 if not item.price_new else item.price_new)
+                    print(price_new, "----------------------------------")
                     if settings.currency == 0:
                         price_old = item.price_old
-                        price_new = item.price_new
                         sign = post.shop.currency.sign
                     else:
                         user_course = get_value_course_user_by_currency(
@@ -111,21 +114,28 @@ def get_formatted_user_settings_posts_by_compilation_id(
                         )
                         if user_course:
                             price_old = item.price_old * user_course.value
-                            price_new = item.price_new * user_course.value
+                            price_new = price_new * user_course.value
+                            print(price_new, "118")
                         else:
                             course = get_course_currency(post.shop.currency.currency)
                             price_old = item.price_old * course
-                            price_new = item.price_new * course
+                            price_new = price_new * course
+                            print(price_new, "123")
                         sign = "₽"
                     if settings.formula:
                         price_old = price_old + (price_old / 100 * settings.commission)
                         price_new = price_new + (price_new / 100 * settings.commission)
+                        print(price_new, "128")
                     if settings.rounder:
                         price_old = round_num_to(price_old, settings.rounder, settings.currency)
                         price_new = round_num_to(price_new, settings.rounder, settings.currency)
-                    post_text += f"<b><s>{price_old}{sign}</s>"
+                        print(price_new, "132")
                     if price_new:
-                        post_text += f"➡️{price_new}{sign}</b>"
+                        post_text += f"<b><s>{price_old}{sign}</s></b>"
+                        post_text += f"<b>➡️{price_new}{sign}</b>"
+                    else:
+                        post_text += f"<b>{price_old}{sign}</b>"
+
                     post_text += "\n"
                 if settings.product_settings.link:
                     if settings.link and channel == 0 and not settings.hided_link:

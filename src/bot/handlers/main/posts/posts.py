@@ -3,8 +3,11 @@ from aiogram.dispatcher import FSMContext
 
 from apps.message.services.message import get_message_by_name_for_user
 from apps.posts.services.compilation import get_compilation_by_id, get_final_compilation
+from apps.posts.services.content import watermark
 from apps.posts.services.post import get_formatted_user_settings_posts_by_compilation_id, add_user_post
 from apps.profiles.services.profile import get_profile_is_helper, get_profile_by_telegram_id
+from apps.settings.services.settings_product_user import get_product_settings
+from apps.settings.services.settings_user import get_settings
 from bot.keyboards import inline as ik
 from bot.states.MainMenu import MainMenu
 from bot.states.Posts import PostStates
@@ -80,13 +83,19 @@ async def sender_anons(message: types.Message, state: FSMContext):
                             compilation_id=compilation_id)
 
 
-async def send_compilation(compilation_id: int, chat_id: int, message: types.Message, keyboard):
+async def send_compilation(compilation_id: int, chat_id: int, message: types.Message, keyboard, user_id=None):
     compilation = get_compilation_by_id(compilation_id=compilation_id)
     compilation_file = compilation.contents.first()
+    compilation_file_path = compilation_file.file.path
     compilation_file_type = compilation_file.type
+    settings = get_settings(telegram_id=user_id or chat_id)
+    if (settings.logo or settings.text_logo) and compilation_file_type == 0:
+        compilation_file_path = watermark(compilation_file_path, settings.logo,
+                                          settings.logo_position, settings.text_logo)
+
     text = unicodedata.normalize('NFKC', unescape(compilation.text.replace('<br>', '\n')))
     mes_id = await mw.try_send_post_to_user(
-        file_path=compilation_file.file.path,
+        file_path=compilation_file_path,
         file_type=compilation_file_type,
         chat_id=chat_id,
         text=f"{compilation.name}\n\n{text}",
@@ -96,13 +105,19 @@ async def send_compilation(compilation_id: int, chat_id: int, message: types.Mes
     return mes_id
 
 
-async def send_final_compilation(compilation_id: int, chat_id: int, message: types.Message, keyboard):
+async def send_final_compilation(compilation_id: int, chat_id: int, message: types.Message, keyboard, user_id=None):
     final_compilation = get_final_compilation(compilation_id=compilation_id)
     final_compilation_file = final_compilation.contents.first()
+    final_compilation_path = final_compilation_file.file.path
     final_compilation_file_type = final_compilation_file.type
+    settings = get_settings(telegram_id=user_id or chat_id)
+    if (settings.logo or settings.text_logo) and final_compilation_file_type == 0:
+        final_compilation_path = watermark(final_compilation_path, settings.logo,
+                                           settings.logo_position, settings.text_logo)
+
     text = unicodedata.normalize('NFKC', unescape(final_compilation.text.replace('<br>', '\n')))
     mes_id = await mw.try_send_post_to_user(
-        file_path=final_compilation_file.file.path,
+        file_path=final_compilation_path,
         file_type=final_compilation_file_type,
         chat_id=chat_id,
         text=f"{text}",

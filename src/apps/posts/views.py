@@ -181,12 +181,14 @@ class CompilationCreateView(LoginRequiredMixin, View):
 
     def post(self, request):
         print(request.POST)
+        print("____________________________________________________")
+        print(datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'))
         compilation = create_compilation(
-                name=request.POST.get('name'),
-                text=request.POST.get('text').replace('<p>', '').replace('</p>', ''),
-                date=datetime.datetime.strptime(request.POST.get('date'), '%Y-%m-%d'),
-                datetime_send=datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'),
-                done=True if request.POST.get('complete') == 'true' else False
+            name=request.POST.get('name'),
+            text=request.POST.get('text').replace('<p>', '').replace('</p>', ''),
+            date=datetime.datetime.strptime(request.POST.get('date'), '%Y-%m-%d'),
+            datetime_send=datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'),
+            done=True if request.POST.get('complete') == 'true' else False
         )
         create_log(request.user, 3, compilation)
         format_file = str(request.FILES.get('media')).split('.')[-1]
@@ -195,14 +197,14 @@ class CompilationCreateView(LoginRequiredMixin, View):
         else:
             type_content = 1
         create_content(
-                file_name=str(request.FILES.get('media')),
-                file=request.FILES.get('media'),
-                type_content=type_content,
-                to='compilation',
-                to_id=compilation.id
+            file_name=str(request.FILES.get('media')),
+            file=request.FILES.get('media'),
+            type_content=type_content,
+            to='compilation',
+            to_id=compilation.id
         )
 
-        #gid = render_to_string('posts/form_gid.html', {'compilation_id': compilation.pk}, request=request)
+        # gid = render_to_string('posts/form_gid.html', {'compilation_id': compilation.pk}, request=request)
         return redirect('compilation_detail', compilation.id)
 
 
@@ -350,14 +352,19 @@ class CompilationDeleteView(LoginRequiredMixin, View):
             posts = x.post_set.all()
             for post in posts:
                 asyncio.run(try_delete_message(settings.CHANNEL, post.message_id))
-            asyncio.run(try_delete_message(settings.CHANNEL, x.message_id))
-            asyncio.run(try_delete_message(settings.CHANNEL, x.finalcompilation_set.first().message_id))
-
+            try:
+                asyncio.run(try_delete_message(settings.CHANNEL, x.message_id))
+            except:
+                pass
+            try:
+                asyncio.run(try_delete_message(settings.CHANNEL, x.finalcompilation_set.first().message_id))
+            except:
+                pass
             create_log(request.user, 4, x)
             x.delete()
 
         except:
-            pass
+            traceback.format_exc()
         return redirect('compilation_list')
 
 

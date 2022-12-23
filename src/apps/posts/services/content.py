@@ -62,7 +62,7 @@ def watermark(img_post, img_wm, position, t_wm=" "):
                 (img_post_p.size[0] // 3, img_post_p.size[1] // 3),
                 mask=paste_mask,
             )
-        elif position == 2:
+        elif position == 0:
             img_wm = img_wm.resize((img_post_p.size[1] // 6, img_post_p.size[1] // 6))
             if img_wm.mode != "RGBA":
                 alpha = Image.new("L", img_wm.size, 255)

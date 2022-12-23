@@ -31,14 +31,16 @@ async def send_posts(call: types.CallbackQuery, callback_data: dict, state: FSMC
                     compilation_id=obj_id,
                     chat_id=channel_id,
                     message=call.message,
-                    keyboard=None
+                    keyboard=None,
+                    user_id=user_id,
                 )
             else:
                 await send_compilation(
                     compilation_id=obj_id,
                     chat_id=channel_id,
                     message=call.message,
-                    keyboard=None
+                    keyboard=None,
+                    user_id=user_id,
                 )
         else:
             compilation_id = int(data.get("compilation_id"))
@@ -56,7 +58,8 @@ async def send_posts(call: types.CallbackQuery, callback_data: dict, state: FSMC
                         compilation_id=compilation_id,
                         chat_id=channel_id,
                         message=call.message,
-                        keyboard=None
+                        keyboard=None,
+                        user_id=user_id,
                     )
                 for post in posts:
                     if post[2] in send_post_pk_list:
@@ -67,7 +70,8 @@ async def send_posts(call: types.CallbackQuery, callback_data: dict, state: FSMC
                         compilation_id=compilation_id,
                         chat_id=channel_id,
                         message=call.message,
-                        keyboard=None
+                        keyboard=None,
+                        user_id=user_id,
                     )
             else:
                 for post in posts:

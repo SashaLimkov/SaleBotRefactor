@@ -6,8 +6,7 @@ def round_num_to(num, round_lvl: int, currency: int) -> str:
         r = f'{float("{:.2f}".format(num))}'
         return str(int(r[:-2]))
     if round_lvl == 1:
-        r = f'{float("{:.2f}".format(int(num) + 1))}'
-        return str(int(r[:-2]))
+        return f"{int(num) if int(str(int(num))) == float(num) else int(num) + 1}"
     elif round_lvl == 2:
         number = (
             (int(num) // 10 + 1) * 10 if int(num) / 10 != int(num) // 10 else int(num)
