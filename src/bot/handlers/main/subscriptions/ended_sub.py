@@ -9,4 +9,4 @@ async def sub_ended(call: types.CallbackQuery, state: FSMContext):
         "action": 3,
 
     }
-    await main_menu_actions(call=call, callback_data=callback_data, state=state)
+    await main_menu_actions(call=call, callback_data=callback_data, state=state, ended_sub=True)

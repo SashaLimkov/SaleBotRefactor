@@ -81,25 +81,37 @@ async def get_date_menu(callback_data: dict):
     )
 
 
-async def get_sub_menu(is_active: bool, is_helper: bool, callback_data: dict):
-    buttons = []
-    if is_active:
-        buttons = [
-            {
-                "text": value,
-                "callback_data": cd.sub_menu.new(
-                    first_lvl=callback_data["action"], second_lvl=index
-                ),
-            }
-            for index, value in enumerate(ld.SUBSCRIPTION_MENU)
-        ]
-    buttons.append({"text": "◀ Назад", "callback_data": cd.MAIN_MENU})
-    return await get_base_keyboard(
-        buttons=buttons,
+async def get_sub_menu(is_active: bool, is_helper: bool, callback_data: dict, ended_sub: bool = False):
+    keyboard = await get_base_keyboard(
         keyboard_options={
             "row_width": 1,
         },
     )
+    if is_active:
+        keyboard.insert(
+            await get_inline_button(
+                text="Купить подписку",
+                cd=cd.sub_menu.new(
+                    first_lvl=callback_data["action"], second_lvl=0
+                ),
+            )
+        )
+        if not ended_sub:
+            keyboard.insert(
+                await get_inline_button(
+                    text="Добавить помощника",
+                    cd=cd.sub_menu.new(
+                        first_lvl=callback_data["action"], second_lvl=1
+                    ),
+                )
+            )
+
+    keyboard.insert(
+        await get_inline_button(
+            text="◀ Назад",
+            cd=cd.MAIN_MENU
+        ))
+    return keyboard
 
 
 async def get_video_menu():

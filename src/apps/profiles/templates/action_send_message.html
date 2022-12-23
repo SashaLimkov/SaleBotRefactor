@@ -1,0 +1,37 @@
+{% extends "admin/base_site.html" %} {% block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+
+        <input type="hidden" name="action" value="send_messages"/>
+        <input type="hidden" name="message" value="1"/>
+        {% load static %}
+        <div style="display: flex; flex-direction: row; justify-content: flex-start">
+            <div class="mailing">
+      <textarea
+              name="message"
+              cols="50"
+              rows="10"
+              required=""
+              id="id_message"
+              placeholder="Напишите сообщение"
+      ></textarea>
+                <div>
+                    <button style="margin-top: 30px;" type="submit">Отправить</button>
+                </div>
+                {{ form.errors }}
+
+                <h2>Чаты для рассылки</h2>
+
+                <ul>
+                    {% for chat in chats %}
+                        <li>
+                            {{ chat.username }} | {{ chat.full_name }}
+                            <input type="hidden" name="_selected_action" value="{{ chat.pk }}"/>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}

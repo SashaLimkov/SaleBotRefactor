@@ -30,7 +30,7 @@ async def get_main_menu(call: types.CallbackQuery, state: FSMContext):
 
 
 async def main_menu_actions(
-        call: types.CallbackQuery, callback_data: dict, state: FSMContext
+        call: types.CallbackQuery, callback_data: dict, state: FSMContext, ended_sub: bool = False
 ):
     data = await state.get_data()
     main_message_id = data.get("main_message_id", False)
@@ -56,6 +56,7 @@ async def main_menu_actions(
             is_active=user.is_active,
             is_helper=user.is_helper,
             callback_data=callback_data,
+            ended_sub=ended_sub,
         )
     else:
         text = get_message_by_name_for_user(

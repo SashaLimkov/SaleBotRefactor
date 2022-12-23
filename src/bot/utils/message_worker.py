@@ -1,3 +1,4 @@
+import asyncio
 import traceback
 import unicodedata
 from html import unescape
@@ -354,3 +355,21 @@ async def try_edit_message_caption(
         await notice_programmers(
             exception_info=traceback.format_exc(),
         )
+
+
+async def _spamer(chat_id: int, text: str):
+    if chat_id:
+        try:
+            await bot.send_message(chat_id, text)
+        except exceptions.RetryAfter as e:
+            await asyncio.sleep(e.timeout)
+            await _spamer(chat_id, text)
+        except:
+            await notice_programmers(
+                exception_info=traceback.format_exc(),
+            )
+
+
+async def spam_machine(text, chats):
+    for chat in chats:
+        await _spamer(chat.telegram_id, text)
