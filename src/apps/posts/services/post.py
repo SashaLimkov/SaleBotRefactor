@@ -126,7 +126,7 @@ def get_formatted_user_settings_posts_by_compilation_id(
                     if settings.rounder or settings.rounder == 0:
                         price_old = round_num_to(price_old, settings.rounder, settings.currency)
                         price_new = round_num_to(price_new, settings.rounder, settings.currency)
-                    if price_new and price_new not in ["0", "0.0"]:
+                    if price_new and price_new not in ["0", "0.0", "0.00"]:
                         post_text += f"<b><s>{price_old}{sign}</s></b>"
                         post_text += f"<b>➡️{price_new}{sign}</b>"
                     else:

@@ -2,16 +2,25 @@ from typing import Union, List
 
 from django.db.models import QuerySet
 
+from apps.profiles.models import Profile
 from apps.settings.models import ChanelVk, ChanelTelegram
 
 
 def get_list_telegram_channels(
-    telegram_id: int,
+        telegram_id: int,
 ) -> Union[QuerySet, List[ChanelTelegram]]:
     """Возвращает список каналов пользователя в Telegram"""
-    return ChanelTelegram.objects.filter(profile_id=telegram_id).select_related(
-        "profile"
-    )
+    profile = Profile.objects.get(telegram_id=telegram_id)
+    if profile.is_helper:
+        return ChanelTelegram.objects.filter(
+            profile_id=profile.inviting_user,
+        ).select_related(
+            "profile"
+        )
+    else:
+        return ChanelTelegram.objects.filter(profile_id=telegram_id).select_related(
+            "profile"
+        )
 
 
 def get_list_vk_channels(telegram_id: int) -> Union[QuerySet, List[ChanelVk]]:
@@ -20,7 +29,7 @@ def get_list_vk_channels(telegram_id: int) -> Union[QuerySet, List[ChanelVk]]:
 
 
 def add_channel_telegram(
-    telegram_id: int, name: str, channel_id: int
+        telegram_id: int, name: str, channel_id: int
 ) -> ChanelTelegram:
     """Создает новый Telegram канал пользователя"""
     return ChanelTelegram.objects.get_or_create(

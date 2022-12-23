@@ -1,3 +1,5 @@
+import datetime
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.utils import deep_linking
@@ -193,6 +195,13 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
 
     else:
         if user_id in all_users:
+            user_days = all_users[user_id]
+            print(user_days)
+            delta_days = datetime.date(2022, 12, 22) - datetime.date.today()
+            user_days = user_days + delta_days.days
+            print(user_days)
+            if user_days < 0:
+                user_days = 0
             if all_users[user_id] > 3:
                 rate = get_rate_by_pk(2)
                 user = create_user(
@@ -202,7 +211,7 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
                     first_name=first_name,
                     last_name=last_name if last_name else "",
                     username=username if username else "",
-                    days_left=int(all_users[user_id]),
+                    days_left=user_days,
                     rate=rate.name,
                     cheque=rate.description
                 )
@@ -214,7 +223,7 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
                     first_name=first_name,
                     last_name=last_name if last_name else "",
                     username=username if username else "",
-                    days_left=int(all_users[user_id] if all_users[user_id] >= 0 else 0),
+                    days_left=user_days,
                 )
         else:
             user = create_user(
