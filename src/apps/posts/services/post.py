@@ -105,8 +105,6 @@ def get_formatted_user_settings_posts_by_compilation_id(
                 if settings.product_settings.price:
                     price_new = (0 if not item.price_new else round(float(item.price_new), 2))
                     price_old = round(float(item.price_old), 2)
-                    print(price_old, "----------------------------------")
-                    print(price_new, "----------------------------------")
                     if settings.currency == 0:
                         price_old = price_old
                         sign = post.shop.currency.sign
@@ -117,21 +115,17 @@ def get_formatted_user_settings_posts_by_compilation_id(
                         if user_course:
                             price_old = price_old * user_course.value
                             price_new = price_new * user_course.value
-                            print(price_new, "118")
                         else:
                             course = get_course_currency(post.shop.currency.currency)
                             price_old = price_old * course
                             price_new = price_new * course
-                            print(price_new, "123")
                         sign = "₽"
                     if settings.formula:
                         price_old = price_old + (price_old / 100 * settings.commission)
                         price_new = price_new + (price_new / 100 * settings.commission)
-                        print(price_new, "128")
                     if settings.rounder or settings.rounder == 0:
                         price_old = round_num_to(price_old, settings.rounder, settings.currency)
                         price_new = round_num_to(price_new, settings.rounder, settings.currency)
-                        print(price_new, "132")
                     if price_new and price_new not in ["0", "0.0"]:
                         post_text += f"<b><s>{price_old}{sign}</s></b>"
                         post_text += f"<b>➡️{price_new}{sign}</b>"
