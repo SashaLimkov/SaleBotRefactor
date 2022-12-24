@@ -55,3 +55,11 @@ def decrement_number_of_days_left() -> None:
         days_left=F("days_left") - 1
     )
     Subscription.objects.filter(days_left=0).only("active").update(active=False)
+
+
+def turn_on_sub_with_days() -> None:
+    for user in Profile.objects.all():
+        if not Subscription.objects.filter(active=True, profile__telegram_id=user.telegram_id).all():
+            s = Subscription.objects.filter(active=False, days_left__gt=0, profile__telegram_id=user.telegram_id).first()
+            s.active=True
+            s.save()
