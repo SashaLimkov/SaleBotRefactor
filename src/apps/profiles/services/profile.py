@@ -74,6 +74,7 @@ def get_profile_is_helper(telegram_id: int) -> bool:
     return Profile.objects.filter(telegram_id=telegram_id).first().is_helper
 
 
+
 def update_last_action_date_profile(telegram_id: int) -> None:
     """Обновляет время последнего действия пользователя и инкрементирует количество действий"""
     profile = Profile.objects.filter(telegram_id=telegram_id).first()

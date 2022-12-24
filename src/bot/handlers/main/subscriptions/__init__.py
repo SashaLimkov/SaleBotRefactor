@@ -29,6 +29,12 @@ def setup(dp: Dispatcher):
     )
     dp.register_pre_checkout_query_handler(invoice.check_payment, state='*')
     dp.register_message_handler(invoice.oplata_ok, content_types=ContentType.SUCCESSFUL_PAYMENT, state='*')
+
+    dp.register_callback_query_handler(
+        buy_sub_or_add_helper.sub_or_add_helper_menu,
+        cd.sub_menu_ended.filter(),
+        state="*"
+    )
     dp.register_callback_query_handler(
         ended_sub.sub_ended,
         IsEndedSub(),
