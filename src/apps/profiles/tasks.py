@@ -1,6 +1,6 @@
 from celery import shared_task
 
-from .services.subscription import decrement_number_of_days_left, turn_on_sub_with_days
+from .services.subscription import decrement_number_of_days_left
 from .services.metric import update_metrics_profiles_for_past_day
 
 
@@ -14,4 +14,4 @@ def repeat_update_metric():
 def repeat_update_subscriptions():
     """Периодичная задача обновления подписок пользователей"""
     decrement_number_of_days_left()
-    turn_on_sub_with_days()
+    # turn_on_sub_with_days()

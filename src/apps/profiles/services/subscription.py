@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 from typing import Optional, List, Union
 
@@ -7,6 +8,8 @@ from django.utils import timezone
 from apps.profiles.models import Subscription, Rate, Profile
 from apps.utils.services.date_time import get_datetime_now
 from django.db.models import F
+
+from bot.utils.message_worker import notice_user
 
 
 def get_user_active_subscription(telegram_id: int) -> Optional[Subscription]:
@@ -51,15 +54,29 @@ def get_user_history_subscriptions(telegram_id: int) -> Union[QuerySet, List[Rat
 
 def decrement_number_of_days_left() -> None:
     """Декрементация количества дней подписки"""
-    Subscription.objects.filter(active=True).only("days_left").update(
-        days_left=F("days_left") - 1
-    )
-    Subscription.objects.filter(days_left=0).only("active").update(active=False)
-
-
-def turn_on_sub_with_days() -> None:
     for user in Profile.objects.all():
+        s = Subscription.objects.filter(active=True, profile__telegram_id=user.telegram_id).first()
+        s.days_left -= 1
+        s.save()
+        if not Subscription.objects.filter(active=False, days_left__gt=0,
+                                           profile__telegram_id=user.telegram_id).all() and Subscription.objects.filter(
+                active=True, profile__telegram_id=user.telegram_id, days_left=1).first():
+            asyncio.run(notice_user(chat_id=user.telegram_id))
+        s = Subscription.objects.filter(days_left=0, profile__telegram_id=user.telegram_id).first()
+        s.active = False
+        s.save()
         if not Subscription.objects.filter(active=True, profile__telegram_id=user.telegram_id).all():
-            s = Subscription.objects.filter(active=False, days_left__gt=0, profile__telegram_id=user.telegram_id).first()
-            s.active=True
+            s = Subscription.objects.filter(active=False, days_left__gt=0,
+                                            profile__telegram_id=user.telegram_id).first()
+            s.active = True
             s.save()
+
+#
+# def turn_on_sub_with_days() -> None:
+#     for user in Profile.objects.all():
+#         if not Subscription.objects.filter(active=True, profile__telegram_id=user.telegram_id).all():
+#             s = Subscription.objects.filter(active=False, days_left__gt=0, profile__telegram_id=user.telegram_id).first()
+#             s.active=True
+#             s.save()
+#
+#

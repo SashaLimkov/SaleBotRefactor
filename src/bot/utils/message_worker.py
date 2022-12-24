@@ -373,3 +373,13 @@ async def _spamer(chat_id: int, text: str):
 async def spam_machine(text, chats):
     for chat in chats:
         await _spamer(chat.telegram_id, text)
+
+
+async def notice_user(chat_id):
+    try:
+        await bot.send_message(
+            text="Количество оставшихся дней = 1\nПродлите подписку в течении 24 часов, чтобы продолжать работу🤖",
+            chat_id=chat_id,
+        )
+    except:
+        pass

@@ -8,23 +8,6 @@ from bot.handlers.main.subscriptions import buy_sub_or_add_helper, invoice, help
 
 def setup(dp: Dispatcher):
     dp.register_callback_query_handler(
-        add_helper.not_allowed_at_trial,
-        IsTrial(),
-        cd.sub_menu.filter(),
-        state="*"
-    )
-    dp.register_callback_query_handler(
-        add_helper.not_allowed_helper,
-        IsHelper(),
-        cd.sub_menu.filter(),
-        state="*"
-    )
-    dp.register_callback_query_handler(
-        buy_sub_or_add_helper.sub_or_add_helper_menu,
-        cd.sub_menu.filter(),
-        state="*"
-    )
-    dp.register_callback_query_handler(
         user_sub.select_sub_to_buy,
         cd.rates_menu.filter(),
         state="*"
@@ -49,5 +32,22 @@ def setup(dp: Dispatcher):
     dp.register_callback_query_handler(
         ended_sub.sub_ended,
         IsEndedSub(),
+        state="*"
+    )
+    dp.register_callback_query_handler(
+        add_helper.not_allowed_at_trial,
+        IsTrial(),
+        cd.sub_menu.filter(),
+        state="*"
+    )
+    dp.register_callback_query_handler(
+        add_helper.not_allowed_helper,
+        IsHelper(),
+        cd.sub_menu.filter(),
+        state="*"
+    )
+    dp.register_callback_query_handler(
+        buy_sub_or_add_helper.sub_or_add_helper_menu,
+        cd.sub_menu.filter(),
         state="*"
     )

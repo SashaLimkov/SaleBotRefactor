@@ -11,10 +11,6 @@ def get_message_by_name_for_user(name: str, telegram_id: int = None) -> Message 
     проверяет существование активной подписки. В случае отсутствия подписки возвращает False"""
     if telegram_id:
         update_last_action_date_profile(telegram_id)
-        if get_user_active_subscription(telegram_id):
-            return _get_message_by_name(name)
-        else:
-            return False
     return _get_message_by_name(name)
 
 
@@ -22,7 +18,7 @@ def _get_message_by_name(name: str) -> Message:
     """Возвращает сообщение по названию"""
     return (
         Message.objects.select_related("keyboard")
-        .prefetch_related("keyboard__button_set")
-        .filter(name=name)
-        .first()
+            .prefetch_related("keyboard__button_set")
+            .filter(name=name)
+            .first()
     )
