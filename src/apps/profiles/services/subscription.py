@@ -56,15 +56,16 @@ def decrement_number_of_days_left() -> None:
     """Декрементация количества дней подписки"""
     for user in Profile.objects.all():
         s = Subscription.objects.filter(active=True, profile__telegram_id=user.telegram_id).first()
-        s.days_left -= 1
+        if s.days_left > 0:
+            s.days_left -= 1
+            s.save()
+        if s.days_left == 0:
+            s.active = False
         s.save()
         if not Subscription.objects.filter(active=False, days_left__gt=0,
                                            profile__telegram_id=user.telegram_id).all() and Subscription.objects.filter(
-                active=True, profile__telegram_id=user.telegram_id, days_left=1).first():
+            active=True, profile__telegram_id=user.telegram_id, days_left=1).first():
             asyncio.run(notice_user(chat_id=user.telegram_id))
-        s = Subscription.objects.filter(days_left=0, profile__telegram_id=user.telegram_id).first()
-        s.active = False
-        s.save()
         if not Subscription.objects.filter(active=True, profile__telegram_id=user.telegram_id).all():
             s = Subscription.objects.filter(active=False, days_left__gt=0,
                                             profile__telegram_id=user.telegram_id).first()
