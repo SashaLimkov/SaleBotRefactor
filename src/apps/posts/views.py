@@ -47,8 +47,8 @@ class CompilationTableView(LoginRequiredMixin, View):
         filter_date = None
 
         if len(daterange) == 2:
-            date_start = datetime.datetime.strptime(daterange[0], '%Y-%m-%d')
-            date_end = datetime.datetime.strptime(daterange[1], '%Y-%m-%d')
+            date_start = timezone.datetime.strptime(daterange[0], '%Y-%m-%d')
+            date_end = timezone.datetime.strptime(daterange[1], '%Y-%m-%d')
             filter_date = get_date_range_compilation_filter(date_start, date_end)
         if len(search) >= 3:
             queryset = get_search_compilations_queryset(search, filter_date)
@@ -74,8 +74,8 @@ class CompilationDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['compilation'].datetime_send = datetime.date.strftime(context['compilation'].datetime_send,
-                                                                      '%Y-%m-%dT%H:%M')
+
+        context['compilation'].datetime_send = context['compilation'].datetime_send.strftime('%Y-%m-%dT%H:%M')
         context['posts'] = get_formatted_posts_by_compilation_id(context['compilation'].pk)
         context['currency'] = get_list_currency()
         return context
@@ -95,12 +95,12 @@ class CompilationDetailView(LoginRequiredMixin, DetailView):
                 to='compilation',
                 to_id=pk
             )
-        datetime_send = datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M')
+        datetime_send = timezone.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M')
         compilation = update_compilation(
             compilation_id=pk,
             name=request.POST.get('name'),
             text=request.POST.get('text').replace('<p>', '').replace('</p>', '<br>'),
-            date=datetime.datetime.strptime(request.POST.get('date'), '%Y-%m-%d'),
+            date=timezone.datetime.strptime(request.POST.get('date'), '%Y-%m-%d'),
             datetime_send=datetime_send,
             done=True if request.POST.get('complete') == 'true' else False
         )
@@ -182,12 +182,12 @@ class CompilationCreateView(LoginRequiredMixin, View):
     def post(self, request):
         print(request.POST)
         print("____________________________________________________")
-        print(datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'))
+        print(timezone.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'))
         compilation = create_compilation(
             name=request.POST.get('name'),
             text=request.POST.get('text').replace('<p>', '').replace('</p>', ''),
-            date=datetime.datetime.strptime(request.POST.get('date'), '%Y-%m-%d'),
-            datetime_send=datetime.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'),
+            date=timezone.datetime.strptime(request.POST.get('date'), '%Y-%m-%d'),
+            datetime_send=timezone.datetime.strptime(request.POST.get('date_send'), '%Y-%m-%dT%H:%M'),
             done=True if request.POST.get('complete') == 'true' else False
         )
         create_log(request.user, 3, compilation)

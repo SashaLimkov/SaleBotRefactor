@@ -113,6 +113,6 @@ def watermark(img_post, img_wm, position, t_wm=" "):
                     img_post_p.paste(watermark, (px, py, px + wx, py + wy), watermark)
 
     file_name, file_format = img_post.split("/")[-1].split('.')
-    path = f'{file_name}_{random.randint(100000, 9999999)}.{file_format}'
+    path = f'photos/{file_name}_{random.randint(100000, 9999999)}.{file_format}'
     img_post_p.save(path)
     return path

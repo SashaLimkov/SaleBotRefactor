@@ -131,3 +131,13 @@ def get_subscribe_profile_queryset(queryset: QuerySet) -> Union[QuerySet, List[P
     for item in queryset:
         item.subscription_active = item.subscription_set.all()
     return queryset
+
+
+def get_inviting_user_profile(telegram_id: int) -> Profile:
+    """Получить объект пригласившего пользователя по telegram_id помощника"""
+    return Profile.objects.get(telegram_id=telegram_id).inviting_user
+
+
+def get_list_helpers_profile(telegram_id: int) -> Union[QuerySet, List[Profile]]:
+    """Возвращает список всех помощников пользователя"""
+    return Profile.objects.get(telegram_id=telegram_id).profile_set.all()

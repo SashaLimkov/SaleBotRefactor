@@ -581,7 +581,7 @@
         ).then(function (e) {
             e.ui.view.editable.element.style.height = "200px"
             editor_compilation = e;
-            var content = '<p>{{ compilation.text | safe }}</p>';
+            var content = `<p>{{ compilation.text | safe }}</p>`;
             const viewFragment = e.data.processor.toView(content);
             const modelFragment = e.data.toModel(viewFragment);
 
@@ -599,7 +599,7 @@
         ).then(function (e) {
             e.ui.view.editable.element.style.height = "200px"
             editor_gid = e;
-            var content = '<p>{{ compilation.finalcompilation_set.first.text | safe }}</p>';
+            var content = `<p>{{ compilation.finalcompilation_set.first.text | safe }}</p>`;
 
             const viewFragment = e.data.processor.toView(content);
             const modelFragment = e.data.toModel(viewFragment);
