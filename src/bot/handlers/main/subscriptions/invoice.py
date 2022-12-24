@@ -25,6 +25,34 @@ async def create_invoice_to_rate(call: types.CallbackQuery, callback_data: dict,
     price = 0
     if user_id == 390959255:
         price = 50
+    amount = int(rate.price) * 100 if not price else price * 100
+    description = f'Оплата тарифа: {rate.name} для {user_id}'
+    helpers = ...
+    items = [
+        {
+            "name": f"Тариф: {rate.name} для {call.message.chat.id}",
+            "quantity": 1,
+            "sum": rate.price if not price else price,
+            "payment_method": "full_payment",
+            "tax": "none"
+        }]
+    if helpers:
+        description = f'Оплата тарифа: {rate.name} для {user_id}, с учётом помощников пользователя.'
+        price = int(rate.price) * 100 if not price else price * 100
+        helpers_tax = price // 10
+        helpers_count = len(helpers)
+        amount = price + helpers_tax
+        items.append(
+            {
+                "name": f"Тариф: {rate.name} для помощников {call.message.chat.id}",
+                "quantity": helpers_count,
+                "sum": helpers_tax // 100,
+                "payment_method": "full_payment",
+                "tax": "none"
+            }
+        )
+        await state.update_data(helpers_tax=helpers_tax // 100)
+
     await mw.try_send_invoice(
         message=call.message,
         user_id=user_id,
@@ -32,21 +60,14 @@ async def create_invoice_to_rate(call: types.CallbackQuery, callback_data: dict,
         state=state,
         main_message_id=main_message_id,
         title=f'Оплата тарифа: {rate.name}',
-        description=f'Оплата тарифа: {rate.name} для {call.message.chat.id}',
+        description=description,
         payload='payment',
         currency='RUB',
-        prices=[{'label': 'Руб', 'amount': int(rate.price) * 100 if not price else price * 100}],
+        prices=[{'label': 'Руб', 'amount': amount}],
         provider_token='1902332405:LIVE:638036107957339291',
         provider_data={
             "Receipt": {
-                "items": [
-                    {
-                        "name": f"Тариф: {rate.name} для {call.message.chat.id}",
-                        "quantity": 1,
-                        "sum": rate.price if not price else price,
-                        "payment_method": "full_payment",
-                        "tax": "none"
-                    }]}}
+                "items": items}}
     )
 
 
@@ -58,12 +79,13 @@ async def oplata_ok(message: types.SuccessfulPayment, state: FSMContext):
     data = await state.get_data()
     main_message_id = data.get("main_message_id")
     callback_data = data.get("callback_data")
+    helpers_tax = data.get("helpers_tax", False)
     amount = message.successful_payment.total_amount / 100
     user_id = message.chat.id
     if user_id == 390959255:
         rate = get_helper_rate_by_price(price=200000 / 100)
     else:
-        rate = get_helper_rate_by_price(price=amount)
+        rate = get_helper_rate_by_price(price=amount - helpers_tax if helpers_tax else amount)
 
     if "inviter_id" in callback_data:
         await success_sub_helper(user_id=user_id,
@@ -71,10 +93,12 @@ async def oplata_ok(message: types.SuccessfulPayment, state: FSMContext):
                                  callback_data=callback_data,
                                  state=state)
     else:
+        user_rate = get_user_active_subscription(telegram_id=user_id)
         create_user_subscription(
             telegram_id=user_id,
             cheque=rate.description,
             rate=rate.name,
+            active=True if user_rate is None else False,
         )
         user_rate = get_user_active_subscription(telegram_id=user_id)
         expire_date = datetime.now() + timedelta(days=user_rate.days_left)

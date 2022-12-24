@@ -2,6 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from apps.message.services.message import get_message_by_name_for_user
+from apps.profiles.services.profile import get_profile_is_helper
 from apps.profiles.services.rate import get_rate_by_pk
 from bot.utils import message_worker as mw
 from bot.keyboards import inline as ik
@@ -22,6 +23,10 @@ async def select_sub_to_buy(call: types.CallbackQuery, callback_data: dict, stat
         description=rate.description
     )
     keyboard = await ik.get_pay_or_cancel_menu(callback_data=callback_data)
+    if get_profile_is_helper(user_id):
+        text = get_message_by_name_for_user(name="helper_cant_buy_sub", telegram_id=user_id).text
+        keyboard = await ik.back_to_main_menu(callback_data=callback_data)
+
     await mw.try_edit_message(
         message=call.message,
         user_id=user_id,

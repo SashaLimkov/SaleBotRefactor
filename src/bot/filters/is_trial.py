@@ -58,11 +58,11 @@ class IsEndedSub(BoundFilter):
         match type(message):
             case types.Message:
                 user_id = message.from_user.id
-                days = await get_user_days(telegram_id=user_id)
-                return False if days > 0 else True
+                active = get_user_active_subscription(telegram_id=user_id)
+                return False if active else True
             case types.CallbackQuery:
                 user_id = message.message.chat.id
-                days = await get_user_days(telegram_id=user_id)
-                return False if days > 0 else True
+                active = get_user_active_subscription(telegram_id=user_id)
+                return False if active else True
             case _:
                 return False

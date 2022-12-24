@@ -17,6 +17,7 @@ select_channel = CallbackData("sc", "action", "date", "comp_or_post", "post_id",
 get_post_by_id = CallbackData("gpbic", "action", "date", "comp_or_post", "post_id")
 settings_menu = CallbackData("sm", "first_lvl", "second_lvl")
 sub_menu = CallbackData("sub_m", "first_lvl", "second_lvl")
+sub_menu_ended = CallbackData("sub_m_e", "first_lvl", "second_lvl")
 rates_menu = CallbackData("rates_m", "first_lvl", "second_lvl", "third_lvl")
 rate_for_helper_menu = CallbackData("rfhm", "first_lvl", "second_lvl", "rate_pk", "inviter_id")
 pay_menu = CallbackData("pay_m", "first_lvl", "second_lvl", "rate_pk")

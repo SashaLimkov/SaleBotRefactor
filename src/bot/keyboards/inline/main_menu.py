@@ -87,7 +87,7 @@ async def get_sub_menu(is_active: bool, is_helper: bool, callback_data: dict, en
             "row_width": 1,
         },
     )
-    if is_active:
+    if is_active and not ended_sub and not is_helper:
         keyboard.insert(
             await get_inline_button(
                 text="Купить подписку",
@@ -96,21 +96,30 @@ async def get_sub_menu(is_active: bool, is_helper: bool, callback_data: dict, en
                 ),
             )
         )
-        if not ended_sub:
-            keyboard.insert(
-                await get_inline_button(
-                    text="Добавить помощника",
-                    cd=cd.sub_menu.new(
-                        first_lvl=callback_data["action"], second_lvl=1
-                    ),
-                )
+        keyboard.insert(
+            await get_inline_button(
+                text="Добавить помощника",
+                cd=cd.sub_menu.new(
+                    first_lvl=callback_data["action"], second_lvl=1
+                ),
             )
+        )
+    elif ended_sub:
+        keyboard.insert(
+            await get_inline_button(
+                text="Купить подписку",
+                cd=cd.sub_menu_ended.new(
+                    first_lvl=callback_data["action"], second_lvl=0
+                ),
+            )
+        )
 
     keyboard.insert(
         await get_inline_button(
             text="◀ Назад",
             cd=cd.MAIN_MENU
         ))
+    print(keyboard)
     return keyboard
 
 

@@ -7,7 +7,7 @@ from bot.keyboards import inline as ik
 from bot.utils import message_worker as mw
 
 
-async def sub_or_add_helper_menu(call: types.CallbackQuery, callback_data: dict, state: FSMContext):
+async def sub_or_add_helper_menu(call: types.CallbackQuery, state: FSMContext, callback_data: dict = {}):
     data = await state.get_data()
     main_message_id = data.get("main_message_id", False)
     user_id = call.message.chat.id

@@ -33,7 +33,8 @@ def get_all_user_subscriptions(telegram_id: int) -> Optional[List[Subscription]]
         return Subscription.objects.filter(profile_id=telegram_id).all()
 
 
-def create_user_subscription(telegram_id: int, cheque: str, rate: str, helper_days: int = None) -> Subscription:
+def create_user_subscription(telegram_id: int, cheque: str, rate: str, helper_days: int = None,
+                             active: bool = True) -> Subscription:
     """Создает новую подписку пользователя"""
     rate = Rate.objects.get(name=rate)
     return Subscription.objects.create(
@@ -42,6 +43,7 @@ def create_user_subscription(telegram_id: int, cheque: str, rate: str, helper_da
         cheque=cheque,
         rate=rate,
         days_left=helper_days if helper_days else rate.count_day_sub,
+        active=active,
     )
 
 
