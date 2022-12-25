@@ -1,3 +1,7 @@
+import asyncio
+import unicodedata
+from html import unescape
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from apps.message.services.message import get_message_by_name_for_user
@@ -82,6 +86,7 @@ async def send_posts(call: types.CallbackQuery, callback_data: dict, state: FSMC
 
 async def send_post(post, channel_id: int, message: types.Message):
     text = post[0]
+    text = unicodedata.normalize('NFKC', unescape(text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
     media = post[1][0]
     media_type: int = media[0]
     media_path = media[1]
@@ -93,3 +98,4 @@ async def send_post(post, channel_id: int, message: types.Message):
         message=message,
         keyboard=None
     )
+    await asyncio.sleep(1)
