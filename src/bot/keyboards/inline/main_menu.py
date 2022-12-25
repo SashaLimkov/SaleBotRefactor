@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-async def get_main_menu(in_chat):
+async def get_main_menu(in_chat, is_helper):
     buttons = [
         {"text": value, "callback_data": cd.mm.new(action=index + 1)}
         for index, value in enumerate(ld.MAIN_MENU)
@@ -34,7 +34,7 @@ async def get_main_menu(in_chat):
             text="👩‍💻 поддержка бота", url="https://t.me/deva_v_brendax"
         )
     )
-    if not in_chat:
+    if not in_chat and not is_helper:
         keyboard.add(
             await get_inline_button(
                 text="👉 Доступ в канал 👈",

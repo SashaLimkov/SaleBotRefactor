@@ -248,12 +248,13 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
         await send_confirmed_message(chat_id=user_id, text=text)
         user_status = await bot.get_chat_member(chat_id=settings.CHANNEL, user_id=user_id)
         if user_status["status"] in ["member", "administrator"]:
+            print(user_status)
             user.in_chat = True
             user.save()
         await try_send_message(
             message=call.message,
             user_id=user_id,
             text=get_message_by_name_for_user("main_menu_message").text,
-            keyboard=await ik.get_main_menu(user.in_chat),
+            keyboard=await ik.get_main_menu(user.in_chat, user.is_helper),
             state=state
         )

@@ -9,7 +9,7 @@ from apps.profiles.models import Subscription, Rate, Profile
 from apps.utils.services.date_time import get_datetime_now
 from django.db.models import F
 
-from bot.utils.message_worker import notice_user
+from bot.utils.message_worker import notice_user, kick_user
 
 
 def get_user_active_subscription(telegram_id: int) -> Optional[Subscription]:
@@ -58,21 +58,28 @@ def decrement_number_of_days_left() -> None:
     """Декрементация количества дней подписки"""
     for user in Profile.objects.all():
         s = Subscription.objects.filter(active=True, profile__telegram_id=user.telegram_id).first()
+        old_active = True
         if s.days_left > 0:
             s.days_left -= 1
             s.save()
         if s.days_left == 0:
             s.active = False
+            old_active = False
         s.save()
+        new_active = False
         if not Subscription.objects.filter(active=False, days_left__gt=0,
                                            profile__telegram_id=user.telegram_id).all() and Subscription.objects.filter(
             active=True, profile__telegram_id=user.telegram_id, days_left=1).first():
             asyncio.run(notice_user(chat_id=user.telegram_id))
+            asyncio.run(notice_user(chat_id=user.telegram_id))
         if not Subscription.objects.filter(active=True, profile__telegram_id=user.telegram_id).all():
-            s = Subscription.objects.filter(active=False, days_left__gt=0,
-                                            profile__telegram_id=user.telegram_id).first()
-            s.active = True
-            s.save()
+            new_active = Subscription.objects.filter(active=False, days_left__gt=0,
+                                                     profile__telegram_id=user.telegram_id).first()
+            new_active.active = True
+            new_active.save()
+            new_active = True
+        if not new_active and not old_active:
+            asyncio.run(kick_user(chat_id=user.telegram_id))
 
 #
 # def turn_on_sub_with_days() -> None:

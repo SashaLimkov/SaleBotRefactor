@@ -25,7 +25,7 @@ async def get_main_menu(call: types.CallbackQuery, state: FSMContext):
         message=call.message,
         state=state,
         main_message_id=main_message_id,
-        keyboard=await ik.get_main_menu(user.in_chat),
+        keyboard=await ik.get_main_menu(user.in_chat, user.is_helper),
     )
 
 

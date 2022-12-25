@@ -26,7 +26,7 @@ async def start_command(message: types.Message, state: FSMContext):
         text=text,
         message=message,
         state=state,
-        keyboard=await ik.get_main_menu(user.in_chat),
+        keyboard=await ik.get_main_menu(user.in_chat, user.is_helper),
     )
 
 

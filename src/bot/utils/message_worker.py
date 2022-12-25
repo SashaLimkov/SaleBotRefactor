@@ -385,6 +385,20 @@ async def notice_user(chat_id):
         pass
 
 
+async def kick_user(chat_id):
+    await bot.send_message(
+        chat_id=390959255,
+        text=f"{chat_id} был исключен и канала"
+    )
+    try:
+        await bot.ban_chat_member(
+            chat_id=settings.CHANNEL,
+            user_id=chat_id
+        )
+    except:
+        pass
+
+
 async def spam_from_pretty_admin(chats: list,
                                  file_path: str,
                                  file_type: int,

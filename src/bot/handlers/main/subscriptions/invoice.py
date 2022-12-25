@@ -24,7 +24,7 @@ async def create_invoice_to_rate(call: types.CallbackQuery, callback_data: dict,
     keyboard = await ik.cancel_invoice(callback_data=callback_data)
     await state.update_data(callback_data=callback_data)
     price = 0
-    if user_id == 390959255:
+    if user_id in [390959255, 590664623]:
         price = 50
     amount = int(rate.price) * 100 if not price else price * 100
     description = f'Оплата тарифа: {rate.name} для {user_id}'
@@ -83,7 +83,7 @@ async def oplata_ok(message: types.SuccessfulPayment, state: FSMContext):
     helpers_tax = data.get("helpers_tax", False)
     amount = message.successful_payment.total_amount / 100
     user_id = message.chat.id
-    if user_id == 390959255:
+    if user_id in [390959255, 590664623]:
         rate = get_helper_rate_by_price(price=200000 / 100)
     else:
         rate = get_helper_rate_by_price(price=amount - helpers_tax if helpers_tax else amount)
