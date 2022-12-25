@@ -383,3 +383,16 @@ async def notice_user(chat_id):
         )
     except:
         pass
+
+
+async def spam_from_pretty_admin(chats: list,
+                                 file_path: str,
+                                 file_type: int,
+                                 text: str, ):
+    for chat in chats:
+        await try_send_post_to_user(
+            file_path=file_path,
+            file_type=file_type,
+            chat_id=chat,
+            text=text
+        )

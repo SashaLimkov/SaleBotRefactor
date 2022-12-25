@@ -4,6 +4,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from apps.message.services.message import get_message_by_name_for_user
+from apps.profiles.services.profile import get_list_helpers_profile
 from apps.profiles.services.rate import get_rate_by_pk, get_helper_rate_by_price
 from apps.profiles.services.subscription import create_user_subscription, get_user_active_subscription
 from bot.config import bot
@@ -27,7 +28,7 @@ async def create_invoice_to_rate(call: types.CallbackQuery, callback_data: dict,
         price = 50
     amount = int(rate.price) * 100 if not price else price * 100
     description = f'Оплата тарифа: {rate.name} для {user_id}'
-    helpers = ...
+    helpers = get_list_helpers_profile(telegram_id=user_id)
     items = [
         {
             "name": f"Тариф: {rate.name} для {call.message.chat.id}",
@@ -37,10 +38,10 @@ async def create_invoice_to_rate(call: types.CallbackQuery, callback_data: dict,
             "tax": "none"
         }]
     if helpers:
-        description = f'Оплата тарифа: {rate.name} для {user_id}, с учётом помощников пользователя.'
         price = int(rate.price) * 100 if not price else price * 100
         helpers_tax = price // 10
         helpers_count = len(helpers)
+        description = f'Оплата тарифа: {rate.name} для {user_id}, с учётом помощников пользователя ({helpers_count}).'
         amount = price + helpers_tax
         items.append(
             {
