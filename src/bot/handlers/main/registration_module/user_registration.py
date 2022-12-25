@@ -197,7 +197,7 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
         if user_id in all_users:
             user_days = all_users[user_id]
             print(user_days)
-            delta_days = datetime.date(2022, 12, 22) - datetime.date.today()
+            delta_days = datetime.date(2022, 12, 25) - datetime.date.today()
             user_days = user_days + delta_days.days
             print(user_days)
             if user_days < 0:

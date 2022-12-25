@@ -49,7 +49,8 @@ async def sender_anons(message: types.Message, state: FSMContext):
     )
     for post in posts:
         text = post[0]
-        text = unicodedata.normalize('NFKC', unescape(text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
+        text = unicodedata.normalize('NFKC', unescape(
+            text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
         media = post[1][0]
         post_pk = post[2]
         media_type: int = media[0]
@@ -96,7 +97,8 @@ async def send_compilation(compilation_id: int, chat_id: int, message: types.Mes
         compilation_file_path = watermark(compilation_file_path, settings.logo,
                                           settings.logo_position, settings.text_logo)
 
-    text = unicodedata.normalize('NFKC', unescape(compilation.text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
+    text = unicodedata.normalize('NFKC', unescape(
+        compilation.text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
     mes_id = await mw.try_send_post_to_user(
         file_path=compilation_file_path,
         file_type=compilation_file_type,
@@ -110,24 +112,26 @@ async def send_compilation(compilation_id: int, chat_id: int, message: types.Mes
 
 async def send_final_compilation(compilation_id: int, chat_id: int, message: types.Message, keyboard, user_id=None):
     final_compilation = get_final_compilation(compilation_id=compilation_id)
-    final_compilation_file = final_compilation.contents.first()
-    final_compilation_path = final_compilation_file.file.path
-    final_compilation_file_type = final_compilation_file.type
-    settings = get_settings(telegram_id=user_id or chat_id)
-    if (settings.logo or settings.text_logo) and final_compilation_file_type == 0:
-        final_compilation_path = watermark(final_compilation_path, settings.logo,
-                                           settings.logo_position, settings.text_logo)
+    if final_compilation:
+        final_compilation_file = final_compilation.contents.first()
+        final_compilation_path = final_compilation_file.file.path
+        final_compilation_file_type = final_compilation_file.type
+        settings = get_settings(telegram_id=user_id or chat_id)
+        if (settings.logo or settings.text_logo) and final_compilation_file_type == 0:
+            final_compilation_path = watermark(final_compilation_path, settings.logo,
+                                               settings.logo_position, settings.text_logo)
 
-    text = unicodedata.normalize('NFKC', unescape(final_compilation.text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
-    mes_id = await mw.try_send_post_to_user(
-        file_path=final_compilation_path,
-        file_type=final_compilation_file_type,
-        chat_id=chat_id,
-        text=f"{text}",
-        message=message,
-        keyboard=keyboard
-    )
-    return mes_id
+        text = unicodedata.normalize('NFKC', unescape(
+            final_compilation.text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
+        mes_id = await mw.try_send_post_to_user(
+            file_path=final_compilation_path,
+            file_type=final_compilation_file_type,
+            chat_id=chat_id,
+            text=f"{text}",
+            message=message,
+            keyboard=keyboard
+        )
+        return mes_id
 
 
 async def edit_is_send_post(call: types.CallbackQuery, callback_data: dict, state: FSMContext):
@@ -190,7 +194,8 @@ async def get_post_or_compilation(call: types.CallbackQuery, callback_data: dict
     if compilation:
         if compilation == 2:
             f_compilation = get_final_compilation(compilation_id=obj_id)
-            text = unicodedata.normalize('NFKC', unescape(f_compilation.text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
+            text = unicodedata.normalize('NFKC', unescape(
+                f_compilation.text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
             keyboard = await ik.get_compilations_menu(
                 callback_data=callback_data,
                 is_in=obj_id in data.get("send_compilation_list"),
@@ -199,7 +204,8 @@ async def get_post_or_compilation(call: types.CallbackQuery, callback_data: dict
             )
         else:
             compilation = get_compilation_by_id(compilation_id=obj_id)
-            text = unicodedata.normalize('NFKC', unescape(compilation.text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
+            text = unicodedata.normalize('NFKC', unescape(
+                compilation.text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
             keyboard = await ik.get_compilations_menu(
                 callback_data=callback_data,
                 is_in=obj_id in data.get("send_compilation_list"),

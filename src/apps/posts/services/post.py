@@ -91,7 +91,7 @@ def get_formatted_user_settings_posts_by_compilation_id(
     for post in posts:
         contents = []
         if not post.user_post.filter(profile_id=telegram_id):
-            post_text = post.compilation.name + "\n\n"
+            post_text = post.compilation.name + "\n\n" if post.items.all() else ""
             for item in post.items.all():
                 if settings.product_settings.name:
                     if settings.hided_link and channel == 0:
@@ -135,11 +135,13 @@ def get_formatted_user_settings_posts_by_compilation_id(
                     post_text += "\n"
                 if settings.product_settings.link:
                     if settings.link and channel == 0 and not settings.hided_link:
-                        post_text += f'<a href="{item.link}">Ссылка</a>'
+                        post_text += f'<a href="{item.link}">Ссылка</a>\n'
                     else:
-                        post_text += item.link
-                if settings.signature:
-                    post_text += "\n\n" + settings.signature
+                        post_text += item.link + "\n"
+                post_text += "\n"
+            if settings.signature and post.items.all():
+                post_text += "\n" + settings.signature + "\n"
+
             for content in post.contents.all():
                 if (settings.logo or settings.text_logo) and content.type == 0:
                     contents.append((0, watermark(content.file.path, settings.logo,
