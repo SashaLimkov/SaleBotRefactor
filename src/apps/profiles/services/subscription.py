@@ -23,6 +23,14 @@ def get_user_active_subscription(telegram_id: int) -> Optional[Subscription]:
         return Subscription.objects.filter(profile_id=telegram_id, active=True).first()
 
 
+def check_user_test_subscription(telegram_id: int) -> bool:
+    sub = get_user_active_subscription(telegram_id)
+    if sub:
+        if sub.rate.name == 'Пробный':
+            return True
+    return False
+
+
 def get_all_user_subscriptions(telegram_id: int) -> Optional[List[Subscription]]:
     profile = Profile.objects.get(telegram_id=telegram_id)
     if profile.is_helper:
@@ -58,27 +66,23 @@ def decrement_number_of_days_left() -> None:
     """Декрементация количества дней подписки"""
     for user in Profile.objects.all():
         s = Subscription.objects.filter(active=True, profile__telegram_id=user.telegram_id).first()
-        old_active = True
         if s.days_left > 0:
             s.days_left -= 1
             s.save()
         if s.days_left == 0:
             s.active = False
-            old_active = False
         s.save()
         new_active = False
         if not Subscription.objects.filter(active=False, days_left__gt=0,
                                            profile__telegram_id=user.telegram_id).all() and Subscription.objects.filter(
             active=True, profile__telegram_id=user.telegram_id, days_left=1).first():
             asyncio.run(notice_user(chat_id=user.telegram_id))
-            asyncio.run(notice_user(chat_id=user.telegram_id))
         if not Subscription.objects.filter(active=True, profile__telegram_id=user.telegram_id).all():
             new_active = Subscription.objects.filter(active=False, days_left__gt=0,
                                                      profile__telegram_id=user.telegram_id).first()
             new_active.active = True
             new_active.save()
-            new_active = True
-        if not new_active and not old_active:
+        if not new_active and not s.active:
             asyncio.run(kick_user(chat_id=user.telegram_id))
 
 #

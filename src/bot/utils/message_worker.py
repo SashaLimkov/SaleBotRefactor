@@ -264,6 +264,15 @@ async def try_send_post_with_photo(
                 reply_markup=keyboard
             )
         return mes.message_id
+    except exceptions.RetryAfter as e:
+        await asyncio.sleep(e.timeout)
+        await try_send_post_with_photo(
+            file_path=file_path,
+            chat_id=chat_id,
+            text=text,
+            message=message,
+            keyboard=keyboard,
+            message_id=message_id)
     except Exception:
         await notice_programmers(
             exception_info=traceback.format_exc(), **message.from_user.to_python()
@@ -301,6 +310,15 @@ async def try_send_post_with_video(
                 reply_markup=keyboard
             )
         return mes.message_id
+    except exceptions.RetryAfter as e:
+        await asyncio.sleep(e.timeout)
+        await try_send_post_with_video(
+            file_path=file_path,
+            chat_id=chat_id,
+            text=text,
+            message=message,
+            keyboard=keyboard,
+            message_id=message_id)
     except Exception:
         await notice_programmers(
             exception_info=traceback.format_exc(), **message.from_user.to_python()
@@ -386,14 +404,18 @@ async def notice_user(chat_id):
 
 
 async def kick_user(chat_id):
-    await bot.send_message(
-        chat_id=390959255,
-        text=f"{chat_id} был исключен и канала"
-    )
     try:
         await bot.ban_chat_member(
             chat_id=settings.CHANNEL,
             user_id=chat_id
+        )
+        await bot.send_message(
+            chat_id=878849282,
+            text=f"{chat_id} был исключен и канала."
+        )
+        await bot.send_message(
+            chat_id=390959255,
+            text=f"{chat_id} был исключен и канала."
         )
     except:
         pass

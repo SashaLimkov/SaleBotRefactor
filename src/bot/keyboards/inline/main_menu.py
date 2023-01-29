@@ -1,3 +1,4 @@
+from apps.profiles.services.subscription import check_user_test_subscription
 from bot.utils.datetime_helper import get_datetime
 from bot.utils.keyboard_utils.base_keyboard_utils import (
     get_base_keyboard,
@@ -15,7 +16,7 @@ __all__ = [
 ]
 
 
-async def get_main_menu(in_chat, is_helper):
+async def get_main_menu(in_chat, is_helper, user_id):
     buttons = [
         {"text": value, "callback_data": cd.mm.new(action=index + 1)}
         for index, value in enumerate(ld.MAIN_MENU)
@@ -34,7 +35,7 @@ async def get_main_menu(in_chat, is_helper):
             text="👩‍💻 поддержка бота", url="https://t.me/deva_v_brendax"
         )
     )
-    if not in_chat and not is_helper:
+    if not in_chat and not check_user_test_subscription(telegram_id=user_id):
         keyboard.add(
             await get_inline_button(
                 text="👉 Доступ в канал 👈",

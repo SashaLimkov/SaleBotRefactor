@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -16,6 +17,8 @@ from bot.states.Posts import PostStates
 from bot.utils import message_worker as mw
 from html import unescape
 import unicodedata
+
+from bot.utils.notice_programmers import notice_programmers
 
 
 async def sender_anons(message: types.Message, state: FSMContext):
@@ -43,28 +46,42 @@ async def sender_anons(message: types.Message, state: FSMContext):
                                          keyboard=await ik.get_compilations_menu(callback_data=callback_data,
                                                                                  post_id=compilation_id, is_in=True))
     delete_messages_list.append(comp_mes_id)
-    posts = get_formatted_user_settings_posts_by_compilation_id(
-        compilation_id=compilation_id,
-        telegram_id=user_id
-    )
-    for post in posts:
-        text = post[0]
-        text = unicodedata.normalize('NFKC', unescape(
-            text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
-        media = post[1][0]
-        post_pk = post[2]
-        media_type: int = media[0]
-        media_path = media[1]
-        mes_id = await mw.try_send_post_to_user(
-            file_path=media_path,
-            file_type=media_type,
-            chat_id=user_id,
-            text=text,
-            message=message,
-            keyboard=await ik.get_post_menu(callback_data=callback_data, post_id=post_pk, is_in=True)
+    if get_profile_is_helper(user_id):
+        helper = get_profile_by_telegram_id(user_id)
+        inviting_user = helper.inviting_user.telegram_id
+        posts = get_formatted_user_settings_posts_by_compilation_id(
+            compilation_id=compilation_id,
+            telegram_id=inviting_user
         )
-        delete_messages_list.append(mes_id)
-        send_post_pk_list.append(post_pk)
+    else:
+        posts = get_formatted_user_settings_posts_by_compilation_id(
+            compilation_id=compilation_id,
+            telegram_id=user_id
+        )
+    for post in posts:
+        try:
+            text = post[0]
+            text = unicodedata.normalize('NFKC', unescape(
+                text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
+            media = post[1][0]
+            post_pk = post[2]
+            media_type: int = media[0]
+            media_path = media[1]
+            mes_id = await mw.try_send_post_to_user(
+                file_path=media_path,
+                file_type=media_type,
+                chat_id=user_id,
+                text=text,
+                message=message,
+                keyboard=await ik.get_post_menu(callback_data=callback_data, post_id=post_pk, is_in=True)
+            )
+            delete_messages_list.append(mes_id)
+            send_post_pk_list.append(post_pk)
+        except:
+            await notice_programmers(
+                exception_info=traceback.format_exc(),
+                **message.chat.to_python()
+            )
 
     final_comp_mes_id = await send_final_compilation(
         compilation_id=compilation_id, chat_id=user_id, message=message,
@@ -73,6 +90,8 @@ async def sender_anons(message: types.Message, state: FSMContext):
                                                 comp_or_post=2)
     )
     delete_messages_list.append(final_comp_mes_id)
+    if get_profile_is_helper(user_id):
+        done += "\n!!!ВНИМАНИЕ!!! выгрузка в канал будет происходить с учетом настроек пригласившего вас пользователя."
     done_mes = await mw.try_send_message(
         message=message,
         user_id=user_id,
@@ -103,7 +122,7 @@ async def send_compilation(compilation_id: int, chat_id: int, message: types.Mes
         file_path=compilation_file_path,
         file_type=compilation_file_type,
         chat_id=chat_id,
-        text=f"{compilation.name}\n\n{text}",
+        text=f"{text}",
         message=message,
         keyboard=keyboard
     )
@@ -212,12 +231,23 @@ async def get_post_or_compilation(call: types.CallbackQuery, callback_data: dict
                 post_id=obj_id
             )
     else:
-        posts = get_formatted_user_settings_posts_by_compilation_id(compilation_id=data.get("compilation_id"),
-                                                                    telegram_id=user_id, )
+        if get_profile_is_helper(user_id):
+            helper = get_profile_by_telegram_id(user_id)
+            inviting_user = helper.inviting_user.telegram_id
+            posts = get_formatted_user_settings_posts_by_compilation_id(
+                compilation_id=data.get("compilation_id"),
+                telegram_id=inviting_user
+            )
+        else:
+            posts = get_formatted_user_settings_posts_by_compilation_id(
+                compilation_id=data.get("compilation_id"),
+                telegram_id=user_id
+            )
         text = "ERROR"
         for post in posts:
             if post[-1] == obj_id:
                 text = post[0]
+                print(post)
                 break
         keyboard = await ik.get_post_menu(
             callback_data=callback_data,

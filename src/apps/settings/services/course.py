@@ -22,6 +22,10 @@ def add_or_update_course_user(
     currency_name: str, telegram_id: int, value: float
 ) -> CourseUser:
     """Создает или обновляет курс пользователя"""
-    return CourseUser.objects.get_or_create(
-        currency_id=currency_name, profile_id=telegram_id, defaults={"value": value}
-    )
+    course = CourseUser.objects.filter(currency_id=currency_name, profile_id=telegram_id).first()
+    if not course:
+        course = CourseUser.objects.create(currency_id=currency_name, profile_id=telegram_id, value=value)
+    else:
+        course.value = value
+        course.save()
+    return course

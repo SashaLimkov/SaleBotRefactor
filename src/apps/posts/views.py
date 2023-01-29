@@ -16,7 +16,7 @@ from django_celery_beat.models import PeriodicTask, IntervalSchedule
 
 from apps.posts.services.compilation import get_search_compilations_queryset, get_all_compilation_queryset, \
     get_content_compilation_queryset, get_date_range_compilation_filter, create_compilation, update_compilation, \
-    create_final_compilation, update_or_create_final_compilation, delete_final_compilation
+    create_final_compilation, update_or_create_final_compilation, delete_final_compilation, get_compilation_by_id
 from apps.posts.models import Compilation, Content, FinalCompilation, Post, Item
 
 from django.core.paginator import Paginator
@@ -148,8 +148,8 @@ class FinalCompilationSaveView(LoginRequiredMixin, View):
                     to='final_compilation',
                     to_id=final_compilation.pk
                 )
+            text = unicodedata.normalize('NFKC', unescape(final_compilation.text.replace('<br>', '\n')))
             if final_compilation.message_id:
-                text = unicodedata.normalize('NFKC', unescape(final_compilation.text.replace('<br>', '\n')))
                 if content[0]:
                     asyncio.run(try_send_post_to_user(
                         file_path=content[0].file.path,
@@ -158,7 +158,15 @@ class FinalCompilationSaveView(LoginRequiredMixin, View):
                         chat_id=settings.CHANNEL,
                         message_id=final_compilation.message_id,
                     ))
-                asyncio.run(try_edit_message_caption(settings.CHANNEL, text, final_compilation.message_id, None))
+                # asyncio.run(try_edit_message_caption(settings.CHANNEL, text, final_compilation.message_id, None))
+            elif get_compilation_by_id(pk).message_id:
+                final_compilation.message_id = asyncio.run(try_send_post_to_user(
+                        file_path=content[0].file.path,
+                        file_type=content[0].type,
+                        text=text,
+                        chat_id=settings.CHANNEL,
+                    ))
+                final_compilation.save()
         else:
             try:
                 final_compilation = FinalCompilation.objects.get(pk=pk)
@@ -311,7 +319,7 @@ class PostCreateView(LoginRequiredMixin, View):
 
         create_log(request.user, 0, post)
 
-        post = post.pk
+        post_id = post.pk
 
         list_values_add = []
         for key in request.POST.keys():
@@ -326,20 +334,30 @@ class PostCreateView(LoginRequiredMixin, View):
             description = request.POST['description_add_' + index]
             price_old = request.POST['price_old_add_' + index]
             price_new = request.POST['price_new_add_' + index] if request.POST['price_new_add_' + index] else None
-            create_item(post, name, link, sizes, description, price_old, price_new)
+            create_item(post_id, name, link, sizes, description, price_old, price_new)
 
         format_file = str(request.FILES.get('media')).split('.')[-1]
         if format_file.lower() in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
             type_content = 0
         else:
             type_content = 1
-        update_or_create_content(
+        content = update_or_create_content(
             file_name=str(request.FILES.get('media')),
             file=request.FILES.get('media'),
             type_content=type_content,
             to='post',
-            to_id=post
+            to_id=post_id
         )
+
+        if get_compilation_by_id(compilation).message_id:
+            text = get_post_text(post)
+            post.message_id = asyncio.run(try_send_post_to_user(
+                file_path=content[0].file.path,
+                file_type=type_content,
+                text=text,
+                chat_id=settings.CHANNEL,
+            ))
+            post.save()
 
         return redirect('compilation_detail', pk=compilation)
 

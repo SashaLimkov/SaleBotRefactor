@@ -1,4 +1,5 @@
 import asyncio
+from dataclasses import dataclass
 
 from django.shortcuts import render
 
@@ -16,6 +17,7 @@ from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
 from django.contrib import admin, messages
 
+from bot.config import all_users
 from bot.utils.message_worker import spam_machine
 
 
@@ -83,6 +85,14 @@ class ProfileMetricInline(NestedStackedInline):
     extra = 0
 
 
+@dataclass
+class UserToSpam:
+    username: str
+    full_name: str
+    pk: str
+    telegram_id: int
+
+
 class ProfileAdmin(NestedModelAdmin):
     inlines = [
         SettingsUserInline,
@@ -96,6 +106,7 @@ class ProfileAdmin(NestedModelAdmin):
     list_filter = (UsersFilter,)
     actions = [
         "send_messages",
+        "send_messages_to_not_reg",
     ]
     loop = asyncio.new_event_loop()
 
@@ -123,7 +134,39 @@ class ProfileAdmin(NestedModelAdmin):
             },
         )
 
-    send_messages.short_description = "Рассылка сообщения"
+    def send_messages_to_not_reg(self, request, queryset):
+        chats = []
+        for index, chat in enumerate(all_users.keys()):
+            if all_users[chat] > 0 and not Profile.objects.filter(telegram_id=chat).first():
+                chats.append(
+                    UserToSpam(
+                        username=chat,
+                        full_name=' ',
+                        pk=str(index),
+                        telegram_id=chat
+                    )
+                )
+        if "message" in request.POST:
+            form = MessageForm(request.POST)
+            if form.is_valid():
+                message = form.cleaned_data["message"]
+                messages.success(request, "Рассылка сообщений началась")
+                self.loop.run_until_complete(spam_machine(message, chats))
+                messages.success(request, "Рассылка сообщений завершилась")
+                return
+        else:
+            form = MessageForm()
+        return render(
+            request,
+            "action_send_message.html",
+            {
+                "title": "Написать не перешедшим в нового бота",
+                "chats": chats,
+                "form": form,
+            },
+        )
+
+    send_messages_to_not_reg.short_description = "Написать не перешедшим в нового бота"
 
 
 admin.site.register(Profile, ProfileAdmin)

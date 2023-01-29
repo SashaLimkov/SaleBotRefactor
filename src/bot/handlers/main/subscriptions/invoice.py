@@ -99,7 +99,7 @@ async def oplata_ok(message: types.SuccessfulPayment, state: FSMContext):
             telegram_id=user_id,
             cheque=rate.description,
             rate=rate.name,
-            active=True if user_rate is None else False,
+            active=False if user_rate else True,
         )
         user_rate = get_user_active_subscription(telegram_id=user_id)
         expire_date = datetime.now() + timedelta(days=user_rate.days_left)

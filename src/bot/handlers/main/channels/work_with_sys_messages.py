@@ -8,6 +8,7 @@ from apps.message.services.message import get_message_by_name_for_user
 from apps.profiles.services.profile import get_profile_by_telegram_id, get_profile_is_helper
 from apps.profiles.services.subscription import get_user_active_subscription
 from apps.settings.services.chanel import delete_channel_telegram, add_channel_telegram, get_list_telegram_channels
+from bot.config import bot
 from bot.states.MainMenu import MainMenu
 from bot.utils import message_worker as mw
 from bot.keyboards import inline as ik
@@ -43,4 +44,9 @@ async def fix_my_chats(update: types.ChatMemberUpdated):
                 telegram_id=user_id,
                 name=update.chat.full_name,
                 channel_id=channel_id
+            )
+        else:
+            await bot.send_message(
+                chat_id=user_id,
+                text="Помощники не могут добавлять бота в канал, попросите об этом пригласившего вас человека"
             )

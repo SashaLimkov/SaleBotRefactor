@@ -36,6 +36,8 @@ def create_user(
     add_product_settings(settings.id)
     sub = create_user_subscription(telegram_id, "Старт пробной подписки" if not cheque else cheque,
                                    "Пробный" if not rate else rate, helper_days=helper_days)
+    if days_left == 0:
+        return profile
     if days_left:
         sub.days_left += days_left - 30
         sub.save()
@@ -72,7 +74,6 @@ def get_profile_by_telegram_id(telegram_id: int) -> Profile:
 def get_profile_is_helper(telegram_id: int) -> bool:
     """Проверяет, является ли пользователь помощником"""
     return Profile.objects.filter(telegram_id=telegram_id).first().is_helper
-
 
 
 def update_last_action_date_profile(telegram_id: int) -> None:
@@ -142,3 +143,8 @@ def get_inviting_user_profile(telegram_id: int) -> Profile:
 def get_list_helpers_profile(telegram_id: int) -> Union[QuerySet, List[Profile]]:
     """Возвращает список всех помощников пользователя"""
     return Profile.objects.get(telegram_id=telegram_id).profile_set.all()
+
+
+def get_all_profiles():
+    return Profile.objects.all()
+

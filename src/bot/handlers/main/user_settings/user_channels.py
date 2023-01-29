@@ -2,6 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from apps.message.services.message import get_message_by_name_for_user
+from apps.profiles.services.profile import get_profile_is_helper, get_profile_by_telegram_id
 from apps.settings.services.chanel import get_list_telegram_channels
 from bot.utils import message_worker as mw
 from apps.settings.services.settings_user import update_field_settings
@@ -29,6 +30,10 @@ async def get_tg_channels_and_instructions(
 
 
 async def get_tg_channels_list_text(telegram_id: int) -> str:
+    if get_profile_is_helper(telegram_id=telegram_id):
+        helper = get_profile_by_telegram_id(telegram_id=telegram_id)
+        inviter = get_profile_by_telegram_id(telegram_id=helper.telegram_id)
+        telegram_id=inviter.telegram_id
     tg_channels = get_list_telegram_channels(telegram_id=telegram_id)
     channel_list = ""
     for channel in tg_channels:

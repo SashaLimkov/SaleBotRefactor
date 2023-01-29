@@ -121,11 +121,14 @@ async def check_wrote_currency_value(message: types.Message, state: FSMContext):
     callback_data = data.get("callback_data")
     if await is_float_number(value):
         value = float(value.replace(",", "."))
-        add_or_update_course_user(
+        print(value)
+        print(float("%.2f" % value))
+        r = add_or_update_course_user(
             currency_name=callback_data["selected_cur"],
             telegram_id=user_id,
             value=float("%.2f" % value),
         )
+        print(r)
         await MainMenu.MAIN_MENU.set()
         custom_cur = await get_custom_currency_info(telegram_id=user_id)
         text = get_message_by_name_for_user(

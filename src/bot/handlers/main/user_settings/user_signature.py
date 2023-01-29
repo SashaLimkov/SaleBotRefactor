@@ -2,6 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from apps.message.services.message import get_message_by_name_for_user
+from bot.states.MainMenu import MainMenu
 from bot.states.Signature import Signature
 from bot.utils import message_worker as mw
 from apps.settings.services.settings_user import update_field_settings, get_settings
@@ -50,6 +51,7 @@ async def user_signature_menu(
 
 async def set_user_signature(message: types.Message, state: FSMContext):
     data = await state.get_data()
+    await MainMenu.MAIN_MENU.set()
     main_message_id = data.get("main_message_id", False)
     user_id = message.chat.id
     signature = message.parse_entities()

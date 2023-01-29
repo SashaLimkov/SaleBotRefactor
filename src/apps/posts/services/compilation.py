@@ -34,9 +34,9 @@ def get_search_compilations_queryset(search: str, filter_date: Q) -> Union[Query
 def get_all_compilation_queryset(filter_date: Q) -> Union[QuerySet, List[Compilation]]:
     """Получить QuerySet пользователей"""
     if filter_date:
-        return Compilation.objects.filter(filter_date).prefetch_related('contents')
+        return Compilation.objects.filter(filter_date).prefetch_related('contents').order_by('-datetime_send')
     else:
-        return Compilation.objects.all().prefetch_related('contents')
+        return Compilation.objects.all().prefetch_related('contents').order_by('-datetime_send')
 
 
 def get_date_range_compilation_filter(date_start: Optional[datetime.date],
@@ -48,8 +48,11 @@ def get_date_range_compilation_filter(date_start: Optional[datetime.date],
 def get_content_compilation_queryset(queryset: QuerySet) -> Union[QuerySet, List[Compilation]]:
     """Привязать поле с контентом к существующему QuerySet"""
     for item in queryset:
-        if item.contents.all():
-            item.media = item.contents.all()[0].file
+        try:
+            if item.contents.all():
+                item.media = item.contents.all()[0].file
+        except:
+            pass
     return queryset
 
 

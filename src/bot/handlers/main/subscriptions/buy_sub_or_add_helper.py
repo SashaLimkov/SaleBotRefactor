@@ -9,6 +9,7 @@ from bot.utils import message_worker as mw
 
 async def sub_or_add_helper_menu(call: types.CallbackQuery, state: FSMContext, callback_data: dict = {}):
     data = await state.get_data()
+    print(13123123123123)
     main_message_id = data.get("main_message_id", False)
     user_id = call.message.chat.id
     user_action = int(callback_data["second_lvl"])

@@ -32,6 +32,10 @@ def setup(dp: Dispatcher):
         content_types=types.ContentTypes.CONTACT,
         state=UserRegistration.PHONE_NUMBER,
     )
+    dp.register_message_handler(
+        user_registration.get_user_phone,
+        state=UserRegistration.PHONE_NUMBER,
+    )
     dp.register_callback_query_handler(
         user_registration.confirm_data,
         filters.Text(cd.DONE_REGISTRATION),

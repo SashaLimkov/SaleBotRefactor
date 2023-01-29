@@ -25,7 +25,7 @@ class Command(BaseCommand):
             PeriodicTask.objects.create(
                 name="Repeat Update Subscription",
                 task="repeat_update_subscriptions",
-                interval=IntervalSchedule.objects.get_or_create(every=10, period=IntervalSchedule.SECONDS)[0],#interval[0],
+                interval=interval[0],#interval[0],
                 start_time=timezone.now(),
             )
 

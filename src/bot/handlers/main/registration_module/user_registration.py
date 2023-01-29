@@ -126,7 +126,7 @@ async def get_user_fio(message: types.Message, state: FSMContext):
 
 
 async def get_user_phone(message: types.Message, state: FSMContext):
-    await state.update_data({"phone": message.contact.phone_number})
+    await state.update_data({"phone": message.contact.phone_number if message.contact else message.text})
     await message.delete()
     await get_registration_menu(message=message, state=state)
 
@@ -197,12 +197,14 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
         if user_id in all_users:
             user_days = all_users[user_id]
             print(user_days)
+            if user_days > 0:
+                user_days += 4
             delta_days = datetime.date(2022, 12, 25) - datetime.date.today()
             user_days = user_days + delta_days.days
             print(user_days)
-            if user_days < 0:
+            if user_days <= 0:
                 user_days = 0
-            if all_users[user_id] > 3:
+            if all_users[user_id] >= 0:
                 rate = get_rate_by_pk(2)
                 user = create_user(
                     telegram_id=user_id,
@@ -255,6 +257,6 @@ async def confirm_data(call: types.CallbackQuery, state: FSMContext):
             message=call.message,
             user_id=user_id,
             text=get_message_by_name_for_user("main_menu_message").text,
-            keyboard=await ik.get_main_menu(user.in_chat, user.is_helper),
+            keyboard=await ik.get_main_menu(user.in_chat, user.is_helper, user.telegram_id),
             state=state
         )

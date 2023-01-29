@@ -15,6 +15,7 @@ class ProductSettings(TimeBasedModel):
     link = models.BooleanField("Ссылка", default=True)
     name = models.BooleanField("Название", default=True)
     price = models.BooleanField("Цена", default=True)
+    # old_price = models.BooleanField("Старая цена", default=True)
     discount = models.BooleanField("Скидка", default=True)
     sizes = models.BooleanField("Размеры", default=True)
     description = models.BooleanField("Описание", default=True)

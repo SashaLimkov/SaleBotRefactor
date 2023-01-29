@@ -13,6 +13,7 @@ from bot.utils.rounder import round_num_to
 
 def get_posts_by_compilation_id(compilation_id: int) -> Union[QuerySet, List[Post]]:
     """Возвращает QuerySet постов по id подборки"""
+
     return (
         Post.objects.filter(compilation_id=compilation_id)
             .select_related("compilation", "shop")
@@ -24,24 +25,24 @@ def get_post_text(post):
     post_text = post.shop.name + "\n\n"
     for item in post.items.all():
         post_text += item.name + "\n" if item.name else ''
-        post_text += item.sizes + "\n" if item.sizes else ''
-        post_text += item.description + "\n" if item.description else ''
         price_old = item.price_old
         price_new = item.price_new
         if price_new:
             post_text += f"<b><s>{price_old}{post.shop.currency.sign}</s></b>"
             post_text += f"<b>➡️{price_new}{post.shop.currency.sign}</b>"
         else:
-            post_text += f"<b>{price_old}{post.shop.currency}</b>"
-
+            post_text += f"<b>{price_old}{post.shop.currency.sign}</b>"
         post_text += '\n'
+
+        post_text += item.sizes + "\n" if item.sizes else ''
+        post_text += item.description + "\n" if item.description else ''
         post_text += f'{item.link}\n'
     return post_text
 
 
 def get_formatted_channel_posts_by_compilation_id(compilation_id: int) -> list:
     """Возвращает список с сформированным текстом для постов"""
-    posts = get_posts_by_compilation_id(compilation_id)
+    posts = get_posts_by_compilation_id(compilation_id).order_by('created_at')
     result = []
     for index, post in enumerate(posts):
         contents = None
@@ -57,26 +58,28 @@ def get_formatted_posts_by_compilation_id(
         compilation_id: int,
 ) -> list:
     """Возвращает список с дополнительными полями (сформированный текст и контент)"""
-    posts = get_posts_by_compilation_id(compilation_id)
+    posts = get_posts_by_compilation_id(compilation_id).order_by('-created_at')
     result = []
     for index, post in enumerate(posts):
         contents = None
         post_text = post.shop.name + "<br><br>"
         for item in post.items.all():
             post_text += item.name + "<br>" if item.name else ''
-            post_text += item.sizes + "<br>" if item.sizes else ''
-            post_text += item.description + "<br>" if item.description else ''
             price_old = item.price_old
             price_new = item.price_new
             if price_new:
-                post_text += f"<b><s>{price_old}{post.shop.currency}</s></b>"
-                post_text += f"➡️<b>{price_new}{post.shop.currency}</b>"
+                post_text += f"<b><s>{price_old}{post.shop.currency.sign}</s></b>"
+                post_text += f"➡️<b>{price_new}{post.shop.currency.sign}</b>"
             else:
-                post_text += f"<b>{price_old}{post.shop.currency}</b>"
+                post_text += f"<b>{price_old}{post.shop.currency.sign}</b>"
+            post_text += '<br>'
+
+            post_text += item.sizes + "<br>" if item.sizes else ''
+            post_text += item.description + "<br>" if item.description else ''
             post_text += f'<a href="{item.link}">{item.link}</a><br>'
         for content in post.contents.all():
             contents = {'url': content.file.url, 'type': content.type}
-        result.append({'text': post_text, 'content': contents, 'pk': post.pk, 'obj': post, 'id': index + 1})
+        result.append({'text': post_text, 'content': contents, 'pk': post.pk, 'obj': post, 'id': len(posts) - index})
     return result
 
 
@@ -85,23 +88,19 @@ def get_formatted_user_settings_posts_by_compilation_id(
 ) -> List[Tuple[str, List[Tuple[str, str]]]]:
     """Возвращает посты на основе настроек пользователя в формате Tuple['текст поста', Tuple['список медиа']]
     Аргумент channel, принимает значение 0 - отправка в TG и 1 - отправка в ВК"""
-    posts = get_posts_by_compilation_id(compilation_id)
+    posts = get_posts_by_compilation_id(compilation_id).order_by('created_at')
     settings = get_settings(telegram_id)
     result_user_list = []
     for post in posts:
         contents = []
         if not post.user_post.filter(profile_id=telegram_id):
-            post_text = post.compilation.name + "\n\n" if post.items.all() else ""
+            post_text = post.shop.name + "\n\n" if post.items.all() else ""
             for item in post.items.all():
                 if settings.product_settings.name:
                     if settings.hided_link and channel == 0:
                         post_text += f'<a href="{item.link}">{item.name}</a>\n'
                     else:
                         post_text += item.name + "\n"
-                if settings.product_settings.sizes:
-                    post_text += item.sizes + "\n" if item.sizes else ''
-                if settings.product_settings.description:
-                    post_text += item.description + "\n" if item.description else ''
                 if settings.product_settings.price:
                     price_new = (0 if not item.price_new else round(float(item.price_new), 2))
                     price_old = round(float(item.price_old), 2)
@@ -133,10 +132,15 @@ def get_formatted_user_settings_posts_by_compilation_id(
                         post_text += f"<b>{price_old}{sign}</b>"
 
                     post_text += "\n"
+                if settings.product_settings.sizes:
+                    post_text += item.sizes + "\n" if item.sizes else ''
+                if settings.product_settings.description:
+                    post_text += item.description + "\n" if item.description else ''
+
                 if settings.product_settings.link:
                     if settings.link and channel == 0 and not settings.hided_link:
                         post_text += f'<a href="{item.link}">Ссылка</a>\n'
-                    else:
+                    elif not settings.hided_link:
                         post_text += item.link + "\n"
                 post_text += "\n"
             if settings.signature and post.items.all():

@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 import unicodedata
 from html import unescape
 
@@ -11,6 +12,7 @@ from apps.profiles.services.profile import get_profile_is_helper, get_profile_by
 from bot.handlers.main.posts.posts import send_compilation, send_final_compilation
 from bot.utils import message_worker as mw, deleter
 from bot.keyboards import inline as ik
+from bot.utils.notice_programmers import notice_programmers
 
 
 async def send_posts(call: types.CallbackQuery, callback_data: dict, state: FSMContext):
@@ -66,8 +68,14 @@ async def send_posts(call: types.CallbackQuery, callback_data: dict, state: FSMC
                         user_id=user_id,
                     )
                 for post in posts:
-                    if post[2] in send_post_pk_list:
-                        await send_post(post=post, channel_id=channel_id, message=call.message)
+                    try:
+                        if post[2] in send_post_pk_list:
+                            await send_post(post=post, channel_id=channel_id, message=call.message)
+                    except:
+                        await notice_programmers(
+                            exception_info=traceback.format_exc(),
+                            **call.message.chat.to_python()
+                        )
 
                 if get_final_compilation(compilation_id=compilation_id):
                     await send_final_compilation(
@@ -79,14 +87,21 @@ async def send_posts(call: types.CallbackQuery, callback_data: dict, state: FSMC
                     )
             else:
                 for post in posts:
-                    if post[-1] == obj_id:
-                        await send_post(post=post, channel_id=channel_id, message=call.message)
-                        break
+                    try:
+                        if post[-1] == obj_id:
+                            await send_post(post=post, channel_id=channel_id, message=call.message)
+                            break
+                    except:
+                        await notice_programmers(
+                            exception_info=traceback.format_exc(),
+                            **call.message.chat.to_python()
+                        )
 
 
 async def send_post(post, channel_id: int, message: types.Message):
     text = post[0]
-    text = unicodedata.normalize('NFKC', unescape(text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
+    text = unicodedata.normalize('NFKC', unescape(
+        text.replace('<br>', '\n').replace('<br />\n<br />', '\n').replace('<br />', '')))
     media = post[1][0]
     media_type: int = media[0]
     media_path = media[1]

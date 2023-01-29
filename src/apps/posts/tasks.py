@@ -1,3 +1,5 @@
+import time
+
 from celery import shared_task
 
 from bot.handlers.main.posts.posts import send_final_compilation
@@ -24,6 +26,8 @@ def time_send_post():
         for post in posts:
             post[2].message_id = asyncio.run(try_send_post_to_user(post[1][0][1], post[1][0][0], settings.CHANNEL, post[0]))
             post[2].save()
+
+            time.sleep(1)
 
         final = get_final_compilation(compilation_id=compilation.id)
         if final:
